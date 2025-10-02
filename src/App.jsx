@@ -6,8 +6,10 @@ import OutputMode from './components/OutputMode';
 import AdminPanel from './components/AdminPanel';
 
 function App() {
+  const basename = process.env.NODE_ENV === 'production' ? '/simpleInfo' : '';
+  
   return (
-    <Router>
+    <Router basename={basename}>
       <div className="app">
         <Routes>
           <Route path="/" element={<MainScreen />} />

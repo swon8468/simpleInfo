@@ -15,8 +15,13 @@
 }
 
 .monitor-icon {
-  font-size: 4rem;
   margin-bottom: 20px;
+}
+
+.monitor-icon img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
 }
 
 .school-name {

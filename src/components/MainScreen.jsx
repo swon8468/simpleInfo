@@ -89,7 +89,9 @@ function MainScreen() {
 
   return (
     <div className="main-screen">
-      <div className="monitor-icon">🖥️</div>
+      <div className="monitor-icon">
+        <img src="/logo.png" alt="학교 로고" />
+      </div>
       <h1 className="school-name">광주동신여자고등학교</h1>
       <h2 className="app-title">학교생활도우미</h2>
       
