@@ -15,11 +15,13 @@ function OutputMeal({ controlData }) {
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + daysOffset);
         
+        // 날짜를 YYYY-MM-DD 형식으로 변환
         const year = targetDate.getFullYear();
-        const month = targetDate.getMonth() + 1;
-        const day = targetDate.getDate();
+        const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+        const day = String(targetDate.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
         
-        const meals = await DataService.getMealData(year, month, day);
+        const meals = await DataService.getMealData(dateString);
         setMealData(meals);
         setCurrentDate(targetDate);
       } catch (error) {
