@@ -8,6 +8,8 @@ function OutputLoading() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let unsubscribe = null;
+    
     const initializeConnection = async () => {
       try {
         const outputSessionId = sessionStorage.getItem('outputSessionId');
@@ -17,7 +19,7 @@ function OutputLoading() {
           setPin(pin);
           
           // 제어용 기기 연결 대기
-          const unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
+          unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
             console.log('OutputLoading: 연결 상태 확인:', data);
             
             // connectedControlSession이 있으면 연결된 것으로 간주
@@ -26,11 +28,6 @@ function OutputLoading() {
               navigate('/output/main');
             }
           });
-          
-          // 컴포넌트 언마운트 시 정리
-          return () => {
-            unsubscribe();
-          };
         } else {
           console.error('OutputLoading: 세션 정보가 없습니다.');
           navigate('/');
@@ -42,6 +39,13 @@ function OutputLoading() {
     };
     
     initializeConnection();
+    
+    // 컴포넌트 언마운트 시 정리
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [navigate]);
 
   return (

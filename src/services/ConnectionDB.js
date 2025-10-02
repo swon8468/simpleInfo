@@ -85,14 +85,17 @@ class ConnectionDB {
       const pairingId = `pair_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
       // 출력용 세션 업데이트
+      console.log('ConnectionDB: 출력용 세션 업데이트 시작:', outputSession.sessionId);
       await updateDoc(doc(db, 'connections', outputSession.sessionId), {
         status: 'connected',
         connectedControlSession: controlSessionId,
         pairingId: pairingId,
         connectedAt: serverTimestamp()
       });
+      console.log('ConnectionDB: 출력용 세션 업데이트 완료:', outputSession.sessionId);
       
       // 제어용 세션 생성
+      console.log('ConnectionDB: 제어용 세션 생성 시작:', controlSessionId);
       await setDoc(doc(db, 'connections', controlSessionId), {
         sessionId: controlSessionId,
         pin: pin,
@@ -104,6 +107,7 @@ class ConnectionDB {
         connectedAt: serverTimestamp(),
         controlData: null
       });
+      console.log('ConnectionDB: 제어용 세션 생성 완료:', controlSessionId);
       
       console.log('ConnectionDB: 연결 완료:', {
         outputSessionId: outputSession.sessionId,
@@ -169,8 +173,8 @@ class ConnectionDB {
         const data = doc.data();
         console.log('ConnectionDB: 출력용 데이터 변경 감지:', sessionId, data);
         
-        // controlData가 있는 경우에만 콜백 호출
-        if (data.controlData) {
+        // 연결 상태 변화나 controlData가 있는 경우 콜백 호출
+        if (data.connectedControlSession || data.controlData) {
           callback(data);
         }
       } else {
