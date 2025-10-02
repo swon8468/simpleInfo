@@ -24,7 +24,7 @@ function OutputMain() {
     const pairingId = sessionStorage.getItem('pairingId');
     console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId, '페어링 ID:', pairingId);
     
-    if (savedPin && outputSessionId && pairingId) {
+    if (savedPin && outputSessionId) {
       ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);
         setConnectionData(data);

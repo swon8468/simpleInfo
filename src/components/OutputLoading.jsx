@@ -15,16 +15,26 @@ function OutputLoading() {
         const outputSessionId = sessionStorage.getItem('outputSessionId');
         const pin = sessionStorage.getItem('currentPin');
         
+        console.log('OutputLoading: 세션 정보 확인:', { outputSessionId, pin });
+        
         if (outputSessionId && pin) {
           setPin(pin);
+          console.log('OutputLoading: PIN 설정 완료, 구독 시작');
           
           // 제어용 기기 연결 대기
           unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
             console.log('OutputLoading: 연결 상태 확인:', data);
+            console.log('OutputLoading: connectedControlSession:', data.connectedControlSession);
+            console.log('OutputLoading: pairingId:', data.pairingId);
             
             // connectedControlSession이 있으면 연결된 것으로 간주
             if (data.connectedControlSession) {
-              console.log('OutputLoading: 제어용 기기 연결됨, 메인 화면으로 이동');
+              console.log('OutputLoading: 제어용 기기 연결됨, 페어링 ID 저장:', data.pairingId);
+              // 페어링 ID 저장
+              if (data.pairingId) {
+                sessionStorage.setItem('pairingId', data.pairingId);
+              }
+              console.log('OutputLoading: 메인 화면으로 이동');
               navigate('/output/main');
             }
           });

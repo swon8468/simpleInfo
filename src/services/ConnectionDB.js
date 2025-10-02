@@ -131,6 +131,7 @@ class ConnectionDB {
   // PIN으로 출력용 세션 찾기
   async findOutputSessionByPin(pin) {
     try {
+      console.log('ConnectionDB: PIN으로 출력용 세션 찾기 시작, PIN:', pin);
       const connectionsRef = collection(db, 'connections');
       const q = query(
         connectionsRef,
@@ -139,7 +140,14 @@ class ConnectionDB {
       );
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({ sessionId: doc.id, ...doc.data() }));
+      console.log('ConnectionDB: 쿼리 결과 개수:', querySnapshot.size);
+      const sessions = querySnapshot.docs.map(doc => {
+        const data = { sessionId: doc.id, ...doc.data() };
+        console.log('ConnectionDB: 찾은 세션:', data);
+        return data;
+      });
+      
+      return sessions;
     } catch (error) {
       console.error('PIN으로 출력용 세션 찾기 실패:', error);
       return [];
