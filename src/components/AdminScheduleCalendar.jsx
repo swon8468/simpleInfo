@@ -111,7 +111,12 @@ function AdminScheduleCalendar() {
         });
       } else {
         // 추가
-        await DataService.addScheduleEvent(eventDate, formData.title, formData.target);
+        const eventDateObj = new Date(eventDate);
+        const year = eventDateObj.getFullYear();
+        const month = eventDateObj.getMonth() + 1;
+        const day = eventDateObj.getDate();
+        
+        await DataService.addScheduleEvent(year, month, day, formData.title, formData.target);
       }
       
       setShowForm(false);
