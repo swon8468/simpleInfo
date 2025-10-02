@@ -40,7 +40,8 @@ function ControlConnection() {
         localStorage.setItem('connectedPin', result.pin);
         localStorage.setItem('controlDeviceId', result.controlDeviceId);
         localStorage.setItem('controlSessionId', sessionId);
-        console.log('ControlConnection: 연결 성공, localStorage 설정 완료, sessionId:', sessionId);
+        localStorage.setItem('pairingId', result.pairingId); // 페어링 ID 저장
+        console.log('ControlConnection: 연결 성공, localStorage 설정 완료, sessionId:', sessionId, 'pairingId:', result.pairingId);
         navigate('/control/main');
       } else {
         setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');

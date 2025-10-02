@@ -21,9 +21,10 @@ function OutputMain() {
     // 연결된 PIN으로 실시간 데이터 구독
     const savedPin = localStorage.getItem('currentPin');
     const outputSessionId = localStorage.getItem('outputSessionId');
-    console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId);
+    const pairingId = localStorage.getItem('pairingId');
+    console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId, '페어링 ID:', pairingId);
     
-    if (savedPin && outputSessionId) {
+    if (savedPin && outputSessionId && pairingId) {
       ConnectionService.subscribeToControlData(savedPin, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);
         setConnectionData(data);
@@ -39,6 +40,7 @@ function OutputMain() {
             console.log('관리자에 의해 연결이 해제되었습니다:', newControlData.message);
             localStorage.removeItem('currentPin');
             localStorage.removeItem('outputSessionId');
+            localStorage.removeItem('pairingId');
             navigate('/');
             return;
           }

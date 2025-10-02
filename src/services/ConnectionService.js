@@ -77,12 +77,16 @@ class ConnectionService {
           // 제어용 디바이스 ID 생성
           const controlDeviceId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           
+          // 연결 고정을 위한 고유한 페어링 ID 생성
+          const pairingId = `pair_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
           // 출력용 디바이스 문서 업데이트
           await setDoc(docRef, {
             ...data,
             status: 'connected',
             deviceType: 'output',
             connectedControlDevice: controlDeviceId,
+            pairingId: pairingId, // 연결 고정을 위한 페어링 ID
             connectedAt: serverTimestamp()
           }, { merge: true });
           
@@ -91,19 +95,21 @@ class ConnectionService {
             pin: pin,
             deviceType: 'control',
             connectedOutputDevice: pin,
+            pairingId: pairingId, // 연결 고정을 위한 페어링 ID
             status: 'control_connected', // 제어용 디바이스는 다른 상태 사용
             createdAt: serverTimestamp(),
             connectedAt: serverTimestamp(),
             controlData: null
           });
           
-          console.log('ConnectionService: 1:1 매칭 연결 완료:', pin, '제어용 ID:', controlDeviceId);
+          console.log('ConnectionService: 1:1 매칭 연결 완료:', pin, '제어용 ID:', controlDeviceId, '페어링 ID:', pairingId);
           
           this.isConnected = true;
           this.currentPin = pin;
           localStorage.setItem('controlDeviceId', controlDeviceId);
           localStorage.setItem('connectedPin', pin); // 연결된 PIN도 저장
-          return { success: true, controlDeviceId, pin };
+          localStorage.setItem('pairingId', pairingId); // 페어링 ID 저장
+          return { success: true, controlDeviceId, pin, pairingId };
         } else if (data.status === 'connected' || data.connectedControlDevice) {
           throw new Error('이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.');
         }
@@ -240,6 +246,7 @@ class ConnectionService {
       // localStorage에서 PIN 제거
       localStorage.removeItem('currentPin');
       localStorage.removeItem('connectedPin');
+      localStorage.removeItem('pairingId');
       
       console.log('ConnectionService: 1:1 매칭 연결 해제 완료:', pin, controlDeviceId);
     } catch (error) {

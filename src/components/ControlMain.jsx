@@ -13,10 +13,11 @@ function ControlMain() {
     const connectedPin = localStorage.getItem('connectedPin');
     const controlDeviceId = localStorage.getItem('controlDeviceId');
     const controlSessionId = localStorage.getItem('controlSessionId');
+    const pairingId = localStorage.getItem('pairingId');
     
-    console.log('ControlMain: 연결 상태 확인', { savedPin, connectedPin, controlDeviceId, controlSessionId });
+    console.log('ControlMain: 연결 상태 확인', { savedPin, connectedPin, controlDeviceId, controlSessionId, pairingId });
     
-    if (savedPin && connectedPin && controlDeviceId && controlSessionId) {
+    if (savedPin && connectedPin && controlDeviceId && controlSessionId && pairingId) {
       setConnectionStatus('연결됨');
       console.log('ControlMain: 연결 상태 - 연결됨');
       
@@ -29,6 +30,7 @@ function ControlMain() {
           localStorage.removeItem('connectedPin');
           localStorage.removeItem('controlDeviceId');
           localStorage.removeItem('controlSessionId');
+          localStorage.removeItem('pairingId');
           navigate('/');
         }
       });
@@ -41,6 +43,7 @@ function ControlMain() {
         localStorage.removeItem('connectedPin');
         localStorage.removeItem('controlDeviceId');
         localStorage.removeItem('controlSessionId');
+        localStorage.removeItem('pairingId');
         navigate('/control');
       });
 

@@ -86,6 +86,8 @@ function ControlConnectionInfo() {
         localStorage.removeItem('currentPin');
         localStorage.removeItem('connectedPin');
         localStorage.removeItem('controlDeviceId');
+        localStorage.removeItem('controlSessionId');
+        localStorage.removeItem('pairingId');
         
         setConnectionStatus('연결 안됨');
         setPin('');
