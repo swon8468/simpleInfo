@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataService from '../services/DataService';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import AdminAuth from './AdminAuth';
 import AdminAnnouncementTable from './AdminAnnouncementTable';
 import AdminScheduleCalendar from './AdminScheduleCalendar';
@@ -66,7 +66,7 @@ function AdminPanel() {
     try {
       console.log('AdminPanel: 활성화된 PIN 가져오기 시작');
       console.log('AdminPanel: 현재 시간:', new Date().toISOString());
-      const pins = await ConnectionService.getActivePins();
+      const pins = await ConnectionDB.getActiveConnections();
       console.log('AdminPanel: 가져온 활성화된 PIN:', pins);
       console.log('AdminPanel: PIN 배열 길이:', pins.length);
       console.log('AdminPanel: PIN 배열 타입:', typeof pins);
@@ -96,13 +96,37 @@ function AdminPanel() {
   // 활성화된 PIN 제거 핸들러
   const handleRemovePin = async (pinId) => {
     if (window.confirm(`정말로 PIN ${pinId}을(를) 제거하시겠습니까?`)) {
-      const success = await ConnectionService.removePin(pinId);
-      if (success) {
-        setPinMessage(`PIN ${pinId}이(가) 성공적으로 제거되었습니다.`);
-        fetchActivePins(); // 목록 새로고침
-      } else {
+      try {
+        // PIN으로 출력용 세션 찾기
+        const outputSession = await ConnectionDB.findOutputSessionByPin(pinId);
+        
+        if (outputSession) {
+          const outputSessionId = outputSession.id;
+          const controlSessionId = outputSession.connectedControlSession;
+          
+          console.log('AdminPanel: PIN 제거 시작', { pinId, outputSessionId, controlSessionId });
+          
+          // 연결된 제어용 디바이스가 있다면 메인 화면으로 이동하라는 신호 전송
+          if (controlSessionId) {
+            await ConnectionDB.sendControlData(controlSessionId, {
+              currentPage: 'main',
+              adminRemoved: true
+            });
+          }
+          
+          // 출력용 세션 삭제 (연결된 제어용 세션도 함께 삭제됨)
+          await ConnectionDB.disconnectSession(outputSessionId);
+          
+          setPinMessage(`PIN ${pinId}이(가) 성공적으로 제거되었습니다.`);
+          fetchActivePins(); // 목록 새로고침
+        } else {
+          setPinMessage(`PIN ${pinId}을(를) 찾을 수 없습니다.`);
+        }
+      } catch (error) {
+        console.error('PIN 제거 실패:', error);
         setPinMessage(`PIN ${pinId} 제거에 실패했습니다.`);
       }
+      
       setTimeout(() => setPinMessage(''), 3000); // 3초 후 메시지 제거
     }
   };
@@ -391,9 +415,6 @@ function AdminPanel() {
                   {activePins.length >= 10 && (
                     <p className="pin-warning">⚠️ 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
                   )}
-                </div>
-                <div style={{ marginBottom: '10px', fontSize: '12px', color: '#666' }}>
-                  디버그: activePins.length = {activePins.length}, activePins = {JSON.stringify(activePins)}
                 </div>
                 {activePins.length === 0 ? (
                   <p>현재 활성화된 PIN이 없습니다.</p>

@@ -78,9 +78,21 @@ function ControlConnectionInfo() {
 
     // 인증이 완료되었으면 연결 해제
     const controlSessionId = sessionStorage.getItem('controlSessionId');
+    const outputSessionId = sessionStorage.getItem('outputSessionId');
+    
     if (controlSessionId) {
       try {
-        console.log('ControlConnectionInfo: 연결 해제 시작, 제어 세션 ID:', controlSessionId);
+        console.log('ControlConnectionInfo: 연결 해제 시작, 제어 세션 ID:', controlSessionId, '출력 세션 ID:', outputSessionId);
+        
+        // 출력용 디바이스에게 메인 화면으로 이동하라는 신호 전송
+        if (outputSessionId) {
+          await ConnectionDB.sendControlData(controlSessionId, {
+            currentPage: 'main',
+            adminRemoved: true
+          });
+        }
+        
+        // 연결 해제
         await ConnectionDB.disconnectSession(controlSessionId);
         
         // sessionStorage 정리
