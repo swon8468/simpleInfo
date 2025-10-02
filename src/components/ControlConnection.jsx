@@ -32,6 +32,9 @@ function ControlConnection() {
       
       if (result.success) {
         localStorage.setItem('currentPin', pin);
+        localStorage.setItem('connectedPin', result.pin);
+        localStorage.setItem('controlDeviceId', result.controlDeviceId);
+        console.log('ControlConnection: 연결 성공, localStorage 설정 완료');
         navigate('/control/main');
       } else {
         setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');

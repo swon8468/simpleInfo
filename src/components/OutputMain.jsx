@@ -20,6 +20,8 @@ function OutputMain() {
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
     const savedPin = localStorage.getItem('currentPin');
+    console.log('OutputMain: 연결된 PIN:', savedPin);
+    
     if (savedPin) {
       ConnectionService.subscribeToControlData(savedPin, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);

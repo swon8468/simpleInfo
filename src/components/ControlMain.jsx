@@ -13,8 +13,11 @@ function ControlMain() {
     const connectedPin = localStorage.getItem('connectedPin');
     const controlDeviceId = localStorage.getItem('controlDeviceId');
     
+    console.log('ControlMain: 연결 상태 확인', { savedPin, connectedPin, controlDeviceId });
+    
     if (savedPin && connectedPin && controlDeviceId) {
       setConnectionStatus('연결됨');
+      console.log('ControlMain: 연결 상태 - 연결됨');
       
       // 관리자에 의한 연결 해제 감지를 위한 실시간 구독
       const unsubscribe = ConnectionService.subscribeToControlData(savedPin, (data) => {
@@ -44,6 +47,7 @@ function ControlMain() {
       };
     } else {
       setConnectionStatus('연결 안됨');
+      console.log('ControlMain: 연결 상태 - 연결 안됨');
     }
   }, [navigate]);
 

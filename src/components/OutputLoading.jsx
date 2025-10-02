@@ -15,7 +15,9 @@ function OutputLoading() {
         
         // 제어용 기기 연결 대기
         ConnectionService.subscribeToControlData(generatedPin, (data) => {
-          if (data.status === 'connected') {
+          console.log('OutputLoading: 연결 상태 확인:', data);
+          if (data.status === 'connected' && data.connectedControlDevice) {
+            console.log('OutputLoading: 제어용 기기 연결됨, 메인 화면으로 이동');
             navigate('/output/main');
           }
         });
