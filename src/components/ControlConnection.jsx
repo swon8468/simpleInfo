@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import ConnectionService from '../services/ConnectionService';
 import './ControlConnection.css';
 
@@ -28,15 +30,48 @@ function ControlConnection() {
     setError('');
     
     try {
-      // 기존 연결 정보 확인
+      // 기존 연결 정보 확인 (Firebase에서 실제 상태 확인)
       const existingControlDeviceId = localStorage.getItem('controlDeviceId');
       const existingConnectedPin = localStorage.getItem('connectedPin');
       
       if (existingControlDeviceId && existingConnectedPin) {
         console.log('ControlConnection: 기존 연결 정보 발견:', { existingControlDeviceId, existingConnectedPin });
-        setError('이미 다른 출력용 디바이스에 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
-        setIsConnecting(false);
-        return;
+        
+        // Firebase에서 실제 연결 상태 확인
+        try {
+          const docRef = doc(db, 'connections', existingConnectedPin);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log('ControlConnection: Firebase 연결 상태:', data);
+            
+            // 실제로 연결된 상태인지 확인
+            if (data.status === 'connected' && data.connectedControlDevice === existingControlDeviceId) {
+              setError('이미 다른 출력용 디바이스에 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
+              setIsConnecting(false);
+              return;
+            } else {
+              // 연결되지 않은 상태면 localStorage 정리
+              console.log('ControlConnection: 연결되지 않은 상태 발견, localStorage 정리');
+              localStorage.removeItem('controlDeviceId');
+              localStorage.removeItem('connectedPin');
+              localStorage.removeItem('currentPin');
+            }
+          } else {
+            // Firebase에 문서가 없으면 localStorage 정리
+            console.log('ControlConnection: Firebase에 문서 없음, localStorage 정리');
+            localStorage.removeItem('controlDeviceId');
+            localStorage.removeItem('connectedPin');
+            localStorage.removeItem('currentPin');
+          }
+        } catch (error) {
+          console.error('ControlConnection: Firebase 연결 상태 확인 실패:', error);
+          // 에러 발생 시 localStorage 정리
+          localStorage.removeItem('controlDeviceId');
+          localStorage.removeItem('connectedPin');
+          localStorage.removeItem('currentPin');
+        }
       }
       
       const result = await ConnectionService.connectWithPin(pin);

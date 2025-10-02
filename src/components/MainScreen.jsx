@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import ConnectionService from '../services/ConnectionService';
 import logoImage from '/logo.png';
@@ -83,12 +83,39 @@ function MainScreen() {
 
   const handleOutputMode = async () => {
     try {
-      // 기존 연결 정보 확인
+      // 기존 연결 정보 확인 (Firebase에서 실제 상태 확인)
       const existingPin = localStorage.getItem('currentPin');
       if (existingPin) {
         console.log('MainScreen: 기존 PIN 발견:', existingPin);
-        alert('이미 출력용 디바이스가 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
-        return;
+        
+        // Firebase에서 실제 연결 상태 확인
+        try {
+          const docRef = doc(db, 'connections', existingPin);
+          const docSnap = await getDoc(docRef);
+          
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            console.log('MainScreen: Firebase 연결 상태:', data);
+            
+            // 실제로 연결된 상태인지 확인
+            if (data.status === 'connected' && data.connectedControlDevice) {
+              alert('이미 출력용 디바이스가 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
+              return;
+            } else {
+              // 연결되지 않은 상태면 localStorage 정리
+              console.log('MainScreen: 연결되지 않은 PIN 발견, localStorage 정리');
+              localStorage.removeItem('currentPin');
+            }
+          } else {
+            // Firebase에 문서가 없으면 localStorage 정리
+            console.log('MainScreen: Firebase에 문서 없음, localStorage 정리');
+            localStorage.removeItem('currentPin');
+          }
+        } catch (error) {
+          console.error('MainScreen: Firebase 연결 상태 확인 실패:', error);
+          // 에러 발생 시 localStorage 정리
+          localStorage.removeItem('currentPin');
+        }
       }
       
       // 최대 PIN 개수 확인
