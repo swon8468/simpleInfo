@@ -39,35 +39,12 @@ function OutputMain() {
             return;
           }
           
-          // 상태가 실제로 변경되었을 때만 업데이트 (중요한 필드만 비교)
-          setControlData(prevControlData => {
-            const prevImportant = prevControlData ? {
-              currentPage: prevControlData.currentPage,
-              scheduleView: prevControlData.scheduleView,
-              scheduleDate: prevControlData.scheduleDate,
-              mealDate: prevControlData.mealDate,
-              announcementIndex: prevControlData.announcementIndex
-            } : null;
-            
-            const newImportant = {
-              currentPage: newControlData.currentPage,
-              scheduleView: newControlData.scheduleView,
-              scheduleDate: newControlData.scheduleDate,
-              mealDate: newControlData.mealDate,
-              announcementIndex: newControlData.announcementIndex
-            };
-            
-            if (JSON.stringify(prevImportant) !== JSON.stringify(newImportant)) {
-              console.log('제어 데이터 업데이트:', newControlData);
-              return newControlData;
-            }
-            return prevControlData;
-          });
+          // 제어 데이터 업데이트 (항상 업데이트)
+          setControlData(newControlData);
           
-          setCurrentPage(prevPage => {
-            console.log('페이지 변경 시도:', prevPage, '->', newPage);
-            return newPage;
-          });
+          // 페이지 변경 (항상 업데이트)
+          console.log('페이지 변경:', currentPage, '->', newPage);
+          setCurrentPage(newPage);
         }
       });
 

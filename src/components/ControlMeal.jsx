@@ -51,15 +51,23 @@ function ControlMeal() {
     const savedPin = localStorage.getItem('currentPin');
     const connectedPin = localStorage.getItem('connectedPin');
     
+    console.log('ControlMeal: 데이터 전송 시도', { days, savedPin, connectedPin });
+    
     if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        const data = {
           currentPage: 'meal',
           mealDate: days
-        });
+        };
+        
+        console.log('ControlMeal: 전송할 데이터:', data);
+        await ConnectionService.sendControlData(connectedPin, data);
+        console.log('ControlMeal: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
+    } else {
+      console.error('ControlMeal: 연결 정보가 없습니다.', { savedPin, connectedPin });
     }
   };
 

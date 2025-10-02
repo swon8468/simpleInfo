@@ -82,16 +82,24 @@ function ControlSchedule() {
     const savedPin = localStorage.getItem('currentPin');
     const connectedPin = localStorage.getItem('connectedPin');
     
+    console.log('ControlSchedule: 데이터 전송 시도', { mode, date, savedPin, connectedPin });
+    
     if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        const data = {
           currentPage: 'schedule',
           scheduleView: mode,
           scheduleDate: date.toISOString()
-        });
+        };
+        
+        console.log('ControlSchedule: 전송할 데이터:', data);
+        await ConnectionService.sendControlData(connectedPin, data);
+        console.log('ControlSchedule: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
+    } else {
+      console.error('ControlSchedule: 연결 정보가 없습니다.', { savedPin, connectedPin });
     }
   };
 

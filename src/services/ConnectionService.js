@@ -121,25 +121,19 @@ class ConnectionService {
       if (doc.exists()) {
         const data = doc.data();
         
-        // heartbeat 필드를 제외한 데이터만 비교
-        const dataWithoutHeartbeat = { ...data };
-        delete dataWithoutHeartbeat.heartbeat;
+        console.log('ConnectionService: 문서 변경 감지:', doc.id, data);
         
-        const lastDataWithoutHeartbeat = lastData ? { ...lastData } : null;
-        if (lastDataWithoutHeartbeat) {
-          delete lastDataWithoutHeartbeat.heartbeat;
-        }
-        
-        // 데이터가 실제로 변경되었을 때만 콜백 호출
-        if (JSON.stringify(lastDataWithoutHeartbeat) !== JSON.stringify(dataWithoutHeartbeat)) {
-          console.log('ConnectionService: 데이터 변경 감지', dataWithoutHeartbeat);
-          lastData = data;
+        // controlData가 있는 경우에만 콜백 호출
+        if (data.controlData) {
+          console.log('ConnectionService: controlData 변경 감지:', data.controlData);
           callback(data);
         }
         
         if (data.status === 'connected') {
           this.isConnected = true;
         }
+      } else {
+        console.log('ConnectionService: 문서가 존재하지 않음:', doc.id);
       }
     });
     
