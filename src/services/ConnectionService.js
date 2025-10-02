@@ -19,7 +19,7 @@ class ConnectionService {
     this.listeners = new Map();
   }
 
-  // PIN 생성 및 저장
+  // PIN 생성 및 저장 (출력용 디바이스용)
   async generatePin() {
     try {
       // 활성화된 PIN 개수 확인
@@ -38,7 +38,9 @@ class ConnectionService {
         pin: pin,
         createdAt: serverTimestamp(),
         status: 'waiting',
-        controlData: null
+        deviceType: 'output', // 출력용 디바이스
+        controlData: null,
+        connectedControlDevice: null // 연결된 제어용 디바이스 ID
       });
       console.log('ConnectionService: PIN 문서 생성 완료:', pin);
       
@@ -54,7 +56,7 @@ class ConnectionService {
     }
   }
 
-  // PIN 검증 및 연결
+  // PIN 검증 및 연결 (제어용 디바이스용)
   async connectWithPin(pin) {
     try {
       console.log('ConnectionService: PIN 연결 시도:', pin);
@@ -64,20 +66,43 @@ class ConnectionService {
       if (docSnap.exists()) {
         const data = docSnap.data();
         console.log('ConnectionService: PIN 문서 데이터:', data);
-        if (data.status === 'waiting') {
+        
+        // 출력용 디바이스가 생성한 PIN이고 대기 상태인지 확인
+        if (data.deviceType === 'output' && data.status === 'waiting') {
+          // 제어용 디바이스 ID 생성
+          const controlDeviceId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          
           await setDoc(docRef, {
             ...data,
             status: 'connected',
+            deviceType: 'output',
+            connectedControlDevice: controlDeviceId,
             connectedAt: serverTimestamp()
           }, { merge: true });
-          console.log('ConnectionService: PIN 연결 완료:', pin);
+          
+          // 제어용 디바이스 정보도 별도로 저장
+          await setDoc(doc(db, 'connections', controlDeviceId), {
+            pin: pin,
+            deviceType: 'control',
+            connectedOutputDevice: pin,
+            status: 'connected',
+            createdAt: serverTimestamp(),
+            connectedAt: serverTimestamp(),
+            controlData: null
+          });
+          
+          console.log('ConnectionService: 1:1 매칭 연결 완료:', pin, '제어용 ID:', controlDeviceId);
           
           this.isConnected = true;
-          return true;
+          this.currentPin = pin;
+          localStorage.setItem('controlDeviceId', controlDeviceId);
+          return { success: true, controlDeviceId };
+        } else if (data.status === 'connected') {
+          throw new Error('이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.');
         }
       }
       console.log('ConnectionService: PIN 연결 실패:', pin);
-      return false;
+      return { success: false, error: '유효하지 않은 PIN입니다.' };
     } catch (error) {
       console.error('PIN 연결 실패:', error);
       throw error;
@@ -119,14 +144,29 @@ class ConnectionService {
     return unsubscribe;
   }
 
-  // 제어 데이터 전송
+  // 제어 데이터 전송 (1:1 매칭 시스템)
   async sendControlData(pin, data) {
     try {
-      const docRef = doc(db, 'connections', pin);
-      await setDoc(docRef, {
+      const controlDeviceId = localStorage.getItem('controlDeviceId');
+      if (!controlDeviceId) {
+        throw new Error('제어용 디바이스 ID가 없습니다.');
+      }
+      
+      // 제어용 디바이스 문서에 데이터 저장
+      const controlDocRef = doc(db, 'connections', controlDeviceId);
+      await setDoc(controlDocRef, {
         controlData: data,
         lastUpdated: serverTimestamp()
       }, { merge: true });
+      
+      // 출력용 디바이스 문서에도 데이터 전달
+      const outputDocRef = doc(db, 'connections', pin);
+      await setDoc(outputDocRef, {
+        controlData: data,
+        lastUpdated: serverTimestamp()
+      }, { merge: true });
+      
+      console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId);
     } catch (error) {
       console.error('제어 데이터 전송 실패:', error);
       throw error;

@@ -28,18 +28,19 @@ function ControlConnection() {
     setError('');
     
     try {
-      const isConnected = await ConnectionService.connectWithPin(pin);
+      const result = await ConnectionService.connectWithPin(pin);
       
-      if (isConnected) {
+      if (result.success) {
         localStorage.setItem('currentPin', pin);
         navigate('/control/main');
       } else {
-        setError('잘못된 PIN입니다. 다시 입력해주세요.');
+        setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');
         setPin('');
       }
     } catch (error) {
       console.error('연결 실패:', error);
-      setError('연결에 실패했습니다. 다시 시도해주세요.');
+      setError(error.message || '연결에 실패했습니다. 다시 시도해주세요.');
+      setPin('');
     } finally {
       setIsConnecting(false);
     }
