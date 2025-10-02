@@ -28,7 +28,6 @@ function ControlConnection() {
     setError('');
     
     try {
-      console.log('ControlConnection: PIN 연결 시도:', pin);
       const result = await ConnectionDB.connectControlDevice(pin);
       
       if (result.success) {
@@ -36,7 +35,6 @@ function ControlConnection() {
         sessionStorage.setItem('outputSessionId', result.outputSessionId);
         sessionStorage.setItem('currentPin', result.pin);
         sessionStorage.setItem('pairingId', result.pairingId);
-        console.log('ControlConnection: 연결 성공, sessionStorage 설정 완료:', result);
         navigate('/control/main');
       } else {
         setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');
@@ -53,7 +51,6 @@ function ControlConnection() {
 
   return (
     <div className="control-connection">
-      <div className="monitor-icon">🖥️</div>
       <h2>제어용 기기에 표시된 PIN을 입력하세요</h2>
       
       <div className="pin-input-container">

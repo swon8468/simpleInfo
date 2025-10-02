@@ -49,7 +49,6 @@ function ControlMeal() {
   const sendMealDataWithDate = async (days) => {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    console.log('ControlMeal: 데이터 전송 시도', { days, controlSessionId });
     
     if (controlSessionId) {
       try {
@@ -58,9 +57,7 @@ function ControlMeal() {
           mealDate: days
         };
         
-        console.log('ControlMeal: 전송할 데이터:', data);
         await ConnectionDB.sendControlData(controlSessionId, data);
-        console.log('ControlMeal: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
@@ -97,7 +94,6 @@ function ControlMeal() {
           {getDateLabel(mealDate + 1)}
         </button>
       </div>
-
 
       <div className="today-button-section">
         <button className="today-btn" onClick={() => handleDateChange(0)}>

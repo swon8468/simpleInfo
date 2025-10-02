@@ -76,17 +76,14 @@ function MainScreen() {
 
   const handleOutputMode = async () => {
     try {
-      console.log('MainScreen: 출력용 모드 시작, activePinCount:', activePinCount);
       
       // 최대 PIN 개수 확인 (10개까지 허용)
-      console.log('MainScreen: 최대 PIN 개수 확인, activePinCount:', activePinCount);
       if (activePinCount >= 10) {
         alert('최대 PIN 개수(10개)에 도달했습니다. 기존 PIN을 제거한 후 다시 시도해주세요.');
         return;
       }
       
       // 출력용 세션 생성
-      console.log('MainScreen: 출력용 세션 생성 시도');
       const result = await ConnectionDB.createOutputSession();
       sessionStorage.setItem('outputSessionId', result.sessionId);
       sessionStorage.setItem('currentPin', result.pin);

@@ -31,11 +31,6 @@ function OutputSchedule() {
     }
   };
 
-  useEffect(() => {
-    // 실제로는 Firebase에서 데이터를 가져와야 함
-    // 여기서는 샘플 데이터 사용
-  }, []);
-
   const getCurrentSchedule = () => {
     if (viewMode === 'monthly') {
       return sampleSchedule.monthly['10월'];

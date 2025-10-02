@@ -64,18 +64,9 @@ function AdminPanel() {
   // 활성화된 PIN 가져오기
   const fetchActivePins = async () => {
     try {
-      console.log('AdminPanel: 활성화된 PIN 가져오기 시작');
-      console.log('AdminPanel: 현재 시간:', new Date().toISOString());
       const pins = await ConnectionDB.getActiveConnections();
-      console.log('AdminPanel: 가져온 활성화된 PIN:', pins);
-      console.log('AdminPanel: PIN 배열 길이:', pins.length);
-      console.log('AdminPanel: PIN 배열 타입:', typeof pins);
-      console.log('AdminPanel: PIN 배열이 배열인가:', Array.isArray(pins));
-      setActivePins(pins);
-      console.log('AdminPanel: activePins 상태 업데이트 완료');
+      setActivePins(pins)
     } catch (error) {
-      console.error('AdminPanel: 활성화된 PIN 가져오기 실패:', error);
-      console.error('AdminPanel: 오류 상세:', error.message);
       setActivePins([]);
     }
   };
@@ -105,7 +96,6 @@ function AdminPanel() {
           const outputSessionId = outputSession.sessionId; // sessionId 필드 사용
           const controlSessionId = outputSession.connectedControlSession;
           
-          console.log('AdminPanel: PIN 제거 시작', { pinId, outputSessionId, controlSessionId });
           
           // 연결된 제어용 디바이스가 있다면 메인 화면으로 이동하라는 신호 전송
           if (controlSessionId) {
@@ -203,7 +193,6 @@ function AdminPanel() {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('알레르기 정보 제출 시작:', allergyForm.items);
       
       // 문자열을 배열로 변환
       let items = [];
@@ -216,7 +205,6 @@ function AdminPanel() {
         items = allergyForm.items.filter(item => item && item.trim().length > 0);
       }
       
-      console.log('처리된 알레르기 항목들:', items);
       
       if (items.length === 0) {
         showMessage('알레르기 정보를 입력해주세요.');

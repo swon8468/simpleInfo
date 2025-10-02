@@ -22,24 +22,17 @@ function OutputMain() {
     const savedPin = sessionStorage.getItem('currentPin');
     const outputSessionId = sessionStorage.getItem('outputSessionId');
     const pairingId = sessionStorage.getItem('pairingId');
-    console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId, '페어링 ID:', pairingId);
     
     if (savedPin && outputSessionId) {
       ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
-        console.log('OutputMain: 실시간 데이터 수신:', data);
-        console.log('OutputMain: controlData 존재 여부:', !!data.controlData);
         setConnectionData(data);
         if (data.controlData) {
           const newControlData = data.controlData;
           const newPage = newControlData.currentPage || 'main';
           
-          console.log('OutputMain: 새로운 제어 데이터:', newControlData);
-          console.log('OutputMain: 새로운 페이지:', newPage);
-          console.log('OutputMain: 현재 페이지:', currentPage);
           
           // 관리자에 의해 연결이 해제된 경우 메인 화면으로 이동
           if (newControlData.adminRemoved) {
-            console.log('관리자에 의해 연결이 해제되었습니다:', newControlData.message);
             sessionStorage.removeItem('currentPin');
             sessionStorage.removeItem('outputSessionId');
             sessionStorage.removeItem('pairingId');
@@ -51,15 +44,13 @@ function OutputMain() {
           setControlData(newControlData);
           
           // 페이지 변경 (항상 업데이트)
-          console.log('페이지 변경:', currentPage, '->', newPage);
           setCurrentPage(newPage);
         } else {
-          console.log('OutputMain: controlData가 없습니다.');
+          console.log('');
         }
       });
     } else {
       // 세션 정보가 없으면 메인 화면으로 리다이렉트
-      console.log('OutputMain: 세션 정보가 없어서 메인 화면으로 이동');
       navigate('/');
     }
     
@@ -80,18 +71,13 @@ function OutputMain() {
 
   const loadInitialData = async () => {
     try {
-      console.log('loadInitialData 시작');
       
       // 학교 정보 로드
       const school = await DataService.getSchoolInfo();
-      console.log('학교 정보 로드 완료:', school);
       setSchoolInfo(school);
 
       // 공지사항 로드
-      console.log('공지사항 로드 시작...');
       const announcementData = await generateAnnouncementData();
-      console.log('로드된 공지사항:', announcementData);
-      console.log('공지사항 개수:', announcementData.length);
       setAnnouncements(announcementData);
 
       // 현재 날짜의 학사일정 로드
@@ -112,9 +98,7 @@ function OutputMain() {
   // 공지사항 데이터 생성 (Firebase 데이터 기반)
   const generateAnnouncementData = async () => {
     try {
-      console.log('generateAnnouncementData 시작');
       const announcements = await DataService.getAnnouncements();
-      console.log('Firebase에서 가져온 공지사항 데이터:', announcements);
       
       if (announcements && announcements.length > 0) {
         return announcements;
@@ -205,9 +189,7 @@ function OutputMain() {
   // 급식 데이터 생성 (Firebase 데이터 기반)
   const generateMealData = async (date) => {
     try {
-      console.log('급식 데이터 요청 날짜:', date);
       const meal = await DataService.getMealData(date);
-      console.log('Firebase에서 가져온 급식 데이터:', meal);
       
       if (meal && (meal.lunch.length > 0 || meal.dinner.length > 0)) {
         return {
@@ -231,26 +213,20 @@ function OutputMain() {
   };
 
   const renderContent = () => {
-    console.log('OutputMain: renderContent 호출, currentPage:', currentPage);
     switch (currentPage) {
       case 'schedule':
-        console.log('OutputMain: 학사일정 렌더링');
         return <ScheduleDisplay controlData={controlData} />;
         
       case 'meal':
-        console.log('OutputMain: 급식 렌더링');
         return <MealDisplay controlData={controlData} />;
         
       case 'roadmap':
-        console.log('OutputMain: 교실 배치 렌더링');
         return <RoadmapDisplay />;
         
       case 'announcement':
-        console.log('OutputMain: 공지사항 렌더링');
         return <AnnouncementDisplay announcements={announcements} controlData={controlData} />;
         
       default:
-        console.log('OutputMain: 메인 화면 렌더링');
         // 메인 화면 - 로고와 제목만 표시
         return (
           <div className="main-display">
@@ -520,9 +496,7 @@ function OutputMain() {
       const loadAnnouncementData = async () => {
         setLoading(true);
         try {
-          console.log('AnnouncementDisplay에서 데이터 로드 시작');
           const data = await generateAnnouncementData();
-          console.log('AnnouncementDisplay에서 로드된 데이터:', data);
           setAnnouncementData(data);
           
           // 현재 표시되는 공지사항의 조회수 증가
@@ -540,24 +514,16 @@ function OutputMain() {
 
       loadAnnouncementData();
     }, [controlData?.announcementIndex]);
-
-    console.log('AnnouncementDisplay 렌더링 시작');
-    console.log('받은 announcements:', announcements);
-    console.log('받은 controlData:', controlData);
-    console.log('로드된 announcementData:', announcementData);
     
     const currentIndex = controlData?.announcementIndex || 0;
     const currentAnnouncement = announcementData?.[currentIndex] || announcementData?.[0];
     
-    console.log('currentIndex:', currentIndex);
-    console.log('currentAnnouncement:', currentAnnouncement);
 
     if (loading) {
       return <div className="loading">공지사항을 불러오는 중...</div>;
     }
 
     if (!announcementData || announcementData.length === 0) {
-      console.log('공지사항이 없음 - 빈 배열 표시');
       return (
         <div className="announcement-display">
           <h2>공지사항</h2>
@@ -569,11 +535,9 @@ function OutputMain() {
     }
 
     if (!currentAnnouncement) {
-      console.log('현재 공지사항이 없음 - 로딩 표시');
       return <div className="loading">공지사항을 불러오는 중...</div>;
     }
     
-    console.log('공지사항 표시 중:', currentAnnouncement);
 
     return (
       <div className="announcement-display">
@@ -606,13 +570,10 @@ function OutputMain() {
 
   return (
     <div className="output-main">
-      {console.log('OutputMain: 렌더링, currentPage:', currentPage)}
       {currentPage === 'main' && (
         <>
-          <div className="monitor-icon">🖥️</div>
           <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
           <h2 className="app-title">학교생활도우미</h2>
-          <h3 className="team-name">{schoolInfo.teamName || '-- 대충 팀 명 --'}</h3>
         </>
       )}
       

@@ -80,7 +80,6 @@ function ControlSchedule() {
   const sendControlDataWithData = async (mode, date) => {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    console.log('ControlSchedule: 데이터 전송 시도', { mode, date, controlSessionId });
     
     if (controlSessionId) {
       try {
@@ -100,9 +99,7 @@ function ControlSchedule() {
           scheduleDate: dateString
         };
         
-        console.log('ControlSchedule: 전송할 데이터:', data);
         await ConnectionDB.sendControlData(controlSessionId, data);
-        console.log('ControlSchedule: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }

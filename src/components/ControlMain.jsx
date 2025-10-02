@@ -13,16 +13,13 @@ function ControlMain() {
     const outputSessionId = sessionStorage.getItem('outputSessionId');
     const pairingId = sessionStorage.getItem('pairingId');
     
-    console.log('ControlMain: 연결 상태 확인', { controlSessionId, outputSessionId, pairingId });
     
     if (controlSessionId && outputSessionId && pairingId) {
       setConnectionStatus('연결됨');
-      console.log('ControlMain: 연결 상태 - 연결됨');
       
       // 관리자에 의한 연결 해제 감지를 위한 실시간 구독
       const unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         if (data.controlData && data.controlData.adminRemoved) {
-          console.log('관리자에 의해 연결이 해제되었습니다:', data.controlData.message);
           setConnectionStatus('연결 안됨');
           sessionStorage.removeItem('controlSessionId');
           sessionStorage.removeItem('outputSessionId');
@@ -37,7 +34,6 @@ function ControlMain() {
       };
     } else {
       setConnectionStatus('연결 안됨');
-      console.log('ControlMain: 연결 상태 - 연결 안됨');
     }
   }, [navigate]);
 
@@ -45,9 +41,6 @@ function ControlMain() {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     const outputSessionId = sessionStorage.getItem('outputSessionId');
     const pairingId = sessionStorage.getItem('pairingId');
-    
-    console.log('ControlMain: 데이터 전송 시도', { page, scheduleView, mealDate, announcementIndex });
-    console.log('ControlMain: 세션 정보:', { controlSessionId, outputSessionId, pairingId });
     
     if (controlSessionId) {
       try {
@@ -65,11 +58,9 @@ function ControlMain() {
           controlData.announcementIndex = announcementIndex;
         }
         
-        console.log('ControlMain: 전송할 데이터:', controlData);
         
         // ConnectionDB를 사용하여 데이터 전송
         await ConnectionDB.sendControlData(controlSessionId, controlData);
-        console.log('ControlMain: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }

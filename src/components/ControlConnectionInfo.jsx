@@ -78,7 +78,6 @@ function ControlConnectionInfo() {
     
     if (controlSessionId) {
       try {
-        console.log('ControlConnectionInfo: 연결 해제 시작, 제어 세션 ID:', controlSessionId, '출력 세션 ID:', outputSessionId);
         
         // 출력용 디바이스에게 메인 화면으로 이동하라는 신호 전송
         if (outputSessionId) {
@@ -104,7 +103,6 @@ function ControlConnectionInfo() {
         setPin('');
         setIsAuthenticated(false);
         
-        console.log('ControlConnectionInfo: 연결 해제 완료, 메인 화면으로 이동');
         // 연결 해제 후 메인 화면으로 이동
         navigate('/');
       } catch (error) {
