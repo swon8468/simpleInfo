@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import logoImage from '/logo.png';
 import './MainScreen.css';
 
@@ -16,20 +16,13 @@ function MainScreen() {
   // 활성화된 PIN 확인 함수
   const checkActivePin = async () => {
     try {
-      const connectionsRef = collection(db, 'connections');
-      const q = query(
-        connectionsRef, 
-        where('deviceType', '==', 'output'),
-        where('status', '==', 'connected')
-      );
-      const querySnapshot = await getDocs(q);
-      
-      const count = querySnapshot.size;
+      const activeConnections = await ConnectionDB.getActiveConnections();
+      const count = activeConnections.length;
       setActivePinCount(count);
       
       if (count > 0) {
-        const activeConnection = querySnapshot.docs[0];
-        setActivePinNumber(activeConnection.id);
+        const activeConnection = activeConnections[0];
+        setActivePinNumber(activeConnection.sessionId);
         setHasActivePin(true);
       } else {
         setHasActivePin(false);
@@ -92,19 +85,15 @@ function MainScreen() {
         return;
       }
       
-      // 고유한 세션 ID 생성 (브라우저 탭별로 고유)
-      const sessionId = `output_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem('sessionId', sessionId);
-      
-      // PIN 생성 시도
-      console.log('MainScreen: PIN 생성 시도, sessionId:', sessionId);
-      const pin = await ConnectionService.generatePin();
-      sessionStorage.setItem('currentPin', pin);
-      sessionStorage.setItem('outputSessionId', sessionId);
+      // 출력용 세션 생성
+      console.log('MainScreen: 출력용 세션 생성 시도');
+      const result = await ConnectionDB.createOutputSession();
+      sessionStorage.setItem('outputSessionId', result.sessionId);
+      sessionStorage.setItem('currentPin', result.pin);
       navigate('/output');
     } catch (error) {
-      console.error('PIN 생성 실패:', error);
-      alert(error.message || 'PIN 생성에 실패했습니다.');
+      console.error('출력용 세션 생성 실패:', error);
+      alert(error.message || '출력용 세션 생성에 실패했습니다.');
     }
   };
 

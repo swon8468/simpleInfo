@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './OutputLoading.css';
 
 function OutputLoading() {
@@ -12,58 +10,34 @@ function OutputLoading() {
   useEffect(() => {
     const initializeConnection = async () => {
       try {
-        const generatedPin = await ConnectionService.generatePin();
-        setPin(generatedPin);
+        const outputSessionId = sessionStorage.getItem('outputSessionId');
+        const pin = sessionStorage.getItem('currentPin');
         
-        // 제어용 기기 연결 대기
-        const unsubscribe = ConnectionService.subscribeToControlData(generatedPin, (data) => {
-          console.log('OutputLoading: 연결 상태 확인:', data);
-          console.log('OutputLoading: status:', data.status, 'connectedControlDevice:', data.connectedControlDevice);
+        if (outputSessionId && pin) {
+          setPin(pin);
           
-          // connectedControlDevice가 있으면 연결된 것으로 간주
-          if (data.connectedControlDevice) {
-            console.log('OutputLoading: 제어용 기기 연결됨, 페어링 ID 저장:', data.pairingId);
-            sessionStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
-            navigate('/output/main');
-          }
-        });
-        
-        // 5초마다 연결 상태 확인 (백업 로직)
-        const checkConnectionInterval = setInterval(async () => {
-          try {
-            const docRef = doc(db, 'connections', generatedPin);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              const data = docSnap.data();
-              console.log('OutputLoading: 주기적 연결 상태 확인:', data);
-              if (data.connectedControlDevice) {
-                console.log('OutputLoading: 주기적 확인에서 연결 감지, 페어링 ID 저장:', data.pairingId);
-                sessionStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
-                clearInterval(checkConnectionInterval);
-                unsubscribe();
-                navigate('/output/main');
-              }
+          // 제어용 기기 연결 대기
+          const unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
+            console.log('OutputLoading: 연결 상태 확인:', data);
+            
+            // connectedControlSession이 있으면 연결된 것으로 간주
+            if (data.connectedControlSession) {
+              console.log('OutputLoading: 제어용 기기 연결됨, 메인 화면으로 이동');
+              navigate('/output/main');
             }
-          } catch (error) {
-            console.error('OutputLoading: 주기적 연결 확인 실패:', error);
-          }
-        }, 5000);
-        
-        // 컴포넌트 언마운트 시 정리
-        return () => {
-          clearInterval(checkConnectionInterval);
-          unsubscribe();
-        };
-        
+          });
+          
+          // 컴포넌트 언마운트 시 정리
+          return () => {
+            unsubscribe();
+          };
+        } else {
+          console.error('OutputLoading: 세션 정보가 없습니다.');
+          navigate('/');
+        }
       } catch (error) {
         console.error('연결 초기화 실패:', error);
-        // 에러 발생 시 기본 PIN 생성
-        const fallbackPin = Math.floor(100000 + Math.random() * 900000).toString();
-        setPin(fallbackPin);
-        
-        setTimeout(() => {
-          navigate('/output/main');
-        }, 3000);
+        navigate('/');
       }
     };
     

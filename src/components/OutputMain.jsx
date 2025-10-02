@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
 import './OutputMain.css';
 
@@ -25,7 +25,7 @@ function OutputMain() {
     console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId, '페어링 ID:', pairingId);
     
     if (savedPin && outputSessionId && pairingId) {
-      ConnectionService.subscribeToControlData(savedPin, (data) => {
+      ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);
         setConnectionData(data);
         if (data.controlData) {
@@ -53,30 +53,27 @@ function OutputMain() {
           setCurrentPage(newPage);
         }
       });
-
-              // 연결 모니터링 시작
-              const cleanupMonitoring = ConnectionService.startConnectionMonitoring(savedPin, () => {
-                // 연결 해제 시 제어용 기기도 연결 해제
-                ConnectionService.disconnect(savedPin);
-                // 출력용 화면을 메인으로 리셋하고 메인 화면으로 이동
-                setCurrentPage('main');
-                setControlData(null);
-                navigate('/');
-              });
-
-      // 페이지 언로드 시 연결 해제
-      const cleanupUnload = ConnectionService.setupPageUnloadHandler(savedPin);
-
-      return () => {
-        cleanupMonitoring();
-        cleanupUnload();
-      };
+    } else {
+      // 세션 정보가 없으면 메인 화면으로 리다이렉트
+      navigate('/');
     }
-
-    // 초기 데이터 로드
-    console.log('useEffect에서 loadInitialData 호출');
-    loadInitialData();
-  }, []);
+    
+    // 페이지 언로드 핸들러 설정
+    const handleBeforeUnload = () => {
+      if (outputSessionId) {
+        ConnectionDB.disconnectSession(outputSessionId);
+      }
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (outputSessionId) {
+        ConnectionDB.disconnectSession(outputSessionId);
+      }
+    };
+  }, [navigate]);
 
   const loadInitialData = async () => {
     try {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlConnectionInfo.css';
 
 function ControlConnectionInfo() {
@@ -77,16 +77,16 @@ function ControlConnectionInfo() {
     }
 
     // 인증이 완료되었으면 연결 해제
-    if (pin) {
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
+    if (controlSessionId) {
       try {
-        console.log('ControlConnectionInfo: 연결 해제 시작, PIN:', pin);
-        await ConnectionService.disconnect(pin);
+        console.log('ControlConnectionInfo: 연결 해제 시작, 제어 세션 ID:', controlSessionId);
+        await ConnectionDB.disconnectSession(controlSessionId);
         
         // sessionStorage 정리
-        sessionStorage.removeItem('currentPin');
-        sessionStorage.removeItem('connectedPin');
-        sessionStorage.removeItem('controlDeviceId');
         sessionStorage.removeItem('controlSessionId');
+        sessionStorage.removeItem('outputSessionId');
+        sessionStorage.removeItem('currentPin');
         sessionStorage.removeItem('pairingId');
         
         setConnectionStatus('연결 안됨');
@@ -101,7 +101,7 @@ function ControlConnectionInfo() {
         setErrorMessage('연결 해제에 실패했습니다. 다시 시도해주세요.');
       }
     } else {
-      setErrorMessage('연결된 PIN이 없습니다.');
+      setErrorMessage('연결된 세션이 없습니다.');
     }
   };
 

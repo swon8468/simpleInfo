@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlConnection.css';
 
 function ControlConnection() {
@@ -28,20 +28,15 @@ function ControlConnection() {
     setError('');
     
     try {
-      // 고유한 세션 ID 생성 (브라우저 탭별로 고유)
-      const sessionId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem('sessionId', sessionId);
-      
-      console.log('ControlConnection: PIN 연결 시도, sessionId:', sessionId);
-      const result = await ConnectionService.connectWithPin(pin);
+      console.log('ControlConnection: PIN 연결 시도:', pin);
+      const result = await ConnectionDB.connectControlDevice(pin);
       
       if (result.success) {
-        sessionStorage.setItem('currentPin', pin);
-        sessionStorage.setItem('connectedPin', result.pin);
-        sessionStorage.setItem('controlDeviceId', result.controlDeviceId);
-        sessionStorage.setItem('controlSessionId', sessionId);
-        sessionStorage.setItem('pairingId', result.pairingId); // 페어링 ID 저장
-        console.log('ControlConnection: 연결 성공, sessionStorage 설정 완료, sessionId:', sessionId, 'pairingId:', result.pairingId);
+        sessionStorage.setItem('controlSessionId', result.controlSessionId);
+        sessionStorage.setItem('outputSessionId', result.outputSessionId);
+        sessionStorage.setItem('currentPin', result.pin);
+        sessionStorage.setItem('pairingId', result.pairingId);
+        console.log('ControlConnection: 연결 성공, sessionStorage 설정 완료:', result);
         navigate('/control/main');
       } else {
         setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');

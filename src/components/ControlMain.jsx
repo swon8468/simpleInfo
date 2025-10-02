@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlMain.css';
 
 function ControlMain() {
@@ -9,47 +9,31 @@ function ControlMain() {
 
   useEffect(() => {
     // 연결 상태 확인
-    const savedPin = sessionStorage.getItem('currentPin');
-    const connectedPin = sessionStorage.getItem('connectedPin');
-    const controlDeviceId = sessionStorage.getItem('controlDeviceId');
     const controlSessionId = sessionStorage.getItem('controlSessionId');
+    const outputSessionId = sessionStorage.getItem('outputSessionId');
     const pairingId = sessionStorage.getItem('pairingId');
     
-    console.log('ControlMain: 연결 상태 확인', { savedPin, connectedPin, controlDeviceId, controlSessionId, pairingId });
+    console.log('ControlMain: 연결 상태 확인', { controlSessionId, outputSessionId, pairingId });
     
-    if (savedPin && connectedPin && controlDeviceId && controlSessionId && pairingId) {
+    if (controlSessionId && outputSessionId && pairingId) {
       setConnectionStatus('연결됨');
       console.log('ControlMain: 연결 상태 - 연결됨');
       
       // 관리자에 의한 연결 해제 감지를 위한 실시간 구독
-      const unsubscribe = ConnectionService.subscribeToControlData(savedPin, (data) => {
+      const unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         if (data.controlData && data.controlData.adminRemoved) {
           console.log('관리자에 의해 연결이 해제되었습니다:', data.controlData.message);
           setConnectionStatus('연결 안됨');
-          sessionStorage.removeItem('currentPin');
-          sessionStorage.removeItem('connectedPin');
-          sessionStorage.removeItem('controlDeviceId');
           sessionStorage.removeItem('controlSessionId');
+          sessionStorage.removeItem('outputSessionId');
+          sessionStorage.removeItem('currentPin');
           sessionStorage.removeItem('pairingId');
           navigate('/');
         }
       });
       
-      // 연결 상태 모니터링
-      const cleanupMonitoring = ConnectionService.startConnectionMonitoring(savedPin, () => {
-        // 연결 해제 시 메인 화면으로 이동
-        setConnectionStatus('연결 안됨');
-        sessionStorage.removeItem('currentPin');
-        sessionStorage.removeItem('connectedPin');
-        sessionStorage.removeItem('controlDeviceId');
-        sessionStorage.removeItem('controlSessionId');
-        sessionStorage.removeItem('pairingId');
-        navigate('/control');
-      });
-
       return () => {
         unsubscribe();
-        cleanupMonitoring();
       };
     } else {
       setConnectionStatus('연결 안됨');
@@ -58,13 +42,12 @@ function ControlMain() {
   }, [navigate]);
 
   const sendControlData = async (page, scheduleView = 'monthly', mealDate = 0, announcementIndex = 0) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
     console.log('ControlMain: 데이터 전송 시도', { page, scheduleView, mealDate, announcementIndex });
-    console.log('ControlMain: 저장된 PIN:', savedPin, '연결된 PIN:', connectedPin);
+    console.log('ControlMain: 제어 세션 ID:', controlSessionId);
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
         const controlData = {
           currentPage: page
@@ -82,14 +65,14 @@ function ControlMain() {
         
         console.log('ControlMain: 전송할 데이터:', controlData);
         
-        // 연결된 PIN을 사용하여 데이터 전송
-        await ConnectionService.sendControlData(connectedPin, controlData);
+        // ConnectionDB를 사용하여 데이터 전송
+        await ConnectionDB.sendControlData(controlSessionId, controlData);
         console.log('ControlMain: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
     } else {
-      console.error('ControlMain: 연결 정보가 없습니다.', { savedPin, connectedPin });
+      console.error('ControlMain: 제어 세션 ID가 없습니다.');
     }
   };
 
