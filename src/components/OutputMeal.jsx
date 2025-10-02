@@ -52,8 +52,8 @@ function OutputMeal({ controlData }) {
     if (daysOffset === 0) return '오늘의 급식';
     if (daysOffset === -1) return '어제의 급식';
     if (daysOffset === 1) return '내일의 급식';
-    if (daysOffset === 2) return '2일 후의 급식';
-    if (daysOffset === 3) return '3일 후의 급식';
+    if (daysOffset === 2) return '3일 후의 급식'; // 내일 다음은 3일 후
+    if (daysOffset === 3) return '4일 후의 급식';
     if (daysOffset < 0) return `${Math.abs(daysOffset)}일 전의 급식`;
     return `${daysOffset}일 후의 급식`;
   };
