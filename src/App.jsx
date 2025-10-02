@@ -6,7 +6,22 @@ import OutputMode from './components/OutputMode';
 import AdminPanel from './components/AdminPanel';
 
 function App() {
-  const basename = process.env.NODE_ENV === 'production' ? '/simpleInfo' : '';
+  // 현재 URL을 기반으로 basename 결정
+  const getBasename = () => {
+    if (process.env.NODE_ENV === 'production') {
+      return '/simpleInfo';
+    }
+    
+    // 로컬 개발 환경에서도 /simpleInfo 경로 지원
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/simpleInfo')) {
+      return '/simpleInfo';
+    }
+    
+    return '';
+  };
+  
+  const basename = getBasename();
   
   return (
     <Router basename={basename}>
