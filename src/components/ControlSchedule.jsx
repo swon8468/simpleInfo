@@ -10,7 +10,7 @@ function ControlSchedule() {
 
   // 컴포넌트 마운트 시 초기 학사일정 데이터 전송 (월별)
   useEffect(() => {
-    sendControlDataWithData(currentDate, 'monthly'); // 초기 데이터 전송 시 'monthly' 사용
+    sendControlDataWithData('monthly', currentDate); // 매개변수 순서 수정: mode, date
   }, []); // 빈 배열로 한 번만 실행
 
   const handleBackToMain = async () => {

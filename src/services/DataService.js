@@ -12,7 +12,8 @@ import {
   orderBy,
   where,
   serverTimestamp,
-  increment
+  increment,
+  Timestamp
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
@@ -60,11 +61,19 @@ class DataService {
   // 주간 학사일정 데이터 가져오기
   async getWeeklyScheduleData(startDate, endDate) {
     try {
+      console.log('DataService: 주간 학사일정 데이터 가져오기 시작', { startDate, endDate });
+      
+      // Date 객체를 Firebase Timestamp로 변환
+      const startTimestamp = Timestamp.fromDate(startDate);
+      const endTimestamp = Timestamp.fromDate(endDate);
+      
+      console.log('DataService: 변환된 타임스탬프', { startTimestamp, endTimestamp });
+      
       const scheduleRef = collection(db, 'schedules');
       const q = query(
         scheduleRef,
-        where('eventDate', '>=', startDate),
-        where('eventDate', '<=', endDate),
+        where('eventDate', '>=', startTimestamp),
+        where('eventDate', '<=', endTimestamp),
         orderBy('eventDate')
       );
       const querySnapshot = await getDocs(q);
@@ -87,6 +96,7 @@ class DataService {
         });
       });
       
+      console.log('DataService: 주간 학사일정 데이터 가져오기 완료', schedules);
       return schedules;
     } catch (error) {
       console.error('주간 학사일정 데이터 가져오기 실패:', error);
