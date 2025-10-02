@@ -100,7 +100,11 @@ function AdminScheduleCalendar() {
     setLoading(true);
     
     try {
-      const eventDate = selectedDate.toISOString().split('T')[0];
+      // 로컬 날짜를 사용하여 시간대 변환 문제 방지
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const eventDate = `${year}-${month}-${day}`;
       
       if (editingEvent) {
         // 수정

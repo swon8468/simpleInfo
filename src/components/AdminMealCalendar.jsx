@@ -106,7 +106,11 @@ function AdminMealCalendar() {
     setLoading(true);
     
     try {
-      const mealDate = selectedDate.toISOString().split('T')[0];
+      // 로컬 날짜를 사용하여 시간대 변환 문제 방지
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const mealDate = `${year}-${month}-${day}`;
       const lunchItems = formData.lunch.split(',').map(item => item.trim()).filter(item => item);
       const dinnerItems = formData.dinner.split(',').map(item => item.trim()).filter(item => item);
       
