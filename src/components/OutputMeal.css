@@ -126,7 +126,7 @@
 .meal-items {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 200px;
   padding: 25px;
   background: white;
@@ -135,10 +135,11 @@
 .meal-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto auto;
   gap: 20px;
   width: 100%;
   max-width: 400px;
+  height: auto;
 }
 
 .meal-item {
