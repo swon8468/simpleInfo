@@ -116,9 +116,12 @@ function AdminPanel() {
             
             // 제어용 디바이스가 신호를 받을 시간을 주기 위해 잠시 대기
             await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // 제어용 세션 먼저 삭제
+            await ConnectionDB.disconnectSession(controlSessionId);
           }
           
-          // 출력용 세션 삭제 (연결된 제어용 세션도 함께 삭제됨)
+          // 출력용 세션 삭제
           await ConnectionDB.disconnectSession(outputSessionId);
           
           setPinMessage(`PIN ${pinId}이(가) 성공적으로 제거되었습니다.`);

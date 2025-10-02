@@ -87,8 +87,7 @@ function ControlConnectionInfo() {
         // 출력용 디바이스에게 메인 화면으로 이동하라는 신호 전송
         if (outputSessionId) {
           await ConnectionDB.sendControlData(controlSessionId, {
-            currentPage: 'main',
-            adminRemoved: true
+            currentPage: 'main'
           });
           
           // 출력용 디바이스가 신호를 받을 시간을 주기 위해 잠시 대기
