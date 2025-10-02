@@ -154,6 +154,7 @@ function AdminMealCalendar() {
 
   return (
     <div className="admin-meal-calendar">
+      <h2 className="meal-calendar-title">급식 목록</h2>
       <div className="calendar-header">
         <button onClick={() => navigateMonth(-1)}>이전 달</button>
         <h2>{currentDate.getFullYear()}년 {monthNames[currentDate.getMonth()]}</h2>
