@@ -98,14 +98,33 @@ function MainScreen() {
           if (docSnap.exists()) {
             const data = docSnap.data();
             console.log('MainScreen: Firebase 연결 상태:', data);
+            console.log('MainScreen: status:', data.status);
+            console.log('MainScreen: connectedControlDevice:', data.connectedControlDevice);
+            console.log('MainScreen: deviceType:', data.deviceType);
             
-            // 실제로 연결된 상태인지 확인
-            if (data.status === 'connected' && data.connectedControlDevice) {
-              alert('이미 출력용 디바이스가 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
-              return;
+            // 실제로 연결된 상태인지 확인 (더 엄격한 조건)
+            if (data.status === 'connected' && data.connectedControlDevice && data.deviceType === 'output') {
+              console.log('MainScreen: 실제로 연결된 상태로 판단');
+              
+              // 사용자에게 선택권 제공
+              const shouldContinue = window.confirm(
+                '기존 PIN이 연결된 상태입니다. 기존 연결을 무시하고 새로운 PIN을 생성하시겠습니까?\n\n' +
+                '기존 연결: ' + existingPin + '\n' +
+                '상태: ' + data.status + '\n' +
+                '연결된 제어용 디바이스: ' + (data.connectedControlDevice || '없음')
+              );
+              
+              if (shouldContinue) {
+                console.log('MainScreen: 사용자가 기존 연결 무시 선택, localStorage 정리');
+                localStorage.removeItem('currentPin');
+              } else {
+                console.log('MainScreen: 사용자가 취소 선택, 연결 거부');
+                return;
+              }
             } else {
               // 연결되지 않은 상태면 localStorage 정리
               console.log('MainScreen: 연결되지 않은 PIN 발견, localStorage 정리');
+              console.log('MainScreen: 정리 이유 - status:', data.status, 'connectedControlDevice:', data.connectedControlDevice, 'deviceType:', data.deviceType);
               localStorage.removeItem('currentPin');
             }
           } else {
