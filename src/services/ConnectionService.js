@@ -9,7 +9,8 @@ import {
   deleteDoc,
   query,
   where,
-  getDocs
+  getDocs,
+  updateDoc
 } from 'firebase/firestore';
 
 class ConnectionService {
@@ -162,13 +163,13 @@ class ConnectionService {
         pin = connectedPin; // 연결된 PIN 사용
       }
       
-      // 출력용 디바이스 문서에만 데이터 전송
+      // 출력용 디바이스 문서에 데이터 업데이트 (기존 문서 덮어쓰지 않음)
       const outputDocRef = doc(db, 'connections', pin);
-      await setDoc(outputDocRef, {
+      await updateDoc(outputDocRef, {
         controlData: data,
         lastUpdated: serverTimestamp(),
         heartbeat: serverTimestamp() // 연결 상태 확인용
-      }, { merge: true });
+      });
       
       console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId, data);
     } catch (error) {
@@ -344,9 +345,30 @@ class ConnectionService {
         // 연결된 제어용 디바이스가 있다면 함께 삭제
         if (outputData.connectedControlDevice) {
           const controlDocRef = doc(db, 'connections', outputData.connectedControlDevice);
+          
+          // 제어용 디바이스에게 메인 화면으로 이동하라는 신호 전송
+          await updateDoc(controlDocRef, {
+            controlData: {
+              currentPage: 'main',
+              adminRemoved: true,
+              message: '관리자에 의해 연결이 해제되었습니다.'
+            },
+            lastUpdated: serverTimestamp()
+          });
+          
           await deleteDoc(controlDocRef);
           console.log(`제어용 디바이스 ${outputData.connectedControlDevice} 제거 완료.`);
         }
+        
+        // 출력용 디바이스에게 메인 화면으로 이동하라는 신호 전송
+        await updateDoc(outputDocRef, {
+          controlData: {
+            currentPage: 'main',
+            adminRemoved: true,
+            message: '관리자에 의해 연결이 해제되었습니다.'
+          },
+          lastUpdated: serverTimestamp()
+        });
         
         // 출력용 디바이스 문서 삭제
         await deleteDoc(outputDocRef);

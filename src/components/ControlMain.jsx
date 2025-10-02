@@ -16,6 +16,18 @@ function ControlMain() {
     if (savedPin && connectedPin && controlDeviceId) {
       setConnectionStatus('연결됨');
       
+      // 관리자에 의한 연결 해제 감지를 위한 실시간 구독
+      const unsubscribe = ConnectionService.subscribeToControlData(savedPin, (data) => {
+        if (data.controlData && data.controlData.adminRemoved) {
+          console.log('관리자에 의해 연결이 해제되었습니다:', data.controlData.message);
+          setConnectionStatus('연결 안됨');
+          localStorage.removeItem('currentPin');
+          localStorage.removeItem('connectedPin');
+          localStorage.removeItem('controlDeviceId');
+          navigate('/');
+        }
+      });
+      
       // 연결 상태 모니터링
       const cleanupMonitoring = ConnectionService.startConnectionMonitoring(savedPin, () => {
         // 연결 해제 시 메인 화면으로 이동
@@ -26,7 +38,10 @@ function ControlMain() {
         navigate('/control');
       });
 
-      return cleanupMonitoring;
+      return () => {
+        unsubscribe();
+        cleanupMonitoring();
+      };
     } else {
       setConnectionStatus('연결 안됨');
     }

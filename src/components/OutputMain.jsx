@@ -28,6 +28,14 @@ function OutputMain() {
           const newControlData = data.controlData;
           const newPage = newControlData.currentPage || 'main';
           
+          // 관리자에 의해 연결이 해제된 경우 메인 화면으로 이동
+          if (newControlData.adminRemoved) {
+            console.log('관리자에 의해 연결이 해제되었습니다:', newControlData.message);
+            localStorage.removeItem('currentPin');
+            navigate('/');
+            return;
+          }
+          
           // 상태가 실제로 변경되었을 때만 업데이트 (중요한 필드만 비교)
           setControlData(prevControlData => {
             const prevImportant = prevControlData ? {
