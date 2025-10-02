@@ -55,10 +55,13 @@ function ControlConnectionInfo() {
       return;
     }
 
-    // 비밀번호가 올바르면 팝업을 닫고 인증 완료
+    // 비밀번호가 올바르면 팝업을 닫고 바로 연결 해제 실행
     setShowPinPopup(false);
     setIsAuthenticated(true);
     setErrorMessage('');
+    
+    // 바로 연결 해제 실행
+    await executeDisconnect();
   };
 
   const handlePinCancel = () => {
@@ -69,14 +72,7 @@ function ControlConnectionInfo() {
     setIsAuthenticated(false);
   };
 
-  const handleDisconnect = async () => {
-    // 인증이 완료되지 않았으면 팝업 표시
-    if (!isAuthenticated) {
-      handlePinButtonClick();
-      return;
-    }
-
-    // 인증이 완료되었으면 연결 해제
+  const executeDisconnect = async () => {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     const outputSessionId = sessionStorage.getItem('outputSessionId');
     
@@ -87,7 +83,8 @@ function ControlConnectionInfo() {
         // 출력용 디바이스에게 메인 화면으로 이동하라는 신호 전송
         if (outputSessionId) {
           await ConnectionDB.sendControlData(controlSessionId, {
-            currentPage: 'main'
+            currentPage: 'main',
+            adminRemoved: true
           });
           
           // 출력용 디바이스가 신호를 받을 시간을 주기 위해 잠시 대기
@@ -117,6 +114,17 @@ function ControlConnectionInfo() {
     } else {
       setErrorMessage('연결된 세션이 없습니다.');
     }
+  };
+
+  const handleDisconnect = async () => {
+    // 인증이 완료되지 않았으면 팝업 표시
+    if (!isAuthenticated) {
+      handlePinButtonClick();
+      return;
+    }
+
+    // 인증이 완료되었으면 연결 해제 실행
+    await executeDisconnect();
   };
 
   const handleBackToMain = () => {
