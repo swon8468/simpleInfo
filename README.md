@@ -1,42 +1,58 @@
-# 학교생활도우미 (School Life Assistant)
+# 학교생활도우미 (School Life Helper)
 
-광주동신여자고등학교를 위한 학생 생활 도우미 웹 애플리케이션입니다. 제어용과 출력용 디바이스로 구성되어 실시간으로 학교 정보를 관리하고 표시할 수 있습니다.
+광주동신여자고등학교를 위한 학생 생활 지원 시스템입니다. 출력용 디스플레이와 제어용 디바이스가 실시간으로 연결되어 학사일정, 급식, 교실 배치, 공지사항 등을 효율적으로 관리할 수 있습니다.
 
-## 🚀 주요 기능
+## 🌟 주요 기능
 
-### 📱 제어용 디바이스
-- **학사일정 관리**: 월별/주별 학사일정 조회 및 제어
-- **급식 정보**: 일별 급식 메뉴 확인 및 날짜 이동
-- **알레르기 정보**: 4x6 표 형태로 알레르기 정보 표시
-- **공지사항**: 공지사항 조회 및 네비게이션
-- **교실 배치**: 교실 배치도 확인 안내
-- **연결 관리**: PIN 기반 실시간 연결 및 해제
+### 📱 듀얼 디바이스 시스템
+- **출력용 디바이스**: 대형 화면에 정보 표시
+- **제어용 디바이스**: 터치스크린으로 출력 내용 제어
+- **실시간 연결**: Firebase를 통한 실시간 데이터 동기화
 
-### 🖥️ 출력용 디바이스
-- **메인 화면**: 학교 로고와 프로젝트명 표시
-- **학사일정**: 월별/주별 달력 형태로 학사일정 표시
-- **급식 정보**: 점심/저녁 메뉴를 깔끔한 디자인으로 표시
-- **교실 배치**: Firebase Storage에 업로드된 교실 배치도 표시
-- **공지사항**: 테이블 형태로 공지사항 목록 표시 (조회수 자동 증가)
+### 📅 학사일정 관리
+- **월간/주간 뷰**: 달력 형태로 학사일정 표시
+- **학년별 표시**: 1학년, 2학년, 3학년 대상 일정 구분
+- **날짜 네비게이션**: 이전/다음 달, 주 이동 기능
+- **실시간 업데이트**: 관리자가 추가/수정한 일정 즉시 반영
 
-### 🔧 관리자 패널
-- **학사일정 관리**: 달력 기반 학사일정 추가/수정/삭제
-- **급식 관리**: 달력 기반 급식 정보 추가/수정/삭제
-- **공지사항 관리**: 테이블 형태로 공지사항 CRUD
-- **알레르기 정보**: 알레르기 정보 관리
-- **교실 배치**: Firebase Storage를 통한 이미지 업로드/삭제
-- **PIN 관리**: 활성화된 PIN 조회 및 제거 (최대 10개)
+### 🍽️ 급식 정보
+- **일별 급식**: 오늘, 어제, 내일 급식 메뉴 표시
+- **알레르기 정보**: 알레르기 유발 식품 정보 제공
+- **메뉴 상세**: 점심, 저녁 메뉴를 구분하여 표시
+
+### 🗺️ 교실 배치
+- **캠퍼스 맵**: 학교 내 건물 및 교실 위치 안내
+- **이미지 업로드**: 관리자가 직접 캠퍼스 맵 이미지 업로드 가능
+
+### 📢 공지사항
+- **실시간 공지**: 새로운 공지사항 즉시 표시
+- **조회수 추적**: 공지사항별 조회수 자동 증가
+- **페이지네이션**: 이전/다음 공지사항 이동
+
+### 🔐 관리자 시스템
+- **데이터 관리**: 학사일정, 급식, 공지사항 CRUD 기능
+- **연결 관리**: 활성 연결 상태 모니터링 및 관리
+- **이미지 관리**: 캠퍼스 맵 이미지 업로드/관리
 
 ## 🛠️ 기술 스택
 
-- **Frontend**: React.js, Vite
-- **Backend**: Firebase (Firestore, Storage, Authentication)
-- **Styling**: CSS3 (Flexbox, Grid, 애니메이션)
-- **State Management**: React Hooks (useState, useEffect)
-- **Routing**: React Router
-- **Real-time Communication**: Firebase onSnapshot
+### Frontend
+- **React 19.1.1**: 최신 React 버전으로 개발
+- **React Router DOM 7.9.3**: 클라이언트 사이드 라우팅
+- **Vite 7.1.7**: 빠른 개발 서버 및 빌드 도구
 
-## 📦 설치 및 실행
+### Backend & Database
+- **Firebase 12.3.0**: 
+  - Firestore: 실시간 데이터베이스
+  - Storage: 이미지 파일 저장
+  - Authentication: 관리자 인증
+
+### Development Tools
+- **ESLint**: 코드 품질 관리
+- **GitHub Pages**: 정적 사이트 호스팅
+- **gh-pages**: 자동 배포 도구
+
+## 🚀 설치 및 실행
 
 ### 1. 프로젝트 클론
 ```bash
@@ -49,191 +65,115 @@ cd simpleInfo
 npm install
 ```
 
-### 3. 개발 서버 실행
+### 3. Firebase 설정
+1. Firebase 프로젝트 생성
+2. Firestore Database 활성화
+3. Storage 활성화
+4. `src/firebase.js` 파일에 Firebase 설정 정보 입력
+
+### 4. 개발 서버 실행
 ```bash
 npm run dev
 ```
+- 로컬 서버: `http://localhost:3000/simpleInfo/`
+- 네트워크 접근: `http://0.0.0.0:3000/simpleInfo/`
 
-### 4. 빌드
+### 5. 프로덕션 빌드
 ```bash
 npm run build
 ```
 
-## 🔧 Firebase 설정
+## 📱 사용 방법
 
-### 1. Firebase 프로젝트 생성
-1. [Firebase Console](https://console.firebase.google.com/)에서 새 프로젝트 생성
-2. Firestore Database 활성화
-3. Storage 활성화
-4. Authentication 설정 (선택사항)
+### 출력용 디바이스 설정
+1. 브라우저에서 `http://localhost:3000/simpleInfo/` 접속
+2. "출력용" 버튼 클릭
+3. 생성된 PIN 코드 확인
+4. 제어용 디바이스에서 PIN 코드 입력하여 연결
 
-### 2. Firebase 설정 파일
-`src/firebase.js` 파일에 Firebase 설정 정보를 입력하세요:
+### 제어용 디바이스 설정
+1. 브라우저에서 `http://localhost:3000/simpleInfo/` 접속
+2. "제어용" 버튼 클릭
+3. 출력용 디바이스의 PIN 코드 입력
+4. 연결 완료 후 원하는 기능 선택
 
-```javascript
-const firebaseConfig = {
-  apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id"
-};
+### 관리자 모드 접속
+1. URL에 `?admin=true` 추가: `http://localhost:3000/simpleInfo/?admin=true`
+2. 관리자 비밀번호 입력: `swon8468`
+3. 데이터 관리 및 시스템 설정
+
+## 🔧 주요 컴포넌트
+
+### 출력용 컴포넌트
+- `OutputMain.jsx`: 메인 출력 화면
+- `OutputLoading.jsx`: 연결 대기 화면
+
+### 제어용 컴포넌트
+- `ControlMain.jsx`: 제어 메인 화면
+- `ControlSchedule.jsx`: 학사일정 제어
+- `ControlMeal.jsx`: 급식 정보 제어
+- `ControlAnnouncement.jsx`: 공지사항 제어
+- `ControlRoadmap.jsx`: 교실 배치 제어
+
+### 서비스
+- `ConnectionDB.js`: 실시간 연결 관리
+- `DataService.js`: Firebase 데이터 관리
+
+## 🌐 배포
+
+### GitHub Pages 배포
+```bash
+npm run deploy
 ```
 
-### 3. Firestore 보안 규칙
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true; // 개발용 - 프로덕션에서는 인증 필요
-    }
-  }
-}
-```
-
-### 4. Storage 보안 규칙
-```javascript
-rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if true; // 개발용 - 프로덕션에서는 인증 필요
-    }
-  }
-}
+### 수동 배포
+```bash
+npm run build
+# dist 폴더를 웹 서버에 업로드
 ```
 
 ## 📊 데이터베이스 구조
 
-### Firestore Collections
+### Collections
+- `schedules`: 학사일정 데이터
+- `meals`: 급식 메뉴 데이터
+- `announcements`: 공지사항 데이터
+- `connections`: 디바이스 연결 상태
+- `settings`: 시스템 설정 (알레르기 정보 등)
 
-#### connections
-```javascript
-{
-  pin: "123456",
-  createdAt: timestamp,
-  status: "connected" | "waiting" | "disconnected",
-  controlData: {
-    currentPage: "main" | "schedule" | "meal" | "roadmap" | "announcement",
-    scheduleView: "monthly" | "weekly",
-    scheduleDate: "2024-01-01T00:00:00.000Z",
-    mealDate: 0,
-    announcementIndex: 0
-  }
-}
-```
+### 주요 필드
+- **학사일정**: `eventDate`, `title`, `target` (학년)
+- **급식**: `date`, `lunch`, `dinner` (메뉴 배열)
+- **공지사항**: `title`, `content`, `views`, `createdAt`
 
-#### announcements
-```javascript
-{
-  createdAt: timestamp,
-  title: "공지사항 제목",
-  content: "공지사항 내용",
-  views: 0
-}
-```
+## 🔒 보안
 
-#### schedules
-```javascript
-{
-  createdAt: timestamp,
-  eventDate: "2024-01-01",
-  title: "행사명",
-  target: ["1학년", "2학년", "3학년"]
-}
-```
-
-#### meals
-```javascript
-{
-  createdAt: timestamp,
-  date: "2024-01-01",
-  lunch: ["메뉴1", "메뉴2", "메뉴3"],
-  dinner: ["메뉴1", "메뉴2", "메뉴3"]
-}
-```
-
-#### settings
-```javascript
-// 알레르기 정보
-{
-  items: ["견과류", "우유", "계란", "대두"]
-}
-
-// 교실 배치 이미지
-{
-  imageURL: "https://firebasestorage.googleapis.com/...",
-  fileName: "campus-layout-1234567890.jpg",
-  uploadedAt: timestamp
-}
-```
-
-## 🎯 사용 방법
-
-### 1. 출력용 디바이스 설정
-1. 메인 화면에서 "출력용" 선택
-2. 생성된 PIN 번호 확인
-3. 출력용 화면에서 PIN 번호 표시
-
-### 2. 제어용 디바이스 설정
-1. 메인 화면에서 "제어용" 선택
-2. 출력용 디바이스에 표시된 PIN 번호 입력
-3. 연결 성공 후 제어 시작
-
-### 3. 관리자 패널 접근
-- URL에 `?admin=true` 추가
-- 또는 `Ctrl + Shift + A` 키 조합
-- 비밀번호: `swon8468`
-
-## 🔄 실시간 동기화
-
-- Firebase의 `onSnapshot`을 사용하여 실시간 데이터 동기화
-- 제어용 디바이스의 모든 조작이 즉시 출력용 디바이스에 반영
-- 연결 상태 모니터링 및 자동 해제 기능
-- 페이지 새로고침 시 자동으로 메인 화면으로 이동
-
-## 🎨 주요 디자인 특징
-
-- **반응형 디자인**: 다양한 화면 크기에 대응
-- **중앙 정렬**: 모든 요소가 화면 중앙에 배치
-- **일관된 색상**: 파란색 계열의 통일된 디자인
-- **로딩 스피너**: 데이터 로드 중 사용자 경험 개선
-- **애니메이션**: 부드러운 전환 효과 및 호버 효과
-
-## 📱 네트워크 설정
-
-개발 서버를 네트워크에서 접근 가능하게 하려면:
-
-```bash
-npm run dev -- --host 0.0.0.0
-```
-
-## 🔒 보안 고려사항
-
-- 프로덕션 환경에서는 Firestore 및 Storage 보안 규칙을 강화하세요
-- 관리자 비밀번호를 변경하세요
-- PIN 생성 제한을 적절히 조정하세요
-
-## 🐛 알려진 이슈
-
-- Firebase Storage 권한 설정이 필요할 수 있습니다
-- 일부 브라우저에서 WebRTC 관련 기능이 제한될 수 있습니다
+- 관리자 인증 시스템
+- 세션 기반 연결 관리
+- Firebase 보안 규칙 적용
 
 ## 📝 라이선스
 
-이 프로젝트는 교육 목적으로 제작되었습니다.
+이 프로젝트는 교육 목적으로 개발되었습니다.
 
-## 👥 기여자
+## 👥 개발자
 
 - **개발자**: swon8468
-- **학교**: 광주동신여자고등학교
+- **GitHub**: [https://github.com/swon8468/simpleInfo](https://github.com/swon8468/simpleInfo)
+- **라이브 데모**: [https://swon8468.github.io/simpleInfo](https://swon8468.github.io/simpleInfo)
 
-## 📞 지원
+## 🆕 최근 업데이트
 
-문제가 발생하거나 질문이 있으시면 GitHub Issues를 통해 문의해주세요.
+### v1.0.0 (2024-12-19)
+- ✅ 듀얼 디바이스 실시간 연결 시스템 구현
+- ✅ 학사일정 월간/주간 뷰 기능
+- ✅ 급식 정보 및 알레르기 안내
+- ✅ 교실 배치 이미지 업로드 기능
+- ✅ 공지사항 관리 시스템
+- ✅ 관리자 대시보드 구현
+- ✅ Firebase 실시간 데이터베이스 연동
+- ✅ GitHub Pages 자동 배포 설정
 
 ---
 
-**학교생활도우미** - 학생들의 학교 생활을 더욱 편리하게 만들어주는 디지털 도우미입니다. 🎓
+**학교생활도우미**로 더 나은 학교 생활을 경험해보세요! 🎓✨
