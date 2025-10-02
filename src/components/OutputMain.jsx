@@ -400,8 +400,6 @@ function OutputMain() {
 
     const getDateLabel = (days) => {
       if (days === 0) return '오늘';
-      if (days === -1) return '어제';
-      if (days === 1) return '내일';
       if (days < 0) return `${Math.abs(days)}일 전`;
       return `${days}일 후`;
     };

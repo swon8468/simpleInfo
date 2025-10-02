@@ -6,7 +6,7 @@ import './ControlMeal.css';
 
 function ControlMeal() {
   const navigate = useNavigate();
-  const [mealDate, setMealDate] = useState(0); // 0 = 오늘, -1 = 어제, 1 = 내일
+  const [mealDate, setMealDate] = useState(0); // 0 = 오늘, -1 = 1일 전, 1 = 1일 후
   const [allergyInfo, setAllergyInfo] = useState([]);
 
   useEffect(() => {
