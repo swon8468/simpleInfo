@@ -15,8 +15,11 @@ function ControlMeal() {
 
   const loadAllergyInfo = async () => {
     try {
+      console.log('ControlMeal: 알레르기 정보 로드 시작');
       const allergyData = await DataService.getAllergyInfo();
+      console.log('ControlMeal: 가져온 알레르기 데이터:', allergyData);
       setAllergyInfo(allergyData || []);
+      console.log('ControlMeal: 알레르기 정보 설정 완료, 길이:', (allergyData || []).length);
     } catch (error) {
       console.error('알레르기 정보 로드 실패:', error);
     }
