@@ -1,0 +1,756 @@
+.no-data {
+  color: #999;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+}
+
+.no-announcements {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: #666;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 2px dashed #ddd;
+}
+
+.output-main {
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.monitor-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.school-name {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.app-title {
+  font-size: 1.8rem;
+  color: #666;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.team-name {
+  font-size: 1.2rem;
+  color: #999;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.content-area {
+  width: 100%;
+  max-width: 1200px;
+  background-color: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  margin: 0 auto 30px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* 메인 화면 스타일 */
+.main-display {
+  text-align: center;
+  padding: 60px 0;
+}
+
+.logo-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.school-logo {
+  font-size: 8rem;
+  margin-bottom: 20px;
+}
+
+.main-title {
+  font-size: 3rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.main-subtitle {
+  font-size: 2rem;
+  color: #666;
+}
+
+/* 학사일정 스타일 */
+.schedule-display {
+  text-align: center;
+}
+
+.schedule-display h2 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* 월별 달력 스타일 */
+.calendar-container {
+  max-width: 1200px;
+  min-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.day-header {
+  background-color: #2196F3;
+  color: white;
+  padding: 15px 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  min-width: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.calendar-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  max-width: 1200px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.calendar-day {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  min-height: 120px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.calendar-day.current-month {
+  background-color: white;
+}
+
+.calendar-day.other-month {
+  background-color: #f8f9fa;
+  color: #999;
+}
+
+.day-number {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.day-number.saturday {
+  color: #2196F3;
+}
+
+.day-number.sunday {
+  color: #f44336;
+}
+
+.day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+}
+
+.event-item {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+.week-range {
+  font-size: 1.3rem;
+  color: #666;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.event-title {
+  font-weight: bold;
+  margin-bottom: 2px;
+  font-size: 0.7rem;
+}
+
+.event-target {
+  font-size: 0.6rem;
+  color: #666;
+  font-style: italic;
+}
+
+.grade-item {
+  display: block;
+  margin-bottom: 1px;
+  font-size: 0.6rem;
+}
+
+/* 주별 달력 스타일 */
+.weekly-calendar {
+  max-width: 1200px;
+  min-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.week-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 15px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.week-day {
+  background-color: #2196F3;
+  color: white;
+  padding: 15px 10px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  border-radius: 5px;
+  text-align: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.week-body {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.week-day-cell {
+  background-color: white;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  padding: 10px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+.week-day-number {
+  font-weight: bold;
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.week-day-number.saturday {
+  color: #2196F3;
+}
+
+.week-day-number.sunday {
+  color: #f44336;
+}
+
+.week-day-events {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+}
+
+.week-event-item {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* 급식 스타일 */
+.meal-display {
+  text-align: center;
+  max-width: 1400px;
+  min-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 80vh;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.meal-date-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.meal-date-header h2 {
+  font-size: 3.5rem;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.meal-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.lunch-section {
+  text-align: left;
+}
+
+.dinner-section {
+  text-align: right;
+}
+
+.meal-section h3 {
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 25px;
+  text-align: center;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.meal-items {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.meal-item {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  color: #2c3e50;
+  padding: 20px 25px;
+  border-radius: 12px;
+  font-size: 1.6rem;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  border: 2px solid #e9ecef;
+  position: relative;
+}
+
+.meal-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  border-color: #3498db;
+}
+
+.meal-item:nth-child(even) {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-color: #dee2e6;
+}
+
+.meal-item:nth-child(even):hover {
+  border-color: #3498db;
+}
+
+.no-meal-data {
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: #6c757d;
+  padding: 30px;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  border: 2px dashed #dee2e6;
+  margin: 20px 0;
+}
+
+/* 교내 배치도 스타일 */
+.roadmap-display {
+  text-align: center;
+  max-width: 1000px;
+  min-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.roadmap-display h2 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.campus-map {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  justify-items: center;
+}
+
+.building-section h3 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.floor-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.floor {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  border: 2px solid #dee2e6;
+}
+
+.floor-label {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.rooms {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.room {
+  background-color: #E3F2FD;
+  color: #1976D2;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid #2196F3;
+}
+
+.room.special {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.special-rooms {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* 공지사항 스타일 */
+.announcement-display {
+  text-align: center;
+  max-width: 1000px;
+  min-width: 600px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+.announcement-display h2 {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.announcement-table {
+  margin-bottom: 30px;
+  width: 85%;
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.announcement-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  gap: 10px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+.announcement-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 120px;
+  gap: 10px;
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.3s ease;
+}
+
+.announcement-row.active {
+  background-color: #e3f2fd;
+}
+
+.announcement-row:hover {
+  background-color: #f8f9fa;
+}
+
+.col-number, .col-title, .col-date {
+  display: flex;
+  align-items: center;
+}
+
+.announcement-content {
+  background-color: #f8f9fa;
+  padding: 30px;
+  border-radius: 10px;
+  border: 2px solid #dee2e6;
+  width: 85%;
+  max-width: 850px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.announcement-content h3 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.announcement-content p {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.announcement-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 1rem;
+  color: #999;
+  justify-content: center;
+}
+
+/* 로딩 스타일 */
+.loading {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #666;
+  padding: 50px;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background-color: white;
+  border-radius: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  background-color: #4CAF50;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator span {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+}
+
+@media (max-width: 768px) {
+  .school-name {
+    font-size: 2rem;
+  }
+  
+  .app-title {
+    font-size: 1.5rem;
+  }
+  
+  .team-name {
+    font-size: 1.1rem;
+  }
+  
+  .content-area {
+    padding: 20px;
+  }
+  
+  .main-title {
+    font-size: 2rem;
+  }
+  
+  .main-subtitle {
+    font-size: 1.5rem;
+  }
+  
+  .school-logo {
+    font-size: 5rem;
+  }
+  
+  .schedule-table {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .meal-sections {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .campus-map {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .special-rooms {
+    grid-template-columns: 1fr;
+  }
+  
+  .announcement-header,
+  .announcement-row {
+    grid-template-columns: 60px 1fr 100px;
+    font-size: 0.9rem;
+  }
+  
+  .announcement-content {
+    padding: 20px;
+  }
+}
+
+/* 교실 배치 이미지 스타일 */
+.campus-image-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.campus-image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  object-fit: contain;
+}
+
+.no-campus-image {
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f5f5f5, #e3f2fd);
+  border-radius: 15px;
+  border: 2px dashed #2196F3;
+  margin: 20px 0;
+}
+
+.no-campus-image h3 {
+  font-size: 2rem;
+  color: #2196F3;
+  margin-bottom: 15px;
+}
+
+.no-campus-image p {
+  font-size: 1.2rem;
+  color: #666;
+  margin: 0;
+}

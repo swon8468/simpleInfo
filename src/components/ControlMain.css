@@ -1,0 +1,203 @@
+.control-main {
+  min-height: 100vh;
+  width: 100vw;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  text-align: center;
+  box-sizing: border-box;
+  margin: 0;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.menu-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 30px 40px;
+  border-radius: 20px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(76, 175, 80, 0.4);
+  background: linear-gradient(135deg, #45a049 0%, #4CAF50 100%);
+}
+
+.menu-btn:active {
+  transform: translateY(-2px);
+}
+
+.connection-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.connection-info-btn {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+  width: 100%;
+}
+
+.connection-info-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(33, 150, 243, 0.4);
+}
+
+.connection-status {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px 30px;
+  border-radius: 20px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.connection-status::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.connection-status.connected {
+  color: #4CAF50;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+  border: 3px solid #4CAF50;
+  animation: pulse-green 2s infinite;
+}
+
+.connection-status.connected::before {
+  left: 100%;
+}
+
+.connection-status.disconnected {
+  color: #f44336;
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.15), rgba(244, 67, 54, 0.05));
+  border: 3px solid #f44336;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(76, 175, 80, 0.5);
+  }
+  100% {
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+  }
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(244, 67, 54, 0.5);
+  }
+  100% {
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.3);
+  }
+}
+
+.disconnect-btn {
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+  width: 100%;
+}
+
+.disconnect-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+}
+
+.main-screen-btn {
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+  width: 100%;
+}
+
+.main-screen-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .menu-grid {
+    gap: 20px;
+    max-width: 400px;
+  }
+  
+  .menu-btn {
+    padding: 25px 20px;
+    font-size: 1.3rem;
+    min-height: 100px;
+  }
+  
+  .connection-section {
+    max-width: 300px;
+  }
+}

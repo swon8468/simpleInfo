@@ -1,0 +1,134 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ConnectionService from '../services/ConnectionService';
+import DataService from '../services/DataService';
+import './ControlMeal.css';
+
+function ControlMeal() {
+  const navigate = useNavigate();
+  const [mealDate, setMealDate] = useState(0); // 0 = 오늘, -1 = 어제, 1 = 내일
+  const [allergyInfo, setAllergyInfo] = useState([]);
+
+  useEffect(() => {
+    loadAllergyInfo();
+  }, []);
+
+  const loadAllergyInfo = async () => {
+    try {
+      const allergyData = await DataService.getAllergyInfo();
+      setAllergyInfo(allergyData || []);
+    } catch (error) {
+      console.error('알레르기 정보 로드 실패:', error);
+    }
+  };
+
+  const handleBackToMain = async () => {
+    await sendControlData('main');
+    navigate('/control/main');
+  };
+
+  const sendControlData = async (page) => {
+    const savedPin = localStorage.getItem('currentPin');
+    if (savedPin) {
+      try {
+        await ConnectionService.sendControlData(savedPin, {
+          currentPage: page
+        });
+      } catch (error) {
+        console.error('제어 데이터 전송 실패:', error);
+      }
+    }
+  };
+
+  const handleDateChange = async (days) => {
+    setMealDate(days);
+    await sendMealDataWithDate(days);
+  };
+
+  const sendMealDataWithDate = async (days) => {
+    const savedPin = localStorage.getItem('currentPin');
+    if (savedPin) {
+      try {
+        await ConnectionService.sendControlData(savedPin, {
+          currentPage: 'meal',
+          mealDate: days
+        });
+      } catch (error) {
+        console.error('제어 데이터 전송 실패:', error);
+      }
+    }
+  };
+
+  const getDateLabel = (days) => {
+    if (days === 0) return '오늘';
+    if (days === -1) return '어제';
+    if (days === 1) return '내일';
+    if (days === 2) return '3일 후'; // 내일 다음은 3일 후
+    if (days < 0) return `${Math.abs(days)}일 전`;
+    return `${days}일 후`;
+  };
+
+  return (
+    <div className="control-meal">
+      <div className="project-header">
+        <h1>학교생활도우미</h1>
+      </div>
+      
+      <h2>급식</h2>
+      
+      <div className="meal-navigation">
+        <button className="meal-btn" onClick={() => handleDateChange(mealDate - 1)}>
+          {getDateLabel(mealDate - 1)}
+        </button>
+        <div className="current-date">
+          현재: {getDateLabel(mealDate)}
+        </div>
+        <button className="meal-btn" onClick={() => handleDateChange(mealDate + 1)}>
+          {getDateLabel(mealDate + 1)}
+        </button>
+      </div>
+
+
+      <div className="today-button-section">
+        <button className="today-btn" onClick={() => handleDateChange(0)}>
+          오늘로 이동
+        </button>
+      </div>
+
+      <div className="allergy-info">
+        <h3>알레르기 정보</h3>
+        <div className="allergy-table">
+          {allergyInfo.length > 0 ? (
+            <table>
+              <tbody>
+                {Array.from({ length: 6 }, (_, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {Array.from({ length: 4 }, (_, colIndex) => {
+                      const itemIndex = rowIndex * 4 + colIndex;
+                      const item = allergyInfo[itemIndex];
+                      return (
+                        <td key={colIndex} className="allergy-cell">
+                          {item ? `${itemIndex + 1}. ${item}` : ''}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="no-allergy-data">
+              등록된 알레르기 정보가 없습니다.
+            </div>
+          )}
+        </div>
+      </div>
+
+      <button className="main-icon-btn" onClick={handleBackToMain}>
+        🏠 메인화면
+      </button>
+    </div>
+  );
+}
+
+export default ControlMeal;
