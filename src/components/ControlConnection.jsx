@@ -28,13 +28,19 @@ function ControlConnection() {
     setError('');
     
     try {
+      // 고유한 세션 ID 생성 (브라우저 탭별로 고유)
+      const sessionId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('sessionId', sessionId);
+      
+      console.log('ControlConnection: PIN 연결 시도, sessionId:', sessionId);
       const result = await ConnectionService.connectWithPin(pin);
       
       if (result.success) {
         localStorage.setItem('currentPin', pin);
         localStorage.setItem('connectedPin', result.pin);
         localStorage.setItem('controlDeviceId', result.controlDeviceId);
-        console.log('ControlConnection: 연결 성공, localStorage 설정 완료');
+        localStorage.setItem('controlSessionId', sessionId);
+        console.log('ControlConnection: 연결 성공, localStorage 설정 완료, sessionId:', sessionId);
         navigate('/control/main');
       } else {
         setError(result.error || '잘못된 PIN입니다. 다시 입력해주세요.');

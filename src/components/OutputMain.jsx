@@ -20,9 +20,10 @@ function OutputMain() {
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
     const savedPin = localStorage.getItem('currentPin');
-    console.log('OutputMain: 연결된 PIN:', savedPin);
+    const outputSessionId = localStorage.getItem('outputSessionId');
+    console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId);
     
-    if (savedPin) {
+    if (savedPin && outputSessionId) {
       ConnectionService.subscribeToControlData(savedPin, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);
         setConnectionData(data);
@@ -37,6 +38,7 @@ function OutputMain() {
           if (newControlData.adminRemoved) {
             console.log('관리자에 의해 연결이 해제되었습니다:', newControlData.message);
             localStorage.removeItem('currentPin');
+            localStorage.removeItem('outputSessionId');
             navigate('/');
             return;
           }

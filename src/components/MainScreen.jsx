@@ -92,10 +92,15 @@ function MainScreen() {
         return;
       }
       
+      // 고유한 세션 ID 생성 (브라우저 탭별로 고유)
+      const sessionId = `output_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('sessionId', sessionId);
+      
       // PIN 생성 시도
-      console.log('MainScreen: PIN 생성 시도');
+      console.log('MainScreen: PIN 생성 시도, sessionId:', sessionId);
       const pin = await ConnectionService.generatePin();
       localStorage.setItem('currentPin', pin);
+      localStorage.setItem('outputSessionId', sessionId);
       navigate('/output');
     } catch (error) {
       console.error('PIN 생성 실패:', error);
