@@ -171,7 +171,7 @@ function AdminScheduleCalendar() {
       </div>
 
       {loading ? (
-        <div className="loading-spinner">
+        <div className="loading-spinner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '10%', margin: '0 auto' }}>
           <div className="spinner"></div>
           <p>학사일정을 불러오는 중...</p>
         </div>

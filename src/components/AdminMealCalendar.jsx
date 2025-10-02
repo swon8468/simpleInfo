@@ -162,9 +162,8 @@ function AdminMealCalendar() {
       </div>
 
       {loading ? (
-        <div className="loading-spinner">
+        <div className="loading-spinner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '10%', margin: '0 auto' }}>
           <div className="spinner"></div>
-          <p>급식 정보를 불러오는 중...</p>
         </div>
       ) : (
         <div className="calendar-grid">
