@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import ConnectionService from '../services/ConnectionService';
 import logoImage from '/logo.png';
@@ -85,61 +85,7 @@ function MainScreen() {
     try {
       console.log('MainScreen: 출력용 모드 시작, activePinCount:', activePinCount);
       
-      // 기존 연결 정보 확인 (Firebase에서 실제 상태 확인)
-      const existingPin = localStorage.getItem('currentPin');
-      if (existingPin) {
-        console.log('MainScreen: 기존 PIN 발견:', existingPin);
-        
-        // Firebase에서 실제 연결 상태 확인
-        try {
-          const docRef = doc(db, 'connections', existingPin);
-          const docSnap = await getDoc(docRef);
-          
-          if (docSnap.exists()) {
-            const data = docSnap.data();
-            console.log('MainScreen: Firebase 연결 상태:', data);
-            console.log('MainScreen: status:', data.status);
-            console.log('MainScreen: connectedControlDevice:', data.connectedControlDevice);
-            console.log('MainScreen: deviceType:', data.deviceType);
-            
-            // 실제로 연결된 상태인지 확인 (더 엄격한 조건)
-            if (data.status === 'connected' && data.connectedControlDevice && data.deviceType === 'output') {
-              console.log('MainScreen: 실제로 연결된 상태로 판단');
-              
-              // 사용자에게 선택권 제공
-              const shouldContinue = window.confirm(
-                '기존 PIN이 연결된 상태입니다. 기존 연결을 무시하고 새로운 PIN을 생성하시겠습니까?\n\n' +
-                '기존 연결: ' + existingPin + '\n' +
-                '상태: ' + data.status + '\n' +
-                '연결된 제어용 디바이스: ' + (data.connectedControlDevice || '없음')
-              );
-              
-              if (shouldContinue) {
-                console.log('MainScreen: 사용자가 기존 연결 무시 선택, localStorage 정리');
-                localStorage.removeItem('currentPin');
-              } else {
-                console.log('MainScreen: 사용자가 취소 선택, 연결 거부');
-                return;
-              }
-            } else {
-              // 연결되지 않은 상태면 localStorage 정리
-              console.log('MainScreen: 연결되지 않은 PIN 발견, localStorage 정리');
-              console.log('MainScreen: 정리 이유 - status:', data.status, 'connectedControlDevice:', data.connectedControlDevice, 'deviceType:', data.deviceType);
-              localStorage.removeItem('currentPin');
-            }
-          } else {
-            // Firebase에 문서가 없으면 localStorage 정리
-            console.log('MainScreen: Firebase에 문서 없음, localStorage 정리');
-            localStorage.removeItem('currentPin');
-          }
-        } catch (error) {
-          console.error('MainScreen: Firebase 연결 상태 확인 실패:', error);
-          // 에러 발생 시 localStorage 정리
-          localStorage.removeItem('currentPin');
-        }
-      }
-      
-      // 최대 PIN 개수 확인
+      // 최대 PIN 개수 확인 (10개까지 허용)
       console.log('MainScreen: 최대 PIN 개수 확인, activePinCount:', activePinCount);
       if (activePinCount >= 10) {
         alert('최대 PIN 개수(10개)에 도달했습니다. 기존 PIN을 제거한 후 다시 시도해주세요.');
