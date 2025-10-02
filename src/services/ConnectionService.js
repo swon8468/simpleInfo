@@ -23,11 +23,15 @@ class ConnectionService {
   // PIN 생성 및 저장 (출력용 디바이스용)
   async generatePin() {
     try {
+      console.log('ConnectionService: PIN 생성 시작');
+      
       // 활성화된 PIN 개수 확인
       const activePins = await this.getActivePins();
       console.log('ConnectionService: 현재 활성화된 PIN 개수:', activePins.length);
+      console.log('ConnectionService: 활성화된 PIN 목록:', activePins);
       
       if (activePins.length >= 10) {
+        console.log('ConnectionService: 최대 PIN 개수 도달, PIN 생성 거부');
         throw new Error('최대 PIN 개수(10개)에 도달했습니다. 기존 PIN을 제거한 후 다시 시도해주세요.');
       }
       

@@ -83,6 +83,8 @@ function MainScreen() {
 
   const handleOutputMode = async () => {
     try {
+      console.log('MainScreen: 출력용 모드 시작, activePinCount:', activePinCount);
+      
       // 기존 연결 정보 확인 (Firebase에서 실제 상태 확인)
       const existingPin = localStorage.getItem('currentPin');
       if (existingPin) {
@@ -119,12 +121,14 @@ function MainScreen() {
       }
       
       // 최대 PIN 개수 확인
+      console.log('MainScreen: 최대 PIN 개수 확인, activePinCount:', activePinCount);
       if (activePinCount >= 10) {
         alert('최대 PIN 개수(10개)에 도달했습니다. 기존 PIN을 제거한 후 다시 시도해주세요.');
         return;
       }
       
       // PIN 생성 시도
+      console.log('MainScreen: PIN 생성 시도');
       const pin = await ConnectionService.generatePin();
       localStorage.setItem('currentPin', pin);
       navigate('/output');
