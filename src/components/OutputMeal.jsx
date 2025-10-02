@@ -89,12 +89,13 @@ function OutputMeal({ controlData }) {
           </div>
           <div className="meal-items">
             {mealData?.lunch && mealData.lunch.length > 0 ? (
-              mealData.lunch.map((item, index) => (
-                <div key={index} className="meal-item">
-                  <span className="item-bullet">•</span>
-                  <span className="item-text">{item}</span>
-                </div>
-              ))
+              <div className="meal-grid">
+                {mealData.lunch.slice(0, 4).map((item, index) => (
+                  <div key={index} className="meal-item">
+                    <span className="item-text">{item}</span>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="no-meal">급식 정보가 없습니다</div>
             )}
@@ -108,12 +109,13 @@ function OutputMeal({ controlData }) {
           </div>
           <div className="meal-items">
             {mealData?.dinner && mealData.dinner.length > 0 ? (
-              mealData.dinner.map((item, index) => (
-                <div key={index} className="meal-item">
-                  <span className="item-bullet">•</span>
-                  <span className="item-text">{item}</span>
-                </div>
-              ))
+              <div className="meal-grid">
+                {mealData.dinner.slice(0, 4).map((item, index) => (
+                  <div key={index} className="meal-item">
+                    <span className="item-text">{item}</span>
+                  </div>
+                ))}
+              </div>
             ) : (
               <div className="no-meal">급식 정보가 없습니다</div>
             )}
