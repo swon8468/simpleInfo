@@ -87,7 +87,7 @@ class ConnectionService {
             pin: pin,
             deviceType: 'control',
             connectedOutputDevice: pin,
-            status: 'connected',
+            status: 'control_connected', // 제어용 디바이스는 다른 상태 사용
             createdAt: serverTimestamp(),
             connectedAt: serverTimestamp(),
             controlData: null
@@ -163,13 +163,25 @@ class ConnectionService {
         pin = connectedPin; // 연결된 PIN 사용
       }
       
-      // 출력용 디바이스 문서에 데이터 업데이트 (기존 문서 덮어쓰지 않음)
+      // 출력용 디바이스 문서에 데이터 전송
       const outputDocRef = doc(db, 'connections', pin);
-      await updateDoc(outputDocRef, {
-        controlData: data,
-        lastUpdated: serverTimestamp(),
-        heartbeat: serverTimestamp() // 연결 상태 확인용
-      });
+      
+      // 문서 존재 여부 확인 후 적절한 방법으로 업데이트
+      const docSnap = await getDoc(outputDocRef);
+      if (docSnap.exists()) {
+        await updateDoc(outputDocRef, {
+          controlData: data,
+          lastUpdated: serverTimestamp(),
+          heartbeat: serverTimestamp() // 연결 상태 확인용
+        });
+      } else {
+        // 문서가 존재하지 않으면 setDoc 사용
+        await setDoc(outputDocRef, {
+          controlData: data,
+          lastUpdated: serverTimestamp(),
+          heartbeat: serverTimestamp()
+        }, { merge: true });
+      }
       
       console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId, data);
     } catch (error) {
@@ -197,11 +209,26 @@ class ConnectionService {
     }
   }
 
-  // 연결 해제
+  // 연결 해제 (1:1 매칭 시스템)
   async disconnect(pin) {
     try {
-      const docRef = doc(db, 'connections', pin);
-      await deleteDoc(docRef);
+      const controlDeviceId = localStorage.getItem('controlDeviceId');
+      const connectedPin = localStorage.getItem('connectedPin');
+      
+      console.log('ConnectionService: 연결 해제 시작', { pin, controlDeviceId, connectedPin });
+      
+      // 제어용 디바이스 문서 삭제
+      if (controlDeviceId) {
+        const controlDocRef = doc(db, 'connections', controlDeviceId);
+        await deleteDoc(controlDocRef);
+        localStorage.removeItem('controlDeviceId');
+        console.log('제어용 디바이스 문서 삭제 완료:', controlDeviceId);
+      }
+      
+      // 출력용 디바이스 문서 삭제
+      const outputDocRef = doc(db, 'connections', pin);
+      await deleteDoc(outputDocRef);
+      console.log('출력용 디바이스 문서 삭제 완료:', pin);
       
       this.isConnected = false;
       
@@ -214,8 +241,12 @@ class ConnectionService {
       
       // localStorage에서 PIN 제거
       localStorage.removeItem('currentPin');
+      localStorage.removeItem('connectedPin');
+      
+      console.log('ConnectionService: 1:1 매칭 연결 해제 완료:', pin, controlDeviceId);
     } catch (error) {
       console.error('연결 해제 실패:', error);
+      throw error;
     }
   }
 
@@ -299,7 +330,7 @@ class ConnectionService {
       
       allSnapshot.forEach((doc) => {
         const data = doc.data();
-        console.log('ConnectionService: 전체 문서 ID:', doc.id, '상태:', data.status, '생성시간:', data.createdAt);
+        console.log('ConnectionService: 전체 문서 ID:', doc.id, '상태:', data.status, '생성시간:', data.createdAt, '타입:', data.deviceType, 'PIN:', data.pin);
       });
       
       const q = query(

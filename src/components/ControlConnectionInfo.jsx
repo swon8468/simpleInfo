@@ -79,16 +79,27 @@ function ControlConnectionInfo() {
     // 인증이 완료되었으면 연결 해제
     if (pin) {
       try {
+        console.log('ControlConnectionInfo: 연결 해제 시작, PIN:', pin);
         await ConnectionService.disconnect(pin);
+        
+        // localStorage 정리
         localStorage.removeItem('currentPin');
+        localStorage.removeItem('connectedPin');
+        localStorage.removeItem('controlDeviceId');
+        
         setConnectionStatus('연결 안됨');
         setPin('');
         setIsAuthenticated(false);
+        
+        console.log('ControlConnectionInfo: 연결 해제 완료, 메인 화면으로 이동');
         // 연결 해제 후 메인 화면으로 이동
         navigate('/');
       } catch (error) {
         console.error('연결 해제 실패:', error);
+        setErrorMessage('연결 해제에 실패했습니다. 다시 시도해주세요.');
       }
+    } else {
+      setErrorMessage('연결된 PIN이 없습니다.');
     }
   };
 

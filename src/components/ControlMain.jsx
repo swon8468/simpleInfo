@@ -51,6 +51,9 @@ function ControlMain() {
     const savedPin = localStorage.getItem('currentPin');
     const connectedPin = localStorage.getItem('connectedPin');
     
+    console.log('ControlMain: 데이터 전송 시도', { page, scheduleView, mealDate, announcementIndex });
+    console.log('ControlMain: 저장된 PIN:', savedPin, '연결된 PIN:', connectedPin);
+    
     if (savedPin && connectedPin) {
       try {
         const controlData = {
@@ -67,11 +70,16 @@ function ControlMain() {
           controlData.announcementIndex = announcementIndex;
         }
         
+        console.log('ControlMain: 전송할 데이터:', controlData);
+        
         // 연결된 PIN을 사용하여 데이터 전송
         await ConnectionService.sendControlData(connectedPin, controlData);
+        console.log('ControlMain: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
+    } else {
+      console.error('ControlMain: 연결 정보가 없습니다.', { savedPin, connectedPin });
     }
   };
 

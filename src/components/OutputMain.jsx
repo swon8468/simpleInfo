@@ -22,11 +22,14 @@ function OutputMain() {
     const savedPin = localStorage.getItem('currentPin');
     if (savedPin) {
       ConnectionService.subscribeToControlData(savedPin, (data) => {
-        console.log('실시간 데이터 수신:', data);
+        console.log('OutputMain: 실시간 데이터 수신:', data);
         setConnectionData(data);
         if (data.controlData) {
           const newControlData = data.controlData;
           const newPage = newControlData.currentPage || 'main';
+          
+          console.log('OutputMain: 새로운 제어 데이터:', newControlData);
+          console.log('OutputMain: 새로운 페이지:', newPage);
           
           // 관리자에 의해 연결이 해제된 경우 메인 화면으로 이동
           if (newControlData.adminRemoved) {
@@ -62,11 +65,8 @@ function OutputMain() {
           });
           
           setCurrentPage(prevPage => {
-            if (prevPage !== newPage) {
-              console.log('페이지 변경:', prevPage, '->', newPage);
-              return newPage;
-            }
-            return prevPage;
+            console.log('페이지 변경 시도:', prevPage, '->', newPage);
+            return newPage;
           });
         }
       });
