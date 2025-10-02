@@ -72,6 +72,7 @@ class ConnectionService {
           // 제어용 디바이스 ID 생성
           const controlDeviceId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           
+          // 출력용 디바이스 문서 업데이트
           await setDoc(docRef, {
             ...data,
             status: 'connected',
@@ -80,7 +81,7 @@ class ConnectionService {
             connectedAt: serverTimestamp()
           }, { merge: true });
           
-          // 제어용 디바이스 정보도 별도로 저장
+          // 제어용 디바이스 정보 저장
           await setDoc(doc(db, 'connections', controlDeviceId), {
             pin: pin,
             deviceType: 'control',
@@ -96,7 +97,8 @@ class ConnectionService {
           this.isConnected = true;
           this.currentPin = pin;
           localStorage.setItem('controlDeviceId', controlDeviceId);
-          return { success: true, controlDeviceId };
+          localStorage.setItem('connectedPin', pin); // 연결된 PIN도 저장
+          return { success: true, controlDeviceId, pin };
         } else if (data.status === 'connected') {
           throw new Error('이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.');
         }
@@ -148,25 +150,27 @@ class ConnectionService {
   async sendControlData(pin, data) {
     try {
       const controlDeviceId = localStorage.getItem('controlDeviceId');
-      if (!controlDeviceId) {
-        throw new Error('제어용 디바이스 ID가 없습니다.');
+      const connectedPin = localStorage.getItem('connectedPin');
+      
+      if (!controlDeviceId || !connectedPin) {
+        throw new Error('제어용 디바이스 연결 정보가 없습니다.');
       }
       
-      // 제어용 디바이스 문서에 데이터 저장
-      const controlDocRef = doc(db, 'connections', controlDeviceId);
-      await setDoc(controlDocRef, {
-        controlData: data,
-        lastUpdated: serverTimestamp()
-      }, { merge: true });
+      // 연결된 PIN이 전달된 PIN과 일치하는지 확인
+      if (pin !== connectedPin) {
+        console.warn('ConnectionService: PIN 불일치. 전달된 PIN:', pin, '연결된 PIN:', connectedPin);
+        pin = connectedPin; // 연결된 PIN 사용
+      }
       
-      // 출력용 디바이스 문서에도 데이터 전달
+      // 출력용 디바이스 문서에만 데이터 전송
       const outputDocRef = doc(db, 'connections', pin);
       await setDoc(outputDocRef, {
         controlData: data,
-        lastUpdated: serverTimestamp()
+        lastUpdated: serverTimestamp(),
+        heartbeat: serverTimestamp() // 연결 상태 확인용
       }, { merge: true });
       
-      console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId);
+      console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId, data);
     } catch (error) {
       console.error('제어 데이터 전송 실패:', error);
       throw error;

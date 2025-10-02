@@ -10,7 +10,10 @@ function ControlMain() {
   useEffect(() => {
     // 연결 상태 확인
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    const controlDeviceId = localStorage.getItem('controlDeviceId');
+    
+    if (savedPin && connectedPin && controlDeviceId) {
       setConnectionStatus('연결됨');
       
       // 연결 상태 모니터링
@@ -18,6 +21,8 @@ function ControlMain() {
         // 연결 해제 시 메인 화면으로 이동
         setConnectionStatus('연결 안됨');
         localStorage.removeItem('currentPin');
+        localStorage.removeItem('connectedPin');
+        localStorage.removeItem('controlDeviceId');
         navigate('/control');
       });
 
@@ -29,7 +34,9 @@ function ControlMain() {
 
   const sendControlData = async (page, scheduleView = 'monthly', mealDate = 0, announcementIndex = 0) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
         const controlData = {
           currentPage: page
@@ -45,7 +52,8 @@ function ControlMain() {
           controlData.announcementIndex = announcementIndex;
         }
         
-        await ConnectionService.sendControlData(savedPin, controlData);
+        // 연결된 PIN을 사용하여 데이터 전송
+        await ConnectionService.sendControlData(connectedPin, controlData);
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }

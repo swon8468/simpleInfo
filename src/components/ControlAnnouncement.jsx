@@ -14,9 +14,11 @@ function ControlAnnouncement() {
 
   const sendControlData = async (page) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: page
         });
       } catch (error) {
@@ -39,9 +41,11 @@ function ControlAnnouncement() {
 
   const sendAnnouncementDataWithIndex = async (index) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: 'announcement',
           announcementIndex: index
         });

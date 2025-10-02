@@ -65,9 +65,11 @@ function ControlSchedule() {
 
   const sendControlData = async (page) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: page
         });
       } catch (error) {
@@ -78,9 +80,11 @@ function ControlSchedule() {
 
   const sendControlDataWithData = async (mode, date) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: 'schedule',
           scheduleView: mode,
           scheduleDate: date.toISOString()

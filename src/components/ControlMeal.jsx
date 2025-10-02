@@ -29,9 +29,11 @@ function ControlMeal() {
 
   const sendControlData = async (page) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: page
         });
       } catch (error) {
@@ -47,9 +49,11 @@ function ControlMeal() {
 
   const sendMealDataWithDate = async (days) => {
     const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const connectedPin = localStorage.getItem('connectedPin');
+    
+    if (savedPin && connectedPin) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionService.sendControlData(connectedPin, {
           currentPage: 'meal',
           mealDate: days
         });
