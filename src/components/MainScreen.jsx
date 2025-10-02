@@ -83,6 +83,14 @@ function MainScreen() {
 
   const handleOutputMode = async () => {
     try {
+      // 기존 연결 정보 확인
+      const existingPin = localStorage.getItem('currentPin');
+      if (existingPin) {
+        console.log('MainScreen: 기존 PIN 발견:', existingPin);
+        alert('이미 출력용 디바이스가 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
+        return;
+      }
+      
       // 최대 PIN 개수 확인
       if (activePinCount >= 10) {
         alert('최대 PIN 개수(10개)에 도달했습니다. 기존 PIN을 제거한 후 다시 시도해주세요.');

@@ -28,6 +28,17 @@ function ControlConnection() {
     setError('');
     
     try {
+      // 기존 연결 정보 확인
+      const existingControlDeviceId = localStorage.getItem('controlDeviceId');
+      const existingConnectedPin = localStorage.getItem('connectedPin');
+      
+      if (existingControlDeviceId && existingConnectedPin) {
+        console.log('ControlConnection: 기존 연결 정보 발견:', { existingControlDeviceId, existingConnectedPin });
+        setError('이미 다른 출력용 디바이스에 연결되어 있습니다. 연결 해제 후 다시 시도해주세요.');
+        setIsConnecting(false);
+        return;
+      }
+      
       const result = await ConnectionService.connectWithPin(pin);
       
       if (result.success) {

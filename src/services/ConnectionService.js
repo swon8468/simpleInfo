@@ -69,7 +69,7 @@ class ConnectionService {
         console.log('ConnectionService: PIN 문서 데이터:', data);
         
         // 출력용 디바이스가 생성한 PIN이고 대기 상태인지 확인
-        if (data.deviceType === 'output' && data.status === 'waiting') {
+        if (data.deviceType === 'output' && data.status === 'waiting' && !data.connectedControlDevice) {
           // 제어용 디바이스 ID 생성
           const controlDeviceId = `control_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           
@@ -100,7 +100,7 @@ class ConnectionService {
           localStorage.setItem('controlDeviceId', controlDeviceId);
           localStorage.setItem('connectedPin', pin); // 연결된 PIN도 저장
           return { success: true, controlDeviceId, pin };
-        } else if (data.status === 'connected') {
+        } else if (data.status === 'connected' || data.connectedControlDevice) {
           throw new Error('이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.');
         }
       }
