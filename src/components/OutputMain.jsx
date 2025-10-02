@@ -27,6 +27,7 @@ function OutputMain() {
     if (savedPin && outputSessionId) {
       ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         console.log('OutputMain: 실시간 데이터 수신:', data);
+        console.log('OutputMain: controlData 존재 여부:', !!data.controlData);
         setConnectionData(data);
         if (data.controlData) {
           const newControlData = data.controlData;
@@ -34,6 +35,7 @@ function OutputMain() {
           
           console.log('OutputMain: 새로운 제어 데이터:', newControlData);
           console.log('OutputMain: 새로운 페이지:', newPage);
+          console.log('OutputMain: 현재 페이지:', currentPage);
           
           // 관리자에 의해 연결이 해제된 경우 메인 화면으로 이동
           if (newControlData.adminRemoved) {
@@ -51,6 +53,8 @@ function OutputMain() {
           // 페이지 변경 (항상 업데이트)
           console.log('페이지 변경:', currentPage, '->', newPage);
           setCurrentPage(newPage);
+        } else {
+          console.log('OutputMain: controlData가 없습니다.');
         }
       });
     } else {

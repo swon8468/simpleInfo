@@ -203,6 +203,8 @@ class ConnectionDB {
       const controlDocRef = doc(db, 'connections', controlSessionId);
       const controlDocSnap = await getDoc(controlDocRef);
       
+      console.log('ConnectionDB: 제어용 세션 문서 존재 여부:', controlDocSnap.exists());
+      
       if (!controlDocSnap.exists()) {
         throw new Error('제어용 세션이 존재하지 않습니다.');
       }
@@ -210,12 +212,16 @@ class ConnectionDB {
       const controlData = controlDocSnap.data();
       const outputSessionId = controlData.connectedOutputSession;
       
+      console.log('ConnectionDB: 제어용 세션 데이터:', controlData);
+      console.log('ConnectionDB: 연결된 출력용 세션 ID:', outputSessionId);
+      
       if (!outputSessionId) {
         throw new Error('연결된 출력용 세션이 없습니다.');
       }
       
       // 출력용 세션에 제어 데이터 전송
       const outputDocRef = doc(db, 'connections', outputSessionId);
+      console.log('ConnectionDB: 출력용 세션에 데이터 전송 시작:', outputSessionId);
       await updateDoc(outputDocRef, {
         controlData: data,
         lastUpdated: serverTimestamp(),

@@ -43,9 +43,11 @@ function ControlMain() {
 
   const sendControlData = async (page, scheduleView = 'monthly', mealDate = 0, announcementIndex = 0) => {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
+    const outputSessionId = sessionStorage.getItem('outputSessionId');
+    const pairingId = sessionStorage.getItem('pairingId');
     
     console.log('ControlMain: 데이터 전송 시도', { page, scheduleView, mealDate, announcementIndex });
-    console.log('ControlMain: 제어 세션 ID:', controlSessionId);
+    console.log('ControlMain: 세션 정보:', { controlSessionId, outputSessionId, pairingId });
     
     if (controlSessionId) {
       try {
