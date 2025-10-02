@@ -465,7 +465,10 @@ function OutputMain() {
       return (
         <div className="roadmap-display">
           <h2>교내 배치도</h2>
-          <div className="loading">교실 배치 정보를 불러오는 중...</div>
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>교실 배치 이미지를 불러오는 중...</p>
+          </div>
         </div>
       );
     }

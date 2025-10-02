@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlRoadmap.css';
 
 function ControlRoadmap() {
@@ -17,10 +17,11 @@ function ControlRoadmap() {
   };
 
   const sendControlData = async (page) => {
-    const savedPin = localStorage.getItem('currentPin');
-    if (savedPin) {
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
+    
+    if (controlSessionId) {
       try {
-        await ConnectionService.sendControlData(savedPin, {
+        await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: page
         });
       } catch (error) {
