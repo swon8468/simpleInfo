@@ -16,7 +16,11 @@ function MainScreen() {
   const checkActivePin = async () => {
     try {
       const connectionsRef = collection(db, 'connections');
-      const q = query(connectionsRef, where('status', '==', 'connected'));
+      const q = query(
+        connectionsRef, 
+        where('deviceType', '==', 'output'),
+        where('status', '==', 'connected')
+      );
       const querySnapshot = await getDocs(q);
       
       if (!querySnapshot.empty) {

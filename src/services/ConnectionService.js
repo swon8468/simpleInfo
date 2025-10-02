@@ -301,7 +301,11 @@ class ConnectionService {
         console.log('ConnectionService: 전체 문서 ID:', doc.id, '상태:', data.status, '생성시간:', data.createdAt);
       });
       
-      const q = query(connectionsRef, where('status', '==', 'connected'));
+      const q = query(
+        connectionsRef, 
+        where('deviceType', '==', 'output'),
+        where('status', '==', 'connected')
+      );
       console.log('ConnectionService: 쿼리 생성:', q);
       
       const querySnapshot = await getDocs(q);
@@ -330,9 +334,25 @@ class ConnectionService {
   // 특정 PIN 제거
   async removePin(pin) {
     try {
-      const docRef = doc(db, 'connections', pin);
-      await deleteDoc(docRef);
-      console.log(`PIN ${pin} 제거 완료.`);
+      // 출력용 디바이스 문서 조회
+      const outputDocRef = doc(db, 'connections', pin);
+      const outputDocSnap = await getDoc(outputDocRef);
+      
+      if (outputDocSnap.exists()) {
+        const outputData = outputDocSnap.data();
+        
+        // 연결된 제어용 디바이스가 있다면 함께 삭제
+        if (outputData.connectedControlDevice) {
+          const controlDocRef = doc(db, 'connections', outputData.connectedControlDevice);
+          await deleteDoc(controlDocRef);
+          console.log(`제어용 디바이스 ${outputData.connectedControlDevice} 제거 완료.`);
+        }
+        
+        // 출력용 디바이스 문서 삭제
+        await deleteDoc(outputDocRef);
+        console.log(`출력용 디바이스 PIN ${pin} 제거 완료.`);
+      }
+      
       return true;
     } catch (error) {
       console.error(`PIN ${pin} 제거 실패:`, error);

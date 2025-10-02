@@ -94,14 +94,14 @@ function AdminPanel() {
   };
 
   // 활성화된 PIN 제거 핸들러
-  const handleRemovePin = async (pin) => {
-    if (window.confirm(`정말로 PIN ${pin}을(를) 제거하시겠습니까?`)) {
-      const success = await ConnectionService.removePin(pin);
+  const handleRemovePin = async (pinId) => {
+    if (window.confirm(`정말로 PIN ${pinId}을(를) 제거하시겠습니까?`)) {
+      const success = await ConnectionService.removePin(pinId);
       if (success) {
-        setPinMessage(`PIN ${pin}이(가) 성공적으로 제거되었습니다.`);
+        setPinMessage(`PIN ${pinId}이(가) 성공적으로 제거되었습니다.`);
         fetchActivePins(); // 목록 새로고침
       } else {
-        setPinMessage(`PIN ${pin} 제거에 실패했습니다.`);
+        setPinMessage(`PIN ${pinId} 제거에 실패했습니다.`);
       }
       setTimeout(() => setPinMessage(''), 3000); // 3초 후 메시지 제거
     }
@@ -400,9 +400,9 @@ function AdminPanel() {
                 ) : (
                   <ul className="pin-list">
                     {activePins.map((pin) => (
-                      <li key={pin.id} className="pin-item">
-                        <span>PIN: <strong>{pin.id}</strong> (연결 시간: {pin.createdAt?.toDate ? pin.createdAt.toDate().toLocaleString() : '알 수 없음'})</span>
-                        <button className="btn remove-pin-btn" onClick={() => handleRemovePin(pin.id)}>
+                      <li key={pin.pin} className="pin-item">
+                        <span>PIN: <strong>{pin.pin}</strong> (연결 시간: {pin.connectedAt?.toDate ? pin.connectedAt.toDate().toLocaleString() : '알 수 없음'})</span>
+                        <button className="btn remove-pin-btn" onClick={() => handleRemovePin(pin.pin)}>
                           제거
                         </button>
                       </li>
