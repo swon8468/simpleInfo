@@ -136,9 +136,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 15px;
+  gap: 20px;
   width: 100%;
-  max-width: 300px;
+  max-width: 400px;
 }
 
 .meal-item {
@@ -147,10 +147,11 @@
   justify-content: center;
   background: #F5F5F5;
   border-radius: 15px;
-  padding: 20px 15px;
+  padding: 25px 20px;
   border: none;
   transition: all 0.3s ease;
-  min-height: 80px;
+  min-height: 100px;
+  width: 100%;
 }
 
 .meal-item:hover {
@@ -264,13 +265,13 @@
   }
   
   .meal-grid {
-    max-width: 250px;
-    gap: 12px;
+    max-width: 350px;
+    gap: 15px;
   }
   
   .meal-item {
-    padding: 15px 10px;
-    min-height: 70px;
+    padding: 20px 15px;
+    min-height: 80px;
   }
   
   .item-text {
