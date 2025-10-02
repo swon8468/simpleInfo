@@ -74,9 +74,7 @@ function OutputMain() {
     
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      if (outputSessionId) {
-        ConnectionDB.disconnectSession(outputSessionId);
-      }
+      // cleanup 함수에서 세션 삭제하지 않음 (페이지 언로드 시에만 삭제)
     };
   }, [navigate]);
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlAnnouncement.css';
 
 function ControlAnnouncement() {
@@ -13,12 +13,11 @@ function ControlAnnouncement() {
   };
 
   const sendControlData = async (page) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: page
         });
       } catch (error) {
@@ -40,12 +39,11 @@ function ControlAnnouncement() {
   };
 
   const sendAnnouncementDataWithIndex = async (index) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: 'announcement',
           announcementIndex: index
         });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
 import './ControlMeal.css';
 
@@ -28,12 +28,11 @@ function ControlMeal() {
   };
 
   const sendControlData = async (page) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: page
         });
       } catch (error) {
@@ -48,12 +47,11 @@ function ControlMeal() {
   };
 
   const sendMealDataWithDate = async (days) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    console.log('ControlMeal: 데이터 전송 시도', { days, savedPin, connectedPin });
+    console.log('ControlMeal: 데이터 전송 시도', { days, controlSessionId });
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
         const data = {
           currentPage: 'meal',
@@ -61,13 +59,13 @@ function ControlMeal() {
         };
         
         console.log('ControlMeal: 전송할 데이터:', data);
-        await ConnectionService.sendControlData(connectedPin, data);
+        await ConnectionDB.sendControlData(controlSessionId, data);
         console.log('ControlMeal: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
     } else {
-      console.error('ControlMeal: 연결 정보가 없습니다.', { savedPin, connectedPin });
+      console.error('ControlMeal: 제어 세션 ID가 없습니다.');
     }
   };
 

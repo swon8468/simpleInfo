@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ConnectionService from '../services/ConnectionService';
+import ConnectionDB from '../services/ConnectionDB';
 import './ControlSchedule.css';
 
 function ControlSchedule() {
@@ -64,12 +64,11 @@ function ControlSchedule() {
   };
 
   const sendControlData = async (page) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
-        await ConnectionService.sendControlData(connectedPin, {
+        await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: page
         });
       } catch (error) {
@@ -79,27 +78,36 @@ function ControlSchedule() {
   };
 
   const sendControlDataWithData = async (mode, date) => {
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
     
-    console.log('ControlSchedule: 데이터 전송 시도', { mode, date, savedPin, connectedPin });
+    console.log('ControlSchedule: 데이터 전송 시도', { mode, date, controlSessionId });
     
-    if (savedPin && connectedPin) {
+    if (controlSessionId) {
       try {
+        // date가 Date 객체인지 확인하고 변환
+        let dateString;
+        if (date instanceof Date) {
+          dateString = date.toISOString();
+        } else if (typeof date === 'string') {
+          dateString = date;
+        } else {
+          dateString = new Date().toISOString();
+        }
+        
         const data = {
           currentPage: 'schedule',
           scheduleView: mode,
-          scheduleDate: date.toISOString()
+          scheduleDate: dateString
         };
         
         console.log('ControlSchedule: 전송할 데이터:', data);
-        await ConnectionService.sendControlData(connectedPin, data);
+        await ConnectionDB.sendControlData(controlSessionId, data);
         console.log('ControlSchedule: 데이터 전송 완료');
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);
       }
     } else {
-      console.error('ControlSchedule: 연결 정보가 없습니다.', { savedPin, connectedPin });
+      console.error('ControlSchedule: 제어 세션 ID가 없습니다.');
     }
   };
 
