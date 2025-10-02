@@ -35,7 +35,11 @@ function OutputLoading() {
                 sessionStorage.setItem('pairingId', data.pairingId);
               }
               console.log('OutputLoading: 메인 화면으로 이동');
-              navigate('/output/main');
+              // 즉시 이동하지 말고 약간의 지연을 두고 이동
+              setTimeout(() => {
+                console.log('OutputLoading: 실제 이동 시작');
+                navigate('/output/main');
+              }, 100);
             }
           });
         } else {

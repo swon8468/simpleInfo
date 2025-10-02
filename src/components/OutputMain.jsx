@@ -55,6 +55,7 @@ function OutputMain() {
       });
     } else {
       // 세션 정보가 없으면 메인 화면으로 리다이렉트
+      console.log('OutputMain: 세션 정보가 없어서 메인 화면으로 이동');
       navigate('/');
     }
     
