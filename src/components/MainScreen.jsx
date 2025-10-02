@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import ConnectionService from '../services/ConnectionService';
+import logoImage from '/logo.png';
 import './MainScreen.css';
 
 function MainScreen() {
@@ -90,7 +91,7 @@ function MainScreen() {
   return (
     <div className="main-screen">
       <div className="monitor-icon">
-        <img src="/logo.png" alt="학교 로고" />
+        <img src={logoImage} alt="학교 로고" />
       </div>
       <h1 className="school-name">광주동신여자고등학교</h1>
       <h2 className="app-title">학교생활도우미</h2>
