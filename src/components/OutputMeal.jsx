@@ -90,22 +90,11 @@ function OutputMeal({ controlData }) {
           <div className="meal-items">
             {mealData?.lunch && mealData.lunch.length > 0 ? (
               <div className="meal-grid">
-                <div className="meal-row">
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.lunch[0] || ''}</span>
+                {mealData.lunch.slice(0, 4).map((item, index) => (
+                  <div key={index} className="meal-item">
+                    <span className="item-text">{item}</span>
                   </div>
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.lunch[1] || ''}</span>
-                  </div>
-                </div>
-                <div className="meal-row">
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.lunch[2] || ''}</span>
-                  </div>
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.lunch[3] || ''}</span>
-                  </div>
-                </div>
+                ))}
               </div>
             ) : (
               <div className="no-meal">급식 정보가 없습니다</div>
@@ -121,22 +110,11 @@ function OutputMeal({ controlData }) {
           <div className="meal-items">
             {mealData?.dinner && mealData.dinner.length > 0 ? (
               <div className="meal-grid">
-                <div className="meal-row">
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.dinner[0] || ''}</span>
+                {mealData.dinner.slice(0, 4).map((item, index) => (
+                  <div key={index} className="meal-item">
+                    <span className="item-text">{item}</span>
                   </div>
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.dinner[1] || ''}</span>
-                  </div>
-                </div>
-                <div className="meal-row">
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.dinner[2] || ''}</span>
-                  </div>
-                  <div className="meal-item">
-                    <span className="item-text">{mealData.dinner[3] || ''}</span>
-                  </div>
-                </div>
+                ))}
               </div>
             ) : (
               <div className="no-meal">급식 정보가 없습니다</div>
