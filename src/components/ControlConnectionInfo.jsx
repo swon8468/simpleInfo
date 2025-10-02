@@ -14,8 +14,8 @@ function ControlConnectionInfo() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // 현재 연결된 PIN 정보 가져오기 (실제로는 localStorage나 context에서 관리)
-    const savedPin = localStorage.getItem('currentPin');
+    // 현재 연결된 PIN 정보 가져오기 (실제로는 sessionStorage나 context에서 관리)
+    const savedPin = sessionStorage.getItem('currentPin');
     if (savedPin) {
       setPin(savedPin);
       setConnectionStatus('연결됨');
@@ -82,12 +82,12 @@ function ControlConnectionInfo() {
         console.log('ControlConnectionInfo: 연결 해제 시작, PIN:', pin);
         await ConnectionService.disconnect(pin);
         
-        // localStorage 정리
-        localStorage.removeItem('currentPin');
-        localStorage.removeItem('connectedPin');
-        localStorage.removeItem('controlDeviceId');
-        localStorage.removeItem('controlSessionId');
-        localStorage.removeItem('pairingId');
+        // sessionStorage 정리
+        sessionStorage.removeItem('currentPin');
+        sessionStorage.removeItem('connectedPin');
+        sessionStorage.removeItem('controlDeviceId');
+        sessionStorage.removeItem('controlSessionId');
+        sessionStorage.removeItem('pairingId');
         
         setConnectionStatus('연결 안됨');
         setPin('');

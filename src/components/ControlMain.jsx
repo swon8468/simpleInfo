@@ -9,11 +9,11 @@ function ControlMain() {
 
   useEffect(() => {
     // 연결 상태 확인
-    const savedPin = localStorage.getItem('currentPin');
-    const connectedPin = localStorage.getItem('connectedPin');
-    const controlDeviceId = localStorage.getItem('controlDeviceId');
-    const controlSessionId = localStorage.getItem('controlSessionId');
-    const pairingId = localStorage.getItem('pairingId');
+    const savedPin = sessionStorage.getItem('currentPin');
+    const connectedPin = sessionStorage.getItem('connectedPin');
+    const controlDeviceId = sessionStorage.getItem('controlDeviceId');
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
+    const pairingId = sessionStorage.getItem('pairingId');
     
     console.log('ControlMain: 연결 상태 확인', { savedPin, connectedPin, controlDeviceId, controlSessionId, pairingId });
     
@@ -26,11 +26,11 @@ function ControlMain() {
         if (data.controlData && data.controlData.adminRemoved) {
           console.log('관리자에 의해 연결이 해제되었습니다:', data.controlData.message);
           setConnectionStatus('연결 안됨');
-          localStorage.removeItem('currentPin');
-          localStorage.removeItem('connectedPin');
-          localStorage.removeItem('controlDeviceId');
-          localStorage.removeItem('controlSessionId');
-          localStorage.removeItem('pairingId');
+          sessionStorage.removeItem('currentPin');
+          sessionStorage.removeItem('connectedPin');
+          sessionStorage.removeItem('controlDeviceId');
+          sessionStorage.removeItem('controlSessionId');
+          sessionStorage.removeItem('pairingId');
           navigate('/');
         }
       });
@@ -39,11 +39,11 @@ function ControlMain() {
       const cleanupMonitoring = ConnectionService.startConnectionMonitoring(savedPin, () => {
         // 연결 해제 시 메인 화면으로 이동
         setConnectionStatus('연결 안됨');
-        localStorage.removeItem('currentPin');
-        localStorage.removeItem('connectedPin');
-        localStorage.removeItem('controlDeviceId');
-        localStorage.removeItem('controlSessionId');
-        localStorage.removeItem('pairingId');
+        sessionStorage.removeItem('currentPin');
+        sessionStorage.removeItem('connectedPin');
+        sessionStorage.removeItem('controlDeviceId');
+        sessionStorage.removeItem('controlSessionId');
+        sessionStorage.removeItem('pairingId');
         navigate('/control');
       });
 

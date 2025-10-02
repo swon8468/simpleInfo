@@ -19,9 +19,9 @@ function OutputMain() {
 
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
-    const savedPin = localStorage.getItem('currentPin');
-    const outputSessionId = localStorage.getItem('outputSessionId');
-    const pairingId = localStorage.getItem('pairingId');
+    const savedPin = sessionStorage.getItem('currentPin');
+    const outputSessionId = sessionStorage.getItem('outputSessionId');
+    const pairingId = sessionStorage.getItem('pairingId');
     console.log('OutputMain: 연결된 PIN:', savedPin, '세션 ID:', outputSessionId, '페어링 ID:', pairingId);
     
     if (savedPin && outputSessionId && pairingId) {
@@ -38,9 +38,9 @@ function OutputMain() {
           // 관리자에 의해 연결이 해제된 경우 메인 화면으로 이동
           if (newControlData.adminRemoved) {
             console.log('관리자에 의해 연결이 해제되었습니다:', newControlData.message);
-            localStorage.removeItem('currentPin');
-            localStorage.removeItem('outputSessionId');
-            localStorage.removeItem('pairingId');
+            sessionStorage.removeItem('currentPin');
+            sessionStorage.removeItem('outputSessionId');
+            sessionStorage.removeItem('pairingId');
             navigate('/');
             return;
           }

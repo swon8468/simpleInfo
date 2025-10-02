@@ -106,9 +106,9 @@ class ConnectionService {
           
           this.isConnected = true;
           this.currentPin = pin;
-          localStorage.setItem('controlDeviceId', controlDeviceId);
-          localStorage.setItem('connectedPin', pin); // 연결된 PIN도 저장
-          localStorage.setItem('pairingId', pairingId); // 페어링 ID 저장
+          sessionStorage.setItem('controlDeviceId', controlDeviceId);
+          sessionStorage.setItem('connectedPin', pin); // 연결된 PIN도 저장
+          sessionStorage.setItem('pairingId', pairingId); // 페어링 ID 저장
           return { success: true, controlDeviceId, pin, pairingId };
         } else if (data.status === 'connected' || data.connectedControlDevice) {
           throw new Error('이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.');
@@ -154,8 +154,8 @@ class ConnectionService {
   // 제어 데이터 전송 (1:1 매칭 시스템)
   async sendControlData(pin, data) {
     try {
-      const controlDeviceId = localStorage.getItem('controlDeviceId');
-      const connectedPin = localStorage.getItem('connectedPin');
+      const controlDeviceId = sessionStorage.getItem('controlDeviceId');
+      const connectedPin = sessionStorage.getItem('connectedPin');
       
       if (!controlDeviceId || !connectedPin) {
         throw new Error('제어용 디바이스 연결 정보가 없습니다.');
@@ -216,8 +216,8 @@ class ConnectionService {
   // 연결 해제 (1:1 매칭 시스템)
   async disconnect(pin) {
     try {
-      const controlDeviceId = localStorage.getItem('controlDeviceId');
-      const connectedPin = localStorage.getItem('connectedPin');
+      const controlDeviceId = sessionStorage.getItem('controlDeviceId');
+      const connectedPin = sessionStorage.getItem('connectedPin');
       
       console.log('ConnectionService: 연결 해제 시작', { pin, controlDeviceId, connectedPin });
       
@@ -225,7 +225,7 @@ class ConnectionService {
       if (controlDeviceId) {
         const controlDocRef = doc(db, 'connections', controlDeviceId);
         await deleteDoc(controlDocRef);
-        localStorage.removeItem('controlDeviceId');
+        sessionStorage.removeItem('controlDeviceId');
         console.log('제어용 디바이스 문서 삭제 완료:', controlDeviceId);
       }
       
@@ -243,10 +243,10 @@ class ConnectionService {
         this.listeners.delete(pin);
       }
       
-      // localStorage에서 PIN 제거
-      localStorage.removeItem('currentPin');
-      localStorage.removeItem('connectedPin');
-      localStorage.removeItem('pairingId');
+      // sessionStorage에서 PIN 제거
+      sessionStorage.removeItem('currentPin');
+      sessionStorage.removeItem('connectedPin');
+      sessionStorage.removeItem('pairingId');
       
       console.log('ConnectionService: 1:1 매칭 연결 해제 완료:', pin, controlDeviceId);
     } catch (error) {

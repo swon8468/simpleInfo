@@ -23,7 +23,7 @@ function OutputLoading() {
           // connectedControlDevice가 있으면 연결된 것으로 간주
           if (data.connectedControlDevice) {
             console.log('OutputLoading: 제어용 기기 연결됨, 페어링 ID 저장:', data.pairingId);
-            localStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
+            sessionStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
             navigate('/output/main');
           }
         });
@@ -38,7 +38,7 @@ function OutputLoading() {
               console.log('OutputLoading: 주기적 연결 상태 확인:', data);
               if (data.connectedControlDevice) {
                 console.log('OutputLoading: 주기적 확인에서 연결 감지, 페어링 ID 저장:', data.pairingId);
-                localStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
+                sessionStorage.setItem('pairingId', data.pairingId); // 페어링 ID 저장
                 clearInterval(checkConnectionInterval);
                 unsubscribe();
                 navigate('/output/main');
