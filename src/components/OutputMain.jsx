@@ -227,20 +227,26 @@ function OutputMain() {
   };
 
   const renderContent = () => {
+    console.log('OutputMain: renderContent 호출, currentPage:', currentPage);
     switch (currentPage) {
       case 'schedule':
+        console.log('OutputMain: 학사일정 렌더링');
         return <ScheduleDisplay controlData={controlData} />;
         
       case 'meal':
+        console.log('OutputMain: 급식 렌더링');
         return <MealDisplay controlData={controlData} />;
         
       case 'roadmap':
+        console.log('OutputMain: 교실 배치 렌더링');
         return <RoadmapDisplay />;
         
       case 'announcement':
+        console.log('OutputMain: 공지사항 렌더링');
         return <AnnouncementDisplay announcements={announcements} controlData={controlData} />;
         
       default:
+        console.log('OutputMain: 메인 화면 렌더링');
         // 메인 화면 - 로고와 제목만 표시
         return (
           <div className="main-display">
@@ -596,6 +602,7 @@ function OutputMain() {
 
   return (
     <div className="output-main">
+      {console.log('OutputMain: 렌더링, currentPage:', currentPage)}
       {currentPage === 'main' && (
         <>
           <div className="monitor-icon">🖥️</div>

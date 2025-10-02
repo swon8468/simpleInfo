@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import ConnectionService from '../services/ConnectionService';
 import './OutputLoading.css';
 
@@ -14,13 +16,42 @@ function OutputLoading() {
         setPin(generatedPin);
         
         // 제어용 기기 연결 대기
-        ConnectionService.subscribeToControlData(generatedPin, (data) => {
+        const unsubscribe = ConnectionService.subscribeToControlData(generatedPin, (data) => {
           console.log('OutputLoading: 연결 상태 확인:', data);
-          if (data.status === 'connected' && data.connectedControlDevice) {
+          console.log('OutputLoading: status:', data.status, 'connectedControlDevice:', data.connectedControlDevice);
+          
+          // connectedControlDevice가 있으면 연결된 것으로 간주
+          if (data.connectedControlDevice) {
             console.log('OutputLoading: 제어용 기기 연결됨, 메인 화면으로 이동');
             navigate('/output/main');
           }
         });
+        
+        // 5초마다 연결 상태 확인 (백업 로직)
+        const checkConnectionInterval = setInterval(async () => {
+          try {
+            const docRef = doc(db, 'connections', generatedPin);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              console.log('OutputLoading: 주기적 연결 상태 확인:', data);
+              if (data.connectedControlDevice) {
+                console.log('OutputLoading: 주기적 확인에서 연결 감지, 메인 화면으로 이동');
+                clearInterval(checkConnectionInterval);
+                unsubscribe();
+                navigate('/output/main');
+              }
+            }
+          } catch (error) {
+            console.error('OutputLoading: 주기적 연결 확인 실패:', error);
+          }
+        }, 5000);
+        
+        // 컴포넌트 언마운트 시 정리
+        return () => {
+          clearInterval(checkConnectionInterval);
+          unsubscribe();
+        };
         
       } catch (error) {
         console.error('연결 초기화 실패:', error);
