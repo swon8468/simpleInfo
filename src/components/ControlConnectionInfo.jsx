@@ -90,6 +90,9 @@ function ControlConnectionInfo() {
             currentPage: 'main',
             adminRemoved: true
           });
+          
+          // 출력용 디바이스가 신호를 받을 시간을 주기 위해 잠시 대기
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
         // 연결 해제

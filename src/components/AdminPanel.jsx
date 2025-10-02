@@ -98,10 +98,11 @@ function AdminPanel() {
     if (window.confirm(`정말로 PIN ${pinId}을(를) 제거하시겠습니까?`)) {
       try {
         // PIN으로 출력용 세션 찾기
-        const outputSession = await ConnectionDB.findOutputSessionByPin(pinId);
+        const outputSessions = await ConnectionDB.findOutputSessionByPin(pinId);
         
-        if (outputSession) {
-          const outputSessionId = outputSession.id;
+        if (outputSessions && outputSessions.length > 0) {
+          const outputSession = outputSessions[0]; // 첫 번째 세션 사용
+          const outputSessionId = outputSession.sessionId; // sessionId 필드 사용
           const controlSessionId = outputSession.connectedControlSession;
           
           console.log('AdminPanel: PIN 제거 시작', { pinId, outputSessionId, controlSessionId });
@@ -112,6 +113,9 @@ function AdminPanel() {
               currentPage: 'main',
               adminRemoved: true
             });
+            
+            // 제어용 디바이스가 신호를 받을 시간을 주기 위해 잠시 대기
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
           
           // 출력용 세션 삭제 (연결된 제어용 세션도 함께 삭제됨)
