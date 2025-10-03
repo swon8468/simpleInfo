@@ -586,6 +586,7 @@ function OutputMain() {
         <div className="status-indicator">
           <div className="status-dot"></div>
           <span>연결됨</span>
+          <span className="pin-display">PIN: {sessionStorage.getItem('currentPin')}</span>
         </div>
       )}
     </div>

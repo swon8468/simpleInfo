@@ -5,12 +5,12 @@ import './ControlSchedule.css';
 
 function ControlSchedule() {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState('monthly'); // monthly or weekly
+  const [viewMode, setViewMode] = useState('weekly'); // monthly or weekly
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  // 컴포넌트 마운트 시 초기 학사일정 데이터 전송 (월별)
+  // 컴포넌트 마운트 시 초기 학사일정 데이터 전송 (주별)
   useEffect(() => {
-    sendControlDataWithData('monthly', currentDate); // 매개변수 순서 수정: mode, date
+    sendControlDataWithData('weekly', currentDate); // 매개변수 순서 수정: mode, date
   }, []); // 빈 배열로 한 번만 실행
 
   const handleBackToMain = async () => {
@@ -118,16 +118,16 @@ function ControlSchedule() {
       
       <div className="navigation-buttons">
         <button className="nav-btn" onClick={handlePreviousPeriod}>
-          {viewMode === 'monthly' ? '저번 달' : '저번 주'}
+          {viewMode === 'monthly' ? '저번 달' : '이번주'}
         </button>
         <button className="nav-btn" onClick={handleNextPeriod}>
-          {viewMode === 'monthly' ? '다음 달' : '다음 주'}
+          {viewMode === 'monthly' ? '다음 달' : '다음주'}
         </button>
       </div>
 
       <div className="today-button-section">
         <button className="today-btn" onClick={handleToday}>
-          이번달로 이동
+          {viewMode === 'monthly' ? '이번달로 이동' : '이번주로 이동'}
         </button>
       </div>
 

@@ -678,6 +678,16 @@
   font-weight: 500;
 }
 
+.pin-display {
+  margin-left: 15px;
+  padding: 5px 12px;
+  background-color: #e3f2fd;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  color: #1976d2;
+  font-weight: 600;
+}
+
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);

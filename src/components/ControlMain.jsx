@@ -70,7 +70,7 @@ function ControlMain() {
   };
 
   const handleScheduleClick = async () => {
-    await sendControlData('schedule', 'monthly'); // 학사일정 클릭 시 항상 'monthly'로 설정
+    await sendControlData('schedule', 'weekly'); // 학사일정 클릭 시 항상 'weekly'로 설정
     navigate('/control/schedule');
   };
 
@@ -118,8 +118,9 @@ function ControlMain() {
         <button className="connection-info-btn" onClick={handleConnectionInfoClick}>
           연결 정보
         </button>
-        <div className={`connection-status ${connectionStatus === '연결됨' ? 'connected' : 'disconnected'}`}>
-          {connectionStatus}
+        <div className="status-indicator">
+          <div className={`status-dot ${connectionStatus === '연결됨' ? 'connected' : 'disconnected'}`}></div>
+          <span>{connectionStatus}</span>
         </div>
         <button className="main-screen-btn" onClick={handleBackToMain}>
           🏠 메인화면
