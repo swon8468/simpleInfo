@@ -657,25 +657,29 @@
 .status-indicator {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 20px;
-  background-color: white;
-  border-radius: 25px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  gap: 15px;
+  padding: 15px 30px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.05));
+  border: 2px solid #4CAF50;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4CAF50;
 }
 
 .status-dot {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   background-color: #4CAF50;
   border-radius: 50%;
   animation: pulse 2s infinite;
 }
 
 .status-indicator span {
-  font-size: 1rem;
-  color: #333;
-  font-weight: 500;
+  font-size: 1.2rem;
+  color: #4CAF50;
+  font-weight: bold;
 }
 
 .pin-display {

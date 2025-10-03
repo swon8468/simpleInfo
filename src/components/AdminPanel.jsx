@@ -64,9 +64,11 @@ function AdminPanel() {
   // 활성화된 PIN 가져오기
   const fetchActivePins = async () => {
     try {
-      const pins = await ConnectionDB.getAllActiveConnections();
+      const pins = await ConnectionDB.getActiveConnections();
+      console.log('AdminPanel: 가져온 PIN 목록:', pins);
       setActivePins(pins)
     } catch (error) {
+      console.error('AdminPanel: PIN 가져오기 실패:', error);
       setActivePins([]);
     }
   };
