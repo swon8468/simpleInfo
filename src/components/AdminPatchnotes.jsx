@@ -92,6 +92,23 @@ function AdminPatchnotes() {
     return `${major}.${newMinor}.0`;
   };
 
+  // 버전에 따른 타입 자동 추론 함수
+  const getVersionType = (version) => {
+    const versionMatch = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    if (!versionMatch) return 'minor';
+    
+    const [, major, minor, patch] = versionMatch;
+    
+    // 주요 버전 변경 (예: 1.x.x → 2.x.x)
+    if (major > '1') return 'major';
+    
+    // 마이너 버전 변경 (예: 1.0.x → 1.1.x)
+    if (minor > '0') return 'minor';
+    
+    // 패치 버전 변경 (예: 1.0.1 → 1.0.2)
+    return 'patch';
+  };
+
   // 폼 초기화 함수
   const resetForm = () => {
     setPatchnoteForm({
@@ -131,6 +148,8 @@ function AdminPatchnotes() {
       
       resetForm();
       setShowForm(false);
+      setExpandedEditForm(null); // 수정 폼 닫기
+      setEditingPatchnote(null); // 수정 중인 패치 노트 초기화
       fetchPatchnotes();
     } catch (error) {
       setMessage('패치 노트 등록에 실패했습니다.');
@@ -234,7 +253,15 @@ function AdminPatchnotes() {
                   type="text"
                   id="version"
                   value={patchnoteForm.version}
-                  onChange={(e) => setPatchnoteForm(prev => ({ ...prev, version: e.target.value }))}
+                  onChange={(e) => {
+                    const version = e.target.value;
+                    const autoType = getVersionType(version);
+                    setPatchnoteForm(prev => ({ 
+                      ...prev, 
+                      version: version,
+                      type: autoType
+                    }));
+                  }}
                   placeholder="예: v1.0.0"
                   required
                 />

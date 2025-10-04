@@ -222,6 +222,7 @@ function AdminMainNotice() {
         isActive: true
       });
       refreshAfterSuccess(); // 목록 새로고침
+      setShowForm(false); // 폼 닫기
     } catch (error) {
       console.error('공지사항 전송 실패:', error);
       setMessage('공지사항 전송에 실패했습니다.');

@@ -641,7 +641,7 @@ function OutputMain() {
           <div className="notice-notice-content">
             <div className="notice-notice-text">
               <p><strong>{mainNotice.title}</strong></p>
-              <p>{mainNotice.content}</p>
+              <p style={{ whiteSpace: 'pre-line' }}>{mainNotice.content}</p>
             </div>
             
             <div className="notice-notice-info">
