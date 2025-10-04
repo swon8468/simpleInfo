@@ -63,6 +63,19 @@ function AdminMainNotice() {
     fetchActivePins();
     fetchActiveNotices();
     
+    // 여러 차례 시도로 PIN 목록 확실히 가져오기
+    const retryFetchPins = () => {
+      setTimeout(() => {
+        console.log('AdminMainNotice: PIN 목록 재시도');
+        fetchActivePins();
+      }, 2000);
+      setTimeout(() => {
+        console.log('AdminMainNotice: PIN 목록 재시도 2차');
+        fetchActivePins();
+      }, 5000);
+    };
+    retryFetchPins();
+    
     // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
     const unsubscribe = ConnectionDB.subscribeToActiveConnections((activePins) => {
       console.log('AdminMainNotice: 실시간 PIN 변경 감지:', activePins);
@@ -133,8 +146,15 @@ function AdminMainNotice() {
       }
       
       if (existingNotices.length > 0) {
-        setMessage(`PIN ${existingNotices.join(', ')}에는 이미 활성화된 공지사항이 있습니다. 기존 공지사항을 비활성화하고 새로 전송하시겠습니까?`);
-        return;
+        // 기존 공지사항을 자동으로 비활성화하고 새로 전송
+        console.log(`기존 공지사항 비활성화 후 새로 전송: ${existingNotices.join(', ')}`);
+        for (const pinId of existingNotices) {
+          const sessions = await ConnectionDB.findOutputSessionByPin(pinId);
+          if (sessions && sessions.length > 0) {
+            const sessionData = sessions[0];
+            await ConnectionDB.deactivateMainNotice(sessionData.sessionId);
+          }
+        }
       }
 
       // 각 선택된 PIN에 대한 공지사항 전송

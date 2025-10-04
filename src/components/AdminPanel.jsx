@@ -30,7 +30,7 @@ function AdminPanel() {
       fetchActivePins();
       
       // 여러 번 시도로 접속 전 연결된 PIN 포함
-      const retryDelays = [1000, 3000, 5000];
+      const retryDelays = [1000, 3000, 5000, 8000];
       retryDelays.forEach((delay, index) => {
         setTimeout(() => {
           console.log(`AdminPanel: ${index + 1}차 PIN 목록 업데이트 실행 (${delay}ms 후)`);
@@ -131,7 +131,10 @@ function AdminPanel() {
           if (allPins.length > 0) {
             console.log('AdminPanel.fetchActivePins: 직접 쿼리로 발견된 PIN들:', allPins);
             setActivePins(allPins);
+            setPinMessage(`직접 쿼리로 ${allPins.length}개의 PIN을 발견했습니다.`);
             return; // 직접 쿼리로 찾은 PIN들을 사용
+          } else {
+            setPinMessage('현재 활성화된 PIN이 없습니다.');
           }
         } catch (firebaseError) {
           console.error('AdminPanel.fetchActivePins: Firebase 직접 쿼리 실패:', firebaseError);
@@ -139,6 +142,9 @@ function AdminPanel() {
       }
       
       setActivePins(pins);
+      if (pins.length > 0) {
+        setPinMessage(`정상적으로 ${pins.length}개의 PIN을 조회했습니다.`);
+      }
     } catch (error) {
       console.error('AdminPanel.fetchActivePins: PIN 가져오기 실패:', error);
       setActivePins([]);
