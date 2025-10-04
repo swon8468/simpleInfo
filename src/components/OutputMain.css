@@ -710,10 +710,22 @@
 }
 
 /* 메인 공지사항 화면 */
+.output-main.notice-display-active {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 9999;
+}
+
 .notice-display-screen {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: inherit;
   color: white;
   display: flex;
   flex-direction: column;
