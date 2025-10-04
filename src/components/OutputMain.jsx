@@ -632,28 +632,26 @@ function OutputMain() {
   // 메인 공지사항이 활성화된 경우 별도 화면 표시 (제어용과 동일한 구조)
   if (showMainNotice && mainNotice) {
     return (
-      <div className="output-main">
-        <div className="notice-notice-active">
-          <div className="notice-notice-header">
-            <h1>📢 메인 공지사항 활성화 중</h1>
+      <div className="output-main notice-notice-active">
+        <div className="notice-notice-header">
+          <h1>📢 메인 공지사항 활성화 중</h1>
+        </div>
+        
+        <div className="notice-notice-content">
+          <div className="notice-notice-text">
+            <p><strong>{mainNotice.title}</strong></p>
+            <p style={{ whiteSpace: 'pre-line' }}>{mainNotice.content}</p>
           </div>
           
-          <div className="notice-notice-content">
-            <div className="notice-notice-text">
-              <p><strong>{mainNotice.title}</strong></p>
-              <p style={{ whiteSpace: 'pre-line' }}>{mainNotice.content}</p>
-            </div>
-            
-            <div className="notice-notice-info">
-              <div className="notice-notice-date">
-                작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </div>
+          <div className="notice-notice-info">
+            <div className="notice-notice-date">
+              작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
             </div>
           </div>
         </div>
