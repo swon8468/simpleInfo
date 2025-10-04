@@ -166,10 +166,12 @@
   border: 1px solid #dee2e6;
   border-radius: 5px;
   min-height: 100px;
+  min-width: 120px; /* 약 8글자가 들어갈 수 있는 최소 너비 */
   padding: 8px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  width: 100%;
 }
 
 .calendar-day.current-month {
@@ -220,6 +222,8 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  min-width: 80px; /* 약 8글자 크기의 최소 너비 */
+  width: 100%;
 }
 
 .week-range {
