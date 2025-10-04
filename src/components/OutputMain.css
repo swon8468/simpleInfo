@@ -119,20 +119,19 @@
 
 /* 월별 달력 스타일 */
 .calendar-container {
-  width: 100vw;
-  margin: 0;
-  padding: 0;
+  width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  padding: 0 20px;
   box-sizing: border-box;
-  margin-left: calc(-50vw + 50%);
 }
 
 .calendar-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  gap: 0;
   margin-bottom: 15px;
   width: 100%;
 }
