@@ -209,6 +209,13 @@ npm run build
 
 ## 🆕 최근 업데이트
 
+### v2.1.4 (2025-10-04) - PIN expired 상태 허용 및 메인 공지사항 발송 수정
+- ✅ **PIN expired 상태 허용**: 실제로 연결된 expired 상태 PIN도 활성 PIN으로 인식
+- 📨 **메인 공지사항 발송 수정**: expired 상태 세션에도 메인 공지사항 정상 발송 가능
+- 🔄 **실시간 동기화 개선**: getActiveConnections와 subscribeToActiveConnections 모두 expired 상태 지원
+- 🎯 **문제 해결**: PIN이 실제 연결되어 있지만 expired로 표시되어 공지사항 발송 실패하던 문제 완전 해결
+- 💫 **사용자 경험**: PIN 연결 상태와 관계없이 안정적인 메인 공지사항 발송 기능 제공
+
 ### v2.1.3 (2025-10-04) - 메인 공지사항 PIN 동기화 및 디버깅 개선
 - 🔄 **PIN 목록 동기화**: AdminMainNotice에서 AdminPanel과 동일한 PIN 목록 함수 사용
 - 🐛 **데이터 일관성**: 별명 포함 버전 함수로 PIN 데이터 통합 관리

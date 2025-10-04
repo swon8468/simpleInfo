@@ -176,12 +176,16 @@ class ConnectionDB {
         });
         
         // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
+        // expired 상태이지만 실제로 제어 디바이스가 연결되어 있으면 활성으로 간주
         if (data.deviceType === 'output' && 
             data.pin && 
             data.pin.length === 6 &&
-            (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
+            (data.status === 'connected' || 
+             data.status === 'control_connected' || 
+             data.status === 'expired' ||  // expired 상태 추가
+             data.connectedControlSession)) {
           activePins.push(data);
-          console.log('ConnectionDB.getActiveConnections: 활성 PIN 추가:', data);
+          console.log('ConnectionDB.getActiveConnections: 활성 PIN 추가 (상태:', data.status, '):', data);
         }
       });
       
@@ -215,10 +219,14 @@ class ConnectionDB {
           });
           
           // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
+          // expired 상태이지만 실제로 제어 디바이스가 연결되어 있으면 활성으로 간주
           if (data.deviceType === 'output' && 
               data.pin && 
               data.pin.length === 6 &&
-              (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
+              (data.status === 'connected' || 
+               data.status === 'control_connected' || 
+               data.status === 'expired' ||  // expired 상태 추가
+               data.connectedControlSession)) {
             activePins.push(data);
             console.log('ConnectionDB.subscribeToActiveConnections: 실시간 활성 PIN 추가:', data);
           }
@@ -430,8 +438,8 @@ class ConnectionDB {
       
       const connectionData = docSnap.data();
       
-      // 세션 상태 확인
-      if (connectionData.status !== 'connected') {
+      // 세션 상태 확인 - expired 상태도 허용 (실제 연결은 유지됨)
+      if (connectionData.status !== 'connected' && connectionData.status !== 'expired') {
         throw new Error('출력용 세션이 연결되지 않았습니다.');
       }
       
