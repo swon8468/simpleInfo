@@ -118,19 +118,24 @@ function ControlMeal() {
           {allergyInfo.length > 0 ? (
             <table>
               <tbody>
-                {Array.from({ length: 6 }, (_, rowIndex) => (
-                  <tr key={rowIndex}>
-                    {Array.from({ length: 4 }, (_, colIndex) => {
-                      const itemIndex = rowIndex * 4 + colIndex;
-                      const item = allergyInfo[itemIndex];
-                      return (
-                        <td key={colIndex} className="allergy-cell">
-                          {item ? `${itemIndex + 1}. ${item}` : ''}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
+                {(() => {
+                  const columns = Math.max(3, Math.min(4, Math.ceil(allergyInfo.length / 2))); // 최소 3개, 최대 4개 컬럼
+                  const rows = Math.ceil(allergyInfo.length / columns);
+                  
+                  return Array.from({ length: rows }, (_, rowIndex) => (
+                    <tr key={rowIndex}>
+                      {Array.from({ length: columns }, (_, colIndex) => {
+                        const itemIndex = rowIndex * columns + colIndex;
+                        const item = allergyInfo[itemIndex];
+                        return (
+                          <td key={colIndex} className="allergy-cell">
+                            {item ? `${itemIndex + 1}. ${item}` : ''}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ));
+                })()}
               </tbody>
             </table>
           ) : (

@@ -132,9 +132,12 @@
   font-size: 1rem;
   color: #333;
   text-align: center;
-  min-width: 120px;
+  min-width: 100px;
+  max-width: 140px;
+  width: auto;
   min-height: 50px;
   vertical-align: middle;
+  flex: 1;
 }
 
 .allergy-cell:nth-child(even) {

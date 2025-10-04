@@ -235,7 +235,7 @@ function AdminMainNotice() {
     if (window.confirm(`정말로 PIN ${pinId}의 공지사항을 삭제하시겠습니까?`)) {
       setLoading(true);
       try {
-        await ConnectionDB.deactivateMainNotice(sessionId);
+        await ConnectionDB.deleteMainNotice(sessionId);
         setMessage('공지사항이 성공적으로 삭제되었습니다.');
         fetchActiveNotices(); // 목록 새로고침
       } catch (error) {

@@ -7,10 +7,11 @@ import {
   onSnapshot, 
   serverTimestamp,
   deleteDoc,
+  updateDoc,
+  deleteField,
   query,
   where,
-  getDocs,
-  updateDoc
+  getDocs
 } from 'firebase/firestore';
 
 class ConnectionDB {
@@ -472,6 +473,39 @@ class ConnectionDB {
       console.log('ConnectionDB: 메인 공지사항 전송 완료:', outputSessionId);
     } catch (error) {
       console.error('메인 공지사항 전송 실패:', error);
+      throw error;
+    }
+  }
+
+  // 메인 공지사항 완전 제거 함수
+  async deleteMainNotice(outputSessionId) {
+    try {
+      console.log('ConnectionDB: 메인 공지사항 완전 제거 시작:', outputSessionId);
+      
+      const docRef = doc(db, 'connections', outputSessionId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        throw new Error('출력용 세션을 찾을 수 없습니다.');
+      }
+      
+      const connectionData = docSnap.data();
+      
+      // 세션 상태 확인
+      if (connectionData.status !== 'connected' && connectionData.status !== 'expired') {
+        throw new Error('출력용 세션이 연결되지 않았습니다.');
+      }
+      
+      // 메인 공지사항 완전 제거
+      await updateDoc(docRef, {
+        mainNotice: deleteField(),
+        updatedAt: serverTimestamp()
+      });
+      
+      console.log('ConnectionDB: 메인 공지사항 완전 제거 완료:', outputSessionId);
+      return true;
+    } catch (error) {
+      console.error('메인 공지사항 삭제 실패:', error);
       throw error;
     }
   }
