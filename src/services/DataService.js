@@ -586,7 +586,7 @@ class DataService {
     } catch (error) {
       throw new Error('패치 노트 목록을 가져오는데 실패했습니다.');
     }
-  },
+  }
 
   async createPatchnote(patchnoteData) {
     try {
@@ -604,7 +604,7 @@ class DataService {
     } catch (error) {
       throw new Error('패치 노트 등록에 실패했습니다.');
     }
-  },
+  }
 
   async updatePatchnote(patchnoteId, patchnoteData) {
     try {
