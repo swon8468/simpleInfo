@@ -12,6 +12,8 @@ import AdminSchoolBlocking from './AdminSchoolBlocking';
 import './AdminPanel.css';
 
 function AdminPanel() {
+  console.log('AdminPanel 컴포넌트 렌더링 시작');
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('schedule');
   const [loading, setLoading] = useState(false);

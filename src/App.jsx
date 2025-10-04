@@ -3,7 +3,7 @@ import './App.css';
 import MainScreen from './components/MainScreen';
 import ControlMode from './components/ControlMode';
 import OutputMode from './components/OutputMode';
-import AdminPanel from './components/AdminPanel';
+import AdminPanel from './components/AdminPanel_debug';
 import SchoolBlockingScreen from './components/SchoolBlockingScreen';
 
 function App() {
