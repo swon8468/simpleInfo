@@ -196,12 +196,24 @@ function AdminPatchnotes() {
           className="add-patchnote-btn"
           onClick={() => {
             if (!showForm) {
-              // 새로운 패치노트 작성 시 자동 버전 생성
-              setPatchnoteForm(prev => ({
-                ...prev,
-                version: generateNextVersion(),
-                date: new Date().toISOString().split('T')[0]
-              }));
+              // 새로운 패치노트 작성 시 완전 초기화하고 새 버전 자동 생성
+              resetForm();
+              setEditingPatchnote(null);
+              setExpandedEditForm(null); // 기존 인라인 편집 폼 닫기
+              
+              const nextVersion = generateNextVersion();
+              setPatchnoteForm({
+                version: nextVersion,
+                date: new Date().toISOString().split('T')[0],
+                title: '',
+                content: '',
+                type: 'major'
+              });
+            } else {
+              // 취소 시에도 폼 완전 초기화
+              resetForm();
+              setEditingPatchnote(null);
+              setExpandedEditForm(null);
             }
             setShowForm(!showForm);
           }}
