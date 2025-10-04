@@ -60,7 +60,7 @@ function AdminAuth({ onSuccess }) {
               </svg>
             </div>
             <h1 className="auth-title">관리자 인증</h1>
-            <p className="auth-subtitle">학교생활도우미 관리자 페이지 접근</p>
+            <p className="auth-subtitle">학교 생활 도우미 관리자 페이지 접근</p>
             <div className="security-badge">
               <span className="security-icon">🔒</span>
               <span>보안 인증 필요</span>

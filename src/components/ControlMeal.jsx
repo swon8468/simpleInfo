@@ -89,7 +89,7 @@ function ControlMeal() {
   return (
     <div className="control-meal">
       <div className="project-header">
-        <h1>학교생활도우미</h1>
+        <h1>학교 생활 도우미</h1>
       </div>
       
       <h2>급식</h2>

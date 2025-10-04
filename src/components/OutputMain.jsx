@@ -264,7 +264,7 @@ function OutputMain() {
             <div className="logo-section">
               <div className="school-logo">🏫</div>
               <h1 className="main-title">{schoolInfo.name}</h1>
-              <h2 className="main-subtitle">학교생활도우미</h2>
+              <h2 className="main-subtitle">학교 생활 도우미</h2>
             </div>
           </div>
         );
@@ -614,7 +614,7 @@ function OutputMain() {
         <div className="main-notice-screen">
           <div className="notice-header">
             <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
-            <h2 className="app-title">학교생활도우미</h2>
+            <h2 className="app-title">학교 생활 도우미</h2>
           </div>
           
           <div className="notice-content">
@@ -646,7 +646,7 @@ function OutputMain() {
       {currentPage === 'main' && (
         <>
           <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
-          <h2 className="app-title">학교생활도우미</h2>
+          <h2 className="app-title">학교 생활 도우미</h2>
         </>
       )}
       

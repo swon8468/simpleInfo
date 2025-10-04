@@ -16,6 +16,7 @@ function MainScreen() {
   const [activePinCount, setActivePinCount] = useState(0);
   const [showPatchnoteModal, setShowPatchnoteModal] = useState(false);
   const [patchnotes, setPatchnotes] = useState([]);
+  const [latestVersion, setLatestVersion] = useState('v1.0.0');
   const [notificationSupported, setNotificationSupported] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(false);
 
@@ -23,7 +24,13 @@ function MainScreen() {
   const fetchPatchnotes = async () => {
     try {
       const data = await DataService.getPatchnotes();
-      setPatchnotes(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      const sortedPatchnotes = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setPatchnotes(sortedPatchnotes);
+      
+      // 최신 버전 설정
+      if (sortedPatchnotes.length > 0) {
+        setLatestVersion(sortedPatchnotes[0].version || 'v1.0.0');
+      }
     } catch (error) {
       console.error('패치 노트 로드 실패:', error);
     }
@@ -52,11 +59,14 @@ function MainScreen() {
     }
   };
 
-  // 알림 상태 초기화
+  // 알림 상태 초기화 및 버전 설정
   useEffect(() => {
     const status = NotificationService.getPermissionStatus();
     setNotificationSupported(status.isSupported);
     setNotificationPermission(status.canShow);
+    
+    // 초기 버전 설정
+    fetchPatchnotes();
   }, []);
 
 
@@ -172,7 +182,7 @@ function MainScreen() {
         <img src={logoImage} alt="학교 로고" />
       </div>
       <h1 className="school-name">광주동신여자고등학교</h1>
-      <h2 className="app-title">학교생활도우미</h2>
+      <h2 className="app-title">학교 생활 도우미</h2>
       
       <div className="mode-selection">
         {activePinCount >= 10 ? (
@@ -218,7 +228,7 @@ function MainScreen() {
           <div className="version-content">
             <span className="version-icon">🔄</span>
             <div className="version-text">
-              <span className="version-number">v1.0.0</span>
+              <span className="version-number">{latestVersion}</span>
               <span className="version-label">패치 노트 보기</span>
             </div>
           </div>
