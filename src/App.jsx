@@ -3,12 +3,12 @@ import './App.css';
 import MainScreen from './components/MainScreen';
 import ControlMode from './components/ControlMode';
 import OutputMode from './components/OutputMode';
-import AdminPanel from './components/AdminPanel_debug';
+import AdminPanel from './components/AdminPanel';
 import SchoolBlockingScreen from './components/SchoolBlockingScreen';
 
 function App() {
-  // 개발 환경에서는 basename을 사용하지 않음
-  const basename = process.env.NODE_ENV === 'production' ? '/simpleInfo' : '';
+  // 개발과 프로덕션 모두에서 일관되게 basename 사용
+  const basename = '/simpleInfo';
   
   return (
     <Router basename={basename}>
