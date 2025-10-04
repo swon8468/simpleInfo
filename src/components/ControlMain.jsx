@@ -6,6 +6,8 @@ import './ControlMain.css';
 function ControlMain() {
   const navigate = useNavigate();
   const [connectionStatus, setConnectionStatus] = useState('연결됨');
+  const [mainNotice, setMainNotice] = useState(null);
+  const [showMainNotice, setShowMainNotice] = useState(false);
 
   useEffect(() => {
     // 연결 상태 확인
@@ -17,7 +19,7 @@ function ControlMain() {
     if (controlSessionId && outputSessionId && pairingId) {
       setConnectionStatus('연결됨');
       
-      // 관리자에 의한 연결 해제 감지를 위한 실시간 구독
+      // 관리자에 의한 연결 해제 감지 및 메인 공지사항 감지를 위한 실시간 구독
       const unsubscribe = ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         if (data.controlData && data.controlData.adminRemoved) {
           setConnectionStatus('연결 안됨');
@@ -26,6 +28,15 @@ function ControlMain() {
           sessionStorage.removeItem('currentPin');
           sessionStorage.removeItem('pairingId');
           navigate('/');
+        }
+        
+        // 메인 공지사항 처리
+        if (data.mainNotice && data.mainNotice.isActive) {
+          setMainNotice(data.mainNotice);
+          setShowMainNotice(true);
+        } else {
+          setMainNotice(null);
+          setShowMainNotice(false);
         }
       });
       
@@ -96,6 +107,46 @@ function ControlMain() {
   const handleBackToMain = async () => {
     await sendControlData('main');
   };
+
+  // 메인 공지사항이 활성화된 경우 차단 화면 표시
+  if (showMainNotice && mainNotice) {
+    return (
+      <div className="control-main">
+        <div className="notice-block-screen">
+          <div className="notice-block-header">
+            <h1>📢 메인 공지사항 활성화 중</h1>
+          </div>
+          
+          <div className="notice-block-content">
+            <div className="notice-block-text">
+              <p><strong>{mainNotice.title}</strong></p>
+              <p>현재 출력 화면에 공지사항이 표시 중입니다.</p>
+              <p>공지사항이 비활성화될 때까지 다른 조작이 일시 중단됩니다.</p>
+            </div>
+            
+            <div className="notice-block-info">
+              <div className="notice-block-date">
+                작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
+            </div>
+          </div>
+          
+          <div className="notice-block-footer">
+            <div className="status-indicator">
+              <div className={`status-dot ${connectionStatus === '연결됨' ? 'connected' : 'disconnected'}`}></div>
+              <span>{connectionStatus}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="control-main">

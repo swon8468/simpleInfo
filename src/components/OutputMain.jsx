@@ -16,6 +16,8 @@ function OutputMain() {
     name: '',
     teamName: ''
   });
+  const [mainNotice, setMainNotice] = useState(null);
+  const [showMainNotice, setShowMainNotice] = useState(false);
 
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
@@ -26,6 +28,16 @@ function OutputMain() {
     if (savedPin && outputSessionId) {
       ConnectionDB.subscribeToOutputData(outputSessionId, (data) => {
         setConnectionData(data);
+        
+        // 메인 공지사항 처리
+        if (data.mainNotice && data.mainNotice.isActive) {
+          setMainNotice(data.mainNotice);
+          setShowMainNotice(true);
+        } else {
+          setMainNotice(null);
+          setShowMainNotice(false);
+        }
+        
         if (data.controlData) {
           const newControlData = data.controlData;
           const newPage = newControlData.currentPage || 'main';
@@ -594,6 +606,40 @@ function OutputMain() {
     );
   };
 
+  // 메인 공지사항이 활성화된 경우 별도 화면 표시
+  if (showMainNotice && mainNotice) {
+    return (
+      <div className="output-main">
+        <div className="main-notice-screen">
+          <div className="notice-header">
+            <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
+            <h2 className="app-title">학교생활도우미</h2>
+          </div>
+          
+          <div className="notice-content">
+            <div className="notice-title">{mainNotice.title}</div>
+            <div className="notice-body">{mainNotice.content}</div>
+          </div>
+          
+          <div className="notice-footer">
+            <div className="notice-date">
+              작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })}
+            </div>
+            <div className="notice-status">
+              공지사항 표시 중 - 평소 화면은 일시 중단됩니다
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="output-main">
       {currentPage === 'main' && (
@@ -611,7 +657,10 @@ function OutputMain() {
         <div className="status-indicator">
           <div className="status-dot"></div>
           <span>연결됨</span>
-          <span>PIN: {sessionStorage.getItem('currentPin') || '----'}</span>
+          {/* 현재 PIN 표시 */}
+          {sessionStorage.getItem('currentPin') && (
+            <span>PIN: {sessionStorage.getItem('currentPin')}</span>
+          )}
         </div>
       )}
     </div>

@@ -159,27 +159,83 @@ class ConnectionDB {
     try {
       console.log('ConnectionDB.getActiveConnections: 쿼리 시작');
       const connectionsRef = collection(db, 'connections');
-      const q = query(
-        connectionsRef,
-        where('deviceType', '==', 'output'),
-        where('status', '==', 'connected')
-      );
-      console.log('ConnectionDB.getActiveConnections: 쿼리 생성 완료');
       
-      const querySnapshot = await getDocs(q);
-      console.log('ConnectionDB.getActiveConnections: 쿼리 실행 완료, 문서 수:', querySnapshot.size);
+      // 모든 연결 상태에서 PIN이 있는 출력용 디바이스 조회
+      const allConnectionsSnapshot = await getDocs(connectionsRef);
+      console.log('ConnectionDB.getActiveConnections: 전체 연결 문서 수:', allConnectionsSnapshot.size);
       
-      const results = querySnapshot.docs.map(doc => {
+      const activePins = [];
+      allConnectionsSnapshot.forEach((doc) => {
         const data = { sessionId: doc.id, ...doc.data() };
-        console.log('ConnectionDB.getActiveConnections: 문서 데이터:', data);
-        return data;
+        console.log('ConnectionDB.getActiveConnections: 전체 문서:', doc.id, {
+          deviceType: data.deviceType,
+          status: data.status,
+          pin: data.pin,
+          createdAt: data.createdAt,
+          connectedAt: data.connectedAt
+        });
+        
+        // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
+        if (data.deviceType === 'output' && 
+            data.pin && 
+            data.pin.length === 6 &&
+            (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
+          activePins.push(data);
+          console.log('ConnectionDB.getActiveConnections: 활성 PIN 추가:', data);
+        }
       });
       
-      console.log('ConnectionDB.getActiveConnections: 최종 결과:', results);
-      return results;
+      console.log('ConnectionDB.getActiveConnections: 최종 활성 PIN 결과:', activePins);
+      console.log('ConnectionDB.getActiveConnections: 최종 활성 PIN 개수:', activePins.length);
+      return activePins;
     } catch (error) {
       console.error('활성화된 연결 목록 가져오기 실패:', error);
       return [];
+    }
+  }
+
+  // 실시간으로 연결 상태 모니터링 (스냅샷 리스너)
+  subscribeToActiveConnections(callback) {
+    try {
+      console.log('ConnectionDB.subscribeToActiveConnections: 실시간 모니터링 시작');
+      const connectionsRef = collection(db, 'connections');
+      
+      // 전체 연결 컬렉션을 실시간 감시
+      const unsubscribe = onSnapshot(connectionsRef, (snapshot) => {
+        console.log('ConnectionDB.subscribeToActiveConnections: 실시간 변경 감지, 전체 문서 수:', snapshot.size);
+        
+        const activePins = [];
+        snapshot.forEach((doc) => {
+          const data = { sessionId: doc.id, ...doc.data() };
+          console.log('ConnectionDB.subscribeToActiveConnections: 실시간 문서:', doc.id, {
+            deviceType: data.deviceType,
+            status: data.status,
+            pin: data.pin,
+            createdAt: data.createdAt
+          });
+          
+          // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
+          if (data.deviceType === 'output' && 
+              data.pin && 
+              data.pin.length === 6 &&
+              (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
+            activePins.push(data);
+            console.log('ConnectionDB.subscribeToActiveConnections: 실시간 활성 PIN 추가:', data);
+          }
+        });
+        
+        console.log('ConnectionDB.subscribeToActiveConnections: 실시간 활성 PIN들:', activePins);
+        callback(activePins);
+      }, (error) => {
+        console.error('ConnectionDB.subscribeToActiveConnections: 실시간 모니터링 실패:', error);
+        callback([]);
+      });
+      
+      console.log('ConnectionDB.subscribeToActiveConnections: 스냅샷 리스너 등록 완료');
+      return unsubscribe;
+    } catch (error) {
+      console.error('ConnectionDB.subscribeToActiveConnections: 설정 실패:', error);
+      return () => {};
     }
   }
 
@@ -356,6 +412,93 @@ class ConnectionDB {
       }
     } catch (error) {
       console.error('관리자 강제 연결 해제 실패:', error);
+      throw error;
+    }
+  }
+
+  // 메인 공지사항 전송 (출력용 디바이스용)
+  async sendMainNotice(outputSessionId, noticeData) {
+    try {
+      console.log('ConnectionDB: 메인 공지사항 전송 시작:', outputSessionId, noticeData);
+      
+      const docRef = doc(db, 'connections', outputSessionId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        throw new Error('출력용 세션을 찾을 수 없습니다.');
+      }
+      
+      const connectionData = docSnap.data();
+      
+      // 세션 상태 확인
+      if (connectionData.status !== 'connected') {
+        throw new Error('출력용 세션이 연결되지 않았습니다.');
+      }
+      
+      // 상대방 세션도 확인
+      const targetSessionId = connectionData.connectedControlSession;
+      if (targetSessionId) {
+        const targetDocRef = doc(db, 'connections', targetSessionId);
+        const targetDocSnap = await getDoc(targetDocRef);
+        
+        if (!targetDocSnap.exists()) {
+          throw new Error('연결된 제어용 세션을 찾을 수 없습니다.');
+        }
+        
+        const targetConnectionData = targetDocSnap.data();
+        if (targetConnectionData.status !== 'connected') {
+          throw new Error('제어용 세션이 연결되지 않았습니다.');
+        }
+      }
+      
+      // 메인 공지사항 데이터 저장
+      await updateDoc(docRef, {
+        mainNotice: {
+          ...noticeData,
+          timestamp: serverTimestamp(),
+          isActive: true
+        },
+        updatedAt: serverTimestamp()
+      });
+      
+      console.log('ConnectionDB: 메인 공지사항 전송 완료:', outputSessionId);
+    } catch (error) {
+      console.error('메인 공지사항 전송 실패:', error);
+      throw error;
+    }
+  }
+
+  // 메인 공지사항 비활성화 (출력용 디바이스용)
+  async deactivateMainNotice(outputSessionId) {
+    try {
+      console.log('ConnectionDB: 메인 공지사항 비활성화 시작:', outputSessionId);
+      
+      const docRef = doc(db, 'connections', outputSessionId);
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        throw new Error('출력용 세션을 찾을 수 없습니다.');
+      }
+      
+      const connectionData = docSnap.data();
+      
+      // 세션 상태 확인
+      if (connectionData.status !== 'connected') {
+        throw new Error('출력용 세션이 연결되지 않았습니다.');
+      }
+      
+      // 메인 공지사항 비활성화
+      await updateDoc(docRef, {
+        mainNotice: {
+          isActive: false,
+          deactivatedAt: serverTimestamp()
+        },
+        updatedAt: serverTimestamp()
+      });
+      
+      console.log('ConnectionDB: 메인 공지사항 비활성화 완료:', outputSessionId);
+    } catch (error) {
+      console.error('메인 공지사항 비활성화 실패:', error);
       throw error;
     }
   }

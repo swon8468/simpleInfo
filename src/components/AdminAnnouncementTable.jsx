@@ -151,7 +151,11 @@ function AdminAnnouncementTable() {
               <tr key={announcement.id}>
                 <td>{index + 1}</td>
                 <td>{announcement.title}</td>
-                <td className="content-cell">{announcement.content}</td>
+                <td className="content-cell">
+                  <div style={{ whiteSpace: 'pre-line' }}>
+                    {announcement.content}
+                  </div>
+                </td>
                 <td>
                   {announcement.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
                 </td>

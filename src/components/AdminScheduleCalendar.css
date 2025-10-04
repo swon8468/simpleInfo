@@ -124,6 +124,113 @@
   background-color: #bbdefb;
 }
 
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .admin-schedule-calendar {
+    padding: 8px;
+    overflow-x: hidden;
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  
+  .calendar-header h2 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .calendar-grid {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+  
+  .calendar-week-header {
+    display: none; /* 주간에서만 표시 */
+  }
+  
+  /* 주간보기 월간보기 버튼 */
+  .view-mode-buttons {
+    padding: 10px;
+    justify-content: center;
+  }
+  
+  .view-mode-btn {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+  }
+  
+  .day-header {
+    min-width: 60px;
+    padding: 8px 2px;
+    font-size: 0.7rem;
+  }
+  
+  .calendar-week {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  
+  .calendar-day {
+    min-width: 60px;
+    min-height: 60px;
+    padding: 3px;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+  
+  .day-number {
+    font-size: 0.8rem;
+    margin-bottom: 1px;
+  }
+  
+  .event-item {
+    font-size: 0.6rem;
+    padding: 1px 2px;
+    margin-bottom: 1px;
+  }
+  
+  .event-title {
+    font-size: 0.6rem;
+    margin-bottom: 0;
+  }
+  
+  /* 폼 스타일 */
+  .schedule-form {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .schedule-form h3 {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  
+  .form-input,
+  .form-textarea {
+    padding: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .checkbox-group {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .checkbox-group label {
+    padding: 10px;
+    font-size: 0.9rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 .event-title {
   font-weight: bold;
   margin-bottom: 2px;

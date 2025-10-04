@@ -6,6 +6,7 @@ import AdminAuth from './AdminAuth';
 import AdminAnnouncementTable from './AdminAnnouncementTable';
 import AdminScheduleCalendar from './AdminScheduleCalendar';
 import AdminMealCalendar from './AdminMealCalendar';
+import AdminMainNotice from './AdminMainNotice';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -24,17 +25,39 @@ function AdminPanel() {
     const authStatus = sessionStorage.getItem('adminAuthenticated');
     if (authStatus === 'true') {
       setIsAuthenticated(true);
-      fetchActivePins(); // 인증되면 활성화된 PIN 목록 가져오기
-      loadAllergyData(); // 알레르기 정보 로드
-      loadCampusLayoutImage(); // 교실 배치 이미지 로드
       
-      // 실시간으로 활성화된 PIN 상태 모니터링
-      const interval = setInterval(() => {
-        fetchActivePins();
-      }, 5000); // 5초마다 확인
+      // 즉시 PIN 목록 가져오기
+      fetchActivePins();
+      
+      // 여러 번 시도로 접속 전 연결된 PIN 포함
+      const retryDelays = [1000, 3000, 5000];
+      retryDelays.forEach((delay, index) => {
+        setTimeout(() => {
+          console.log(`AdminPanel: ${index + 1}차 PIN 목록 업데이트 실행 (${delay}ms 후)`);
+          fetchActivePins();
+        }, delay);
+      });
+      
+      // 알레르기 정보 로드
+      loadAllergyData();
+      
+      // 교실 배치 이미지 로드
+      loadCampusLayoutImage();
+      
+      // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
+      const unsubscribe = ConnectionDB.subscribeToActiveConnections((activePins) => {
+        console.log('AdminPanel: 실시간 PIN 변경 감지:', activePins);
+        if (activePins.length > 0) {
+          console.log('AdminPanel: 실시간 감지로 PIN 업데이트:', activePins.length, '개');
+        }
+        setActivePins(activePins);
+      });
       
       return () => {
-        clearInterval(interval);
+        if (unsubscribe && typeof unsubscribe === 'function') {
+          unsubscribe();
+          console.log('AdminPanel: 실시간 모니터링 구독 해제');
+        }
       };
     }
   }, []);
@@ -64,7 +87,7 @@ function AdminPanel() {
   // 활성화된 PIN 가져오기
   const fetchActivePins = async () => {
     try {
-      console.log('AdminPanel.fetchActivePins: 시작');
+      console.log('AdminPanel.fetchActivePins: 시작 - 현재 시간:', new Date().toISOString());
       const pins = await ConnectionDB.getActiveConnections();
       console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록:', pins);
       console.log('AdminPanel.fetchActivePins: PIN 개수:', pins.length);
@@ -72,8 +95,49 @@ function AdminPanel() {
         sessionId: pin.sessionId, 
         pin: pin.pin, 
         deviceType: pin.deviceType, 
-        status: pin.status 
+        status: pin.status,
+        createdAt: pin.createdAt,
+        connectedAt: pin.connectedAt,
+        hasControlDevice: pin.hasControlDevice
       })));
+      
+      // PIN이 없는 경우 추가로 다른 방법 시도
+      if (pins.length === 0) {
+        console.log('AdminPanel.fetchActivePins: 초기 PIN 목록이 없음 - 다른 방법 시도');
+        
+        // 직접 Firebase 쿼리로 모든 연결 상태 확인
+        try {
+          const { collection, getDocs } = await import('firebase/firestore');
+          const { db } = await import('../firebase');
+          
+          const connectionsRef = collection(db, 'connections');
+          const allDocs = await getDocs(connectionsRef);
+          console.log('AdminPanel.fetchActivePins: Firebase 직접 쿼리 - 전체 문서 수:', allDocs.size);
+          
+          const allPins = [];
+          allDocs.forEach((doc) => {
+            const data = doc.data();
+            console.log('AdminPanel.fetchActivePins: Firebase 직접 쿼리 문서:', doc.id, data);
+            
+            // 출력용 디바이스이면서 6자리 PIN이 있는 경우 포함
+            if (data.deviceType === 'output' && 
+                data.pin && 
+                data.pin.length === 6 &&
+                (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
+              allPins.push({ sessionId: doc.id, ...data });
+            }
+          });
+          
+          if (allPins.length > 0) {
+            console.log('AdminPanel.fetchActivePins: 직접 쿼리로 발견된 PIN들:', allPins);
+            setActivePins(allPins);
+            return; // 직접 쿼리로 찾은 PIN들을 사용
+          }
+        } catch (firebaseError) {
+          console.error('AdminPanel.fetchActivePins: Firebase 직접 쿼리 실패:', firebaseError);
+        }
+      }
+      
       setActivePins(pins);
     } catch (error) {
       console.error('AdminPanel.fetchActivePins: PIN 가져오기 실패:', error);
@@ -324,6 +388,12 @@ function AdminPanel() {
               교실 배치
             </button>
             <button 
+              className={`tab-btn ${activeTab === 'mainNotice' ? 'active' : ''}`}
+              onClick={() => setActiveTab('mainNotice')}
+            >
+              메인 공지사항
+            </button>
+            <button 
               className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
               onClick={() => setActiveTab('pins')}
             >
@@ -366,6 +436,12 @@ function AdminPanel() {
                     {loading ? '업데이트 중...' : '업데이트'}
                   </button>
                 </form>
+              </div>
+            )}
+
+            {activeTab === 'mainNotice' && (
+              <div className="form-section">
+                <AdminMainNotice />
               </div>
             )}
 

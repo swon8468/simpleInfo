@@ -155,7 +155,8 @@
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: pre-line;
+  word-wrap: break-word;
 }
 
 .edit-btn {
@@ -211,5 +212,7 @@
   
   .content-cell {
     max-width: 150px;
+    white-space: pre-line;
+    word-wrap: break-word;
   }
 }

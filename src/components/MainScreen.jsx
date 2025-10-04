@@ -16,20 +16,25 @@ function MainScreen() {
   // 활성화된 PIN 확인 함수
   const checkActivePin = async () => {
     try {
+      console.log('MainScreen.checkActivePin: 시작 - 현재 시간:', new Date().toISOString());
       const activeConnections = await ConnectionDB.getActiveConnections();
+      console.log('MainScreen.checkActivePin: 가져온 연결 목록:', activeConnections);
       const count = activeConnections.length;
+      console.log('MainScreen.checkActivePin: 연결 개수:', count);
       setActivePinCount(count);
       
       if (count > 0) {
         const activeConnection = activeConnections[0];
+        console.log('MainScreen.checkActivePin: 첫 번째 연결:', activeConnection);
         setActivePinNumber(activeConnection.sessionId);
         setHasActivePin(true);
       } else {
+        console.log('MainScreen.checkActivePin: 연결 없음');
         setHasActivePin(false);
         setActivePinNumber(null);
       }
     } catch (error) {
-      console.error('활성 PIN 확인 실패:', error);
+      console.error('MainScreen.checkActivePin: 활성 PIN 확인 실패:', error);
       setHasActivePin(false);
       setActivePinNumber(null);
       setActivePinCount(0);
@@ -40,10 +45,23 @@ function MainScreen() {
     // 활성화된 PIN 확인
     checkActivePin();
     
-    // 실시간으로 활성화된 PIN 상태 모니터링
-    const interval = setInterval(() => {
-      checkActivePin();
-    }, 5000); // 5초마다 확인
+    // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
+    const unsubscribe = ConnectionDB.subscribeToActiveConnections((activePins) => {
+      console.log('MainScreen: 실시간 PIN 변경 감지:', activePins);
+      const count = activePins.length;
+      setActivePinCount(count);
+      
+      if (count > 0) {
+        const activeConnection = activePins[0];
+        console.log('MainScreen: 첫 번째 연결:', activeConnection);
+        setActivePinNumber(activeConnection.sessionId);
+        setHasActivePin(true);
+      } else {
+        console.log('MainScreen: 연결 없음');
+        setHasActivePin(false);
+        setActivePinNumber(null);
+      }
+    });
     
     // 특정 조건에서 관리자 버튼 표시 (예: URL 파라미터 또는 특정 키 조합)
     const urlParams = new URLSearchParams(window.location.search);
@@ -66,7 +84,10 @@ function MainScreen() {
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      clearInterval(interval); // 인터벌 정리
+      if (unsubscribe && typeof unsubscribe === 'function') {
+        unsubscribe();
+        console.log('MainScreen: 실시간 모니터링 구독 해제');
+      }
     };
   }, [navigate]);
 
