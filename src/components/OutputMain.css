@@ -713,7 +713,7 @@
 .output-main.notice-notice-active {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  background: linear-gradient(135deg, #00C851 0%, #007E33 100%) !important;
   color: white;
   display: flex;
   flex-direction: column;

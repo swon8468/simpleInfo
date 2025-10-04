@@ -23,7 +23,7 @@ function OutputMain() {
   useEffect(() => {
     if (showMainNotice && mainNotice) {
       // 메인 공지사항 활성화 시 body에 그라디언트 배경 적용
-      document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+      document.body.style.background = 'linear-gradient(135deg, #00C851 0%, #007E33 100%)';
       document.body.style.minHeight = '100vh';
     } else {
       // 메인 공지사항 비활성화 시 원래 배경으로 되돌리기
