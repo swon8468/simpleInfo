@@ -749,7 +749,7 @@
   justify-content: center;
   text-align: center;
   width: 100%;
-  padding: 0 40px;
+  padding: 0 20px;
 }
 
 .notice-notice-text {
@@ -760,8 +760,8 @@
   margin-bottom: 30px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   width: 100%;
-  max-width: 90vw;
-}
+  max-width: 100%;
+ }
 
 .notice-notice-text p {
   margin: 10px 0;
@@ -781,6 +781,7 @@
   border-radius: 10px;
   backdrop-filter: blur(10px);
   width: 100%;
+  max-width: 100%;
 }
 
 .notice-notice-date {
