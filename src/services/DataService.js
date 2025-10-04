@@ -687,6 +687,38 @@ class DataService {
       throw new Error('모든 알레르기 항목 삭제에 실패했습니다.');
     }
   }
+
+  // 기존 알레르기 데이터를 새로운 컬렉션으로 마이그레이션
+  async migrateAllergyData() {
+    try {
+      console.log('알레르기 데이터 마이그레이션 시작...');
+      
+      // 기존 데이터 가져오기
+      const existingAllergyData = await this.getAllergyInfo();
+      console.log('기존 알레르기 데이터:', existingAllergyData);
+      
+      if (Array.isArray(existingAllergyData) && existingAllergyData.length > 0) {
+        // 새로운 컬렉션에 각 항목 추가
+        for (const allergyItem of existingAllergyData) {
+          if (allergyItem && allergyItem.trim()) {
+            await this.addAllergyItem(allergyItem);
+          }
+        }
+        
+        console.log(`${existingAllergyData.length}개의 알레르기 항목이 새로운 컬렉션으로 마이그레이션되었습니다.`);
+        
+        // 기존 settings 컬렉션의 allergy 문서는 남겨둠 (백업용)
+        // 필요시 나중에 수동으로 삭제 가능
+        return true;
+      } else {
+        console.log('마이그레이션할 알레르기 데이터가 없습니다.');
+        return false;
+      }
+    } catch (error) {
+      console.error('알레르기 데이터 마이그레이션 실패:', error);
+      throw error;
+    }
+  }
 }
 
 export default new DataService();

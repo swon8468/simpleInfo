@@ -86,7 +86,18 @@ function AdminPanel() {
   // 알레르기 정보 로드 (새로운 컬렉션 사용)
   const loadAllergyData = async () => {
     try {
-      const allergyItems = await DataService.getAllergyItems();
+      let allergyItems = await DataService.getAllergyItems();
+      
+      // 새로운 컬렉션이 비어있다면 기존 데이터 마이그레이션
+      if (allergyItems.length === 0) {
+        console.log('새로운 알레르기 컬렉션이 비어있음. 기존 데이터 마이그레이션 실행...');
+        const migrated = await DataService.migrateAllergyData();
+        if (migrated) {
+          // 마이그레이션 후 다시 로드
+          allergyItems = await DataService.getAllergyItems();
+        }
+      }
+      
       setAllergyForm({
         items: allergyItems.map(item => ({ id: item.id, name: item.name }))
       });
@@ -690,7 +701,13 @@ function AdminPanel() {
                 {pinMessage && <p className="pin-message">{pinMessage}</p>}
                 <div className="pin-info">
                   <p>📌 현재 활성화된 PIN: <strong style={{ color: '#007bff', fontSize: '1.2rem' }}>{activePins.length}</strong>개 / 최대 10개</p>
-                  <p className="realtime-indicator">🔄 실시간 업데이트 중...</p>
+                  <p
+                    className="realtime-indicator"
+                    style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                    onClick={fetchActivePins}
+                  >
+                    PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침 됩니다.
+                  </p>
                   {activePins.length >= 10 && (
                     <p className="pin-warning">⚠️ 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
                   )}
