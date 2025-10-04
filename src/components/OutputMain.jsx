@@ -632,7 +632,7 @@ function OutputMain() {
   // 메인 공지사항이 활성화된 경우 별도 화면 표시
   if (showMainNotice && mainNotice) {
     return (
-      <div className="output-main">
+      <div className="output-main notice-notice-active">
         <div className="notice-notice-screen">
           <div className="notice-notice-header">
             <h1>📢 메인 공지사항 활성화 중</h1>
