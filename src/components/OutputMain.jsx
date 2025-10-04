@@ -19,6 +19,25 @@ function OutputMain() {
   const [mainNotice, setMainNotice] = useState(null);
   const [showMainNotice, setShowMainNotice] = useState(false);
 
+  // 메인 공지사항 활성화 시 body 배경색 변경
+  useEffect(() => {
+    if (showMainNotice && mainNotice) {
+      // 메인 공지사항 활성화 시 body에 그라디언트 배경 적용
+      document.body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+      document.body.style.minHeight = '100vh';
+    } else {
+      // 메인 공지사항 비활성화 시 원래 배경으로 되돌리기
+      document.body.style.background = '#f5f5f5';
+      document.body.style.minHeight = 'auto';
+    }
+
+    // cleanup 함수에서 원래 스타일로 되돌리기
+    return () => {
+      document.body.style.background = '#f5f5f5';
+      document.body.style.minHeight = 'auto';
+    };
+  }, [showMainNotice, mainNotice]);
+
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
     const savedPin = sessionStorage.getItem('currentPin');

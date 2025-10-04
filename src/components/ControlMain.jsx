@@ -9,6 +9,25 @@ function ControlMain() {
   const [mainNotice, setMainNotice] = useState(null);
   const [showMainNotice, setShowMainNotice] = useState(false);
 
+  // 메인 공지사항 활성화 시 body 배경색 변경 (제어용 화면용)
+  useEffect(() => {
+    if (showMainNotice && mainNotice) {
+      // 메인 공지사항 활성화 시 body에 차단 화면용 그라디언트 배경 적용
+      document.body.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+      document.body.style.minHeight = '100vh';
+    } else {
+      // 메인 공지사항 비활성화 시 원래 배경으로 되돌리기
+      document.body.style.background = '#f5f5f5';
+      document.body.style.minHeight = 'auto';
+    }
+
+    // cleanup 함수에서 원래 스타일로 되돌리기
+    return () => {
+      document.body.style.background = '#f5f5f5';
+      document.body.style.minHeight = 'auto';
+    };
+  }, [showMainNotice, mainNotice]);
+
   useEffect(() => {
     // 연결 상태 확인
     const controlSessionId = sessionStorage.getItem('controlSessionId');
