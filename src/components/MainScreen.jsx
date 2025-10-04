@@ -20,14 +20,29 @@ function MainScreen() {
   const [notificationSupported, setNotificationSupported] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(false);
 
+  // 버전 비교 함수 (v2.0.0 > v1.9.0 > v1.8.0)
+  const compareVersions = (a, b) => {
+    const parseVersion = (version) => {
+      const [, major, minor, patch] = version.match(/v?(\d+)\.(\d+)\.(\d+)/) || [0, 0, 0, 0];
+      return { major: parseInt(major), minor: parseInt(minor), patch: parseInt(patch) };
+    };
+    
+    const versionA = parseVersion(a.version);
+    const versionB = parseVersion(b.version);
+    
+    if (versionA.major !== versionB.major) return versionB.major - versionA.major;
+    if (versionA.minor !== versionB.minor) return versionB.minor - versionA.minor;
+    return versionB.patch - versionA.patch;
+  };
+
   // 패치 노트 가져오기
   const fetchPatchnotes = async () => {
     try {
       const data = await DataService.getPatchnotes();
-      const sortedPatchnotes = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      const sortedPatchnotes = data.sort(compareVersions); // 버전 역순 정렬
       setPatchnotes(sortedPatchnotes);
       
-      // 최신 버전 설정
+      // 최신 버전 설정 (첫 번째 항목이 가장 최신 버전)
       if (sortedPatchnotes.length > 0) {
         setLatestVersion(sortedPatchnotes[0].version || 'v1.0.0');
       }
