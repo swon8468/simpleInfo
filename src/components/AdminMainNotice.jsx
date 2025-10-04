@@ -42,13 +42,18 @@ function AdminMainNotice() {
   // 활성화된 공지사항 가져오기
   const fetchActiveNotices = async () => {
     try {
-      const pins = await ConnectionDB.getActiveConnections();
+      // AdminPanel과 동일하게 별명 포함 버전 사용
+      const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
       const notices = [];
       
-      for (const pin of pins) {
+      console.log('AdminMainNotice.fetchActiveNotices: PIN 목록 (별명 포함):', pinsWithNicknames);
+      
+      for (const pin of pinsWithNicknames) {
         const sessions = await ConnectionDB.findOutputSessionByPin(pin.pin);
         if (sessions && sessions.length > 0) {
           const sessionData = sessions[0];
+          console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 세션 데이터:`, sessionData);
+          
           if (sessionData.mainNotice && sessionData.mainNotice.isActive) {
             notices.push({
               pinId: pin.pin,
@@ -58,13 +63,19 @@ function AdminMainNotice() {
               createdAt: sessionData.mainNotice.createdAt,
               timestamp: sessionData.mainNotice.timestamp
             });
+            console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 공지사항 추가됨`);
+          } else {
+            console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin}에는 활성 공지사항 없음`);
           }
+        } else {
+          console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 세션을 찾을 수 없음`);
         }
       }
       
+      console.log('AdminMainNotice.fetchActiveNotices: 최종 공지사항 목록:', notices);
       setActiveNotices(notices);
     } catch (error) {
-      console.error('공지사항 목록 가져오기 실패:', error);
+      console.error('AdminMainNotice.fetchActiveNotices: 공지사항 목록 가져오기 실패:', error);
       setActiveNotices([]);
     }
   };
@@ -93,7 +104,8 @@ function AdminMainNotice() {
       
       // 별명 정보와 함께 PIN 목록 업데이트
       await fetchActivePins();
-      fetchActiveNotices(); // 공지사항도 함께 업데이트
+      // 메인 공지사항도 별명 포함 버전으로 업데이트
+      await fetchActiveNotices();
     });
     
     return () => {
