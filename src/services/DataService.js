@@ -575,7 +575,7 @@ class DataService {
       console.error('교실 배치 이미지 삭제 실패:', error);
       throw error;
     }
-  },
+  }
 
   // 패치 노트 관련 함수들
   async getPatchnotes() {
