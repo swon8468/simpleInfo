@@ -62,7 +62,7 @@ function AdminPanel() {
           
           // 별명 정보 추가로 PIN 목록 업데이트
           try {
-            const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
+            const pinsWithNicknames = await ConnectionDB.getActiveConnections();
             setActivePins(pinsWithNicknames);
             console.log('AdminPanel: 별명 포함 PIN 목록 업데이트 완료');
           } catch (error) {
@@ -109,7 +109,7 @@ function AdminPanel() {
   const fetchActivePins = async () => {
     try {
       console.log('AdminPanel.fetchActivePins: 시작 - 현재 시간:', new Date().toISOString());
-      const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
+      const pinsWithNicknames = await ConnectionDB.getActiveConnections();
       console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록 (별명 포함):', pinsWithNicknames);
       console.log('AdminPanel.fetchActivePins: PIN 개수:', pinsWithNicknames.length);
       console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pinsWithNicknames.map(pin => ({ 
@@ -556,20 +556,38 @@ function AdminPanel() {
                         type="button"
                         onClick={() => {
                           if (allergyForm.newItem && allergyForm.newItem.trim()) {
-                            const newItems = allergyForm.newItem.trim();
+                            const inputValue = allergyForm.newItem.trim();
                             const existingItems = Array.isArray(allergyForm.items) 
                               ? allergyForm.items
                               : [];
                             
-                            // 이미 존재하는 항목인지 확인
-                            if (!existingItems.includes(newItems)) {
-                              setAllergyForm({ 
-                                ...allergyForm, 
-                                items: [...existingItems, newItems],
-                                newItem: ''
-                              });
+                            // 쉼표가 포함된 경우 여러 항목으로 분리
+                            if (inputValue.includes(',')) {
+                              const newItems = inputValue
+                                .split(',')
+                                .map(item => item.trim())
+                                .filter(item => item.length > 0 && !existingItems.includes(item));
+                              
+                              if (newItems.length > 0) {
+                                setAllergyForm({ 
+                                  ...allergyForm, 
+                                  items: [...existingItems, ...newItems],
+                                  newItem: ''
+                                });
+                              } else {
+                                setAllergyForm(prev => ({ ...prev, newItem: '' }));
+                              }
                             } else {
-                              setAllergyForm(prev => ({ ...prev, newItem: '' }));
+                              // 단일 항목인 경우
+                              if (!existingItems.includes(inputValue)) {
+                                setAllergyForm({ 
+                                  ...allergyForm, 
+                                  items: [...existingItems, inputValue],
+                                  newItem: ''
+                                });
+                              } else {
+                                setAllergyForm(prev => ({ ...prev, newItem: '' }));
+                              }
                             }
                           }
                         }}
