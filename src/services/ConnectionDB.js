@@ -163,18 +163,10 @@ class ConnectionDB {
       
       // 모든 연결 상태에서 PIN이 있는 출력용 디바이스 조회
       const allConnectionsSnapshot = await getDocs(connectionsRef);
-      console.log('ConnectionDB.getActiveConnections: 전체 연결 문서 수:', allConnectionsSnapshot.size);
       
       const activePins = [];
       allConnectionsSnapshot.forEach((doc) => {
         const data = { sessionId: doc.id, ...doc.data() };
-        console.log('ConnectionDB.getActiveConnections: 전체 문서:', doc.id, {
-          deviceType: data.deviceType,
-          status: data.status,
-          pin: data.pin,
-          createdAt: data.createdAt,
-          connectedAt: data.connectedAt
-        });
         
         // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
         // expired 상태이지만 실제로 제어 디바이스가 연결되어 있으면 활성으로 간주
@@ -186,12 +178,8 @@ class ConnectionDB {
              data.status === 'expired' ||  // expired 상태 추가
              data.connectedControlSession)) {
           activePins.push(data);
-          console.log('ConnectionDB.getActiveConnections: 활성 PIN 추가 (상태:', data.status, '):', data);
         }
       });
-      
-      console.log('ConnectionDB.getActiveConnections: 최종 활성 PIN 결과:', activePins);
-      console.log('ConnectionDB.getActiveConnections: 최종 활성 PIN 개수:', activePins.length);
       return activePins;
     } catch (error) {
       console.error('활성화된 연결 목록 가져오기 실패:', error);
@@ -202,22 +190,17 @@ class ConnectionDB {
   // 실시간으로 연결 상태 모니터링 (스냅샷 리스너)
   subscribeToActiveConnections(callback) {
     try {
-      console.log('ConnectionDB.subscribeToActiveConnections: 실시간 모니터링 시작');
+      // ConnectionDB.subscribeToActiveConnections: 실시간 모니터링 시작
       const connectionsRef = collection(db, 'connections');
       
       // 전체 연결 컬렉션을 실시간 감시
       const unsubscribe = onSnapshot(connectionsRef, (snapshot) => {
-        console.log('ConnectionDB.subscribeToActiveConnections: 실시간 변경 감지, 전체 문서 수:', snapshot.size);
+        // ConnectionDB.subscribeToActiveConnections: 실시간 변경 감지
         
         const activePins = [];
         snapshot.forEach((doc) => {
           const data = { sessionId: doc.id, ...doc.data() };
-          console.log('ConnectionDB.subscribeToActiveConnections: 실시간 문서:', doc.id, {
-            deviceType: data.deviceType,
-            status: data.status,
-            pin: data.pin,
-            createdAt: data.createdAt
-          });
+          // 실시간 문서 처리
           
           // 출력용 디바이스이면서 6자리 PIN이 있는 경우만 포함
           // expired 상태이지만 실제로 제어 디바이스가 연결되어 있으면 활성으로 간주
@@ -229,18 +212,15 @@ class ConnectionDB {
                data.status === 'expired' ||  // expired 상태 추가
                data.connectedControlSession)) {
             activePins.push(data);
-            console.log('ConnectionDB.subscribeToActiveConnections: 실시간 활성 PIN 추가:', data);
           }
         });
-        
-        console.log('ConnectionDB.subscribeToActiveConnections: 실시간 활성 PIN들:', activePins);
         callback(activePins);
       }, (error) => {
         console.error('ConnectionDB.subscribeToActiveConnections: 실시간 모니터링 실패:', error);
         callback([]);
       });
       
-      console.log('ConnectionDB.subscribeToActiveConnections: 스냅샷 리스너 등록 완료');
+      // ConnectionDB.subscribeToActiveConnections: 스냅샷 리스너 등록 완료
       return unsubscribe;
     } catch (error) {
       console.error('ConnectionDB.subscribeToActiveConnections: 설정 실패:', error);
