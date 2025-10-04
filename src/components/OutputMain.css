@@ -181,6 +181,12 @@
   color: #999;
 }
 
+.calendar-day.empty-day {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+}
+
 .day-number {
   font-weight: bold;
   font-size: 1.1rem;

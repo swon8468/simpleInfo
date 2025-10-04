@@ -131,20 +131,38 @@ function OutputMain() {
       const calendar = [];
       const current = new Date(startDate);
       
-      // 6주 * 7일 = 42일 달력
+      // 현재 달의 마지막 날 계산
+      const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+      
+      // 달력 생성 (현재 달만)
       for (let week = 0; week < 6; week++) {
         const weekData = [];
+        
         for (let day = 0; day < 7; day++) {
+          const dayNumber = (week * 7) + day + 1 - firstDay.getDay();
+          
+          // 현재 달의 날짜 범위를 벗어나면 표시하지 않음
+          if (dayNumber > lastDayOfMonth || dayNumber <= 0) {
+            weekData.push(null);
+            continue;
+          }
+          
+          const dayDate = new Date(year, month, dayNumber);
           const dayData = {
-            date: new Date(current),
-            isCurrentMonth: current.getMonth() === month,
-            events: current.getMonth() === month ? (schedules[current.getDate()] || []) : []
+            date: dayDate,
+            isCurrentMonth: true,
+            events: schedules[dayNumber] || []
           };
           
           weekData.push(dayData);
-          current.setDate(current.getDate() + 1);
         }
+        
         calendar.push(weekData);
+        
+        // 현재 달의 마지막 날을 지났으면 중단
+        if ((week + 1) * 7 - firstDay.getDay() > lastDayOfMonth) {
+          break;
+        }
       }
       
       return {
@@ -285,30 +303,37 @@ function OutputMain() {
             <div className="calendar-body">
               {scheduleData.calendar.map((week, weekIndex) => (
                 <div key={weekIndex} className="calendar-week">
-                  {week.map((day, dayIndex) => (
-                    <div key={dayIndex} className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'}`}>
-                      <div className={`day-number ${day.date.getDay() === 0 ? 'sunday' : day.date.getDay() === 6 ? 'saturday' : ''}`}>
-                        {day.date.getDate()}
+                  {week.map((day, dayIndex) => {
+                    // null 값 처리 (현재 달이 아닌 날짜는 표시하지 않음)
+                    if (!day) {
+                      return <div key={dayIndex} className="calendar-day empty-day"></div>;
+                    }
+                    
+                    return (
+                      <div key={dayIndex} className={`calendar-day ${day.isCurrentMonth ? 'current-month' : 'other-month'}`}>
+                        <div className={`day-number ${day.date.getDay() === 0 ? 'sunday' : day.date.getDay() === 6 ? 'saturday' : ''}`}>
+                          {day.date.getDate()}
+                        </div>
+                        <div className="day-events">
+                          {day.events.map((event, eventIndex) => (
+                            <div key={eventIndex} className="event-item">
+                              <div className="event-title">{event.title}</div>
+                              {event.target && event.target.length > 0 && (
+                                <div className="event-target">
+                                  {event.target.length > 1 ? 
+                                    event.target.map((grade, gradeIndex) => (
+                                      <div key={gradeIndex} className="grade-item">{grade}</div>
+                                    )) : 
+                                    event.target.join(', ')
+                                  }
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="day-events">
-                        {day.events.map((event, eventIndex) => (
-                          <div key={eventIndex} className="event-item">
-                            <div className="event-title">{event.title}</div>
-                            {event.target && event.target.length > 0 && (
-                              <div className="event-target">
-                                {event.target.length > 1 ? 
-                                  event.target.map((grade, gradeIndex) => (
-                                    <div key={gradeIndex} className="grade-item">{grade}</div>
-                                  )) : 
-                                  event.target.join(', ')
-                                }
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ))}
             </div>
