@@ -252,7 +252,10 @@ function MainScreen() {
                           {patchnote.version}
                         </span>
                         <span className="patchnote-date">
-                          {new Date(patchnote.createdAt).toLocaleDateString('ko-KR')}
+                          {patchnote.date ? 
+                            new Date(patchnote.date + 'T00:00:00').toLocaleDateString('ko-KR') :
+                            new Date(patchnote.createdAt).toLocaleDateString('ko-KR')
+                          }
                         </span>
                       </div>
                       <div className="patchnote-content">

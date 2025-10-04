@@ -525,6 +525,53 @@ class ConnectionDB {
       throw error;
     }
   }
+
+  // 학교 생활 도우미 차단 관련 함수들
+  async getSchoolBlockingStatus() {
+    try {
+      const settingsRef = collection(db, 'settings');
+      const blockingDoc = doc(settingsRef, 'schoolBlocking');
+      const docSnap = await getDoc(blockingDoc);
+      
+      if (docSnap.exists()) {
+        return docSnap.data().isActive || false;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('차단 상태 조회 실패:', error);
+      return false;
+    }
+  }
+
+  async setSchoolBlockingStatus(isActive) {
+    try {
+      const settingsRef = collection(db, 'settings');
+      const blockingDoc = doc(settingsRef, 'schoolBlocking');
+      
+      await setDoc(blockingDoc, {
+        isActive: isActive,
+        updatedAt: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('차단 상태 설정 실패:', error);
+      throw error;
+    }
+  }
+
+  // 학교 차단 상태 구독 함수
+  subscribeToSchoolBlockingStatus(callback) {
+    const settingsRef = collection(db, 'settings');
+    const blockingDoc = doc(settingsRef, 'schoolBlocking');
+    
+    return onSnapshot(blockingDoc, (doc) => {
+      if (doc.exists()) {
+        callback(doc.data().isActive || false);
+      } else {
+        callback(false);
+      }
+    });
+  }
 }
 
 export default new ConnectionDB();

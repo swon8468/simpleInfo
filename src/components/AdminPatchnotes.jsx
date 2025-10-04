@@ -331,7 +331,10 @@ function AdminPatchnotes() {
                     </span>
                   </div>
                   <div className="patchnote-date">
-                    {new Date(patchnote.createdAt).toLocaleDateString('ko-KR')}
+                    {patchnote.date ? 
+                      new Date(patchnote.date + 'T00:00:00').toLocaleDateString('ko-KR') :
+                      new Date(patchnote.createdAt).toLocaleDateString('ko-KR')
+                    }
                   </div>
                 </div>
                 <div className="patchnote-content">

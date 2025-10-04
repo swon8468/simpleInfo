@@ -8,6 +8,7 @@ import AdminScheduleCalendar from './AdminScheduleCalendar';
 import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
+import AdminSchoolBlocking from './AdminSchoolBlocking';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -407,6 +408,12 @@ function AdminPanel() {
               패치 노트
             </button>
             <button 
+              className={`tab-btn ${activeTab === 'schoolBlocking' ? 'active' : ''}`}
+              onClick={() => setActiveTab('schoolBlocking')}
+            >
+              학교 차단
+            </button>
+            <button 
               className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
               onClick={() => setActiveTab('pins')}
             >
@@ -461,6 +468,12 @@ function AdminPanel() {
             {activeTab === 'patchnotes' && (
               <div className="form-section">
                 <AdminPatchnotes />
+              </div>
+            )}
+
+            {activeTab === 'schoolBlocking' && (
+              <div className="form-section">
+                <AdminSchoolBlocking />
               </div>
             )}
 

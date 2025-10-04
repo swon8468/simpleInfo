@@ -4,6 +4,7 @@ import MainScreen from './components/MainScreen';
 import ControlMode from './components/ControlMode';
 import OutputMode from './components/OutputMode';
 import AdminPanel from './components/AdminPanel';
+import SchoolBlockingScreen from './components/SchoolBlockingScreen';
 
 function App() {
   // 현재 URL을 기반으로 basename 결정
@@ -26,6 +27,7 @@ function App() {
   return (
     <Router basename={basename}>
       <div className="app">
+        <SchoolBlockingScreen />
         <Routes>
           <Route path="/" element={<MainScreen />} />
           <Route path="/control/*" element={<ControlMode />} />
