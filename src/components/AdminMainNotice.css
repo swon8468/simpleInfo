@@ -599,3 +599,28 @@
     box-sizing: border-box;
   }
 }
+
+/* PIN 별명 스타일 */
+.pin-with-nickname {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pin-nickname {
+  font-size: 0.85rem;
+  color: #007bff;
+  font-weight: 500;
+}
+
+.pin-label-section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pin-nickname-inline {
+  font-size: 0.8rem;
+  color: #007bff;
+  font-weight: 500;
+}

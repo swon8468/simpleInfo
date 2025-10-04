@@ -590,6 +590,61 @@ class ConnectionDB {
     
     await Promise.all(updatePromises);
   }
+
+  // PIN 별명 설정/업데이트
+  async setPinNickname(pin, nickname) {
+    try {
+      const pinDoc = doc(db, 'connections', `pin_${pin}`);
+      const pinData = {
+        nickname: nickname.trim(),
+        updatedAt: serverTimestamp()
+      };
+      await updateDoc(pinDoc, pinData);
+      console.log(`PIN ${pin} 별명 설정:`, nickname);
+      return true;
+    } catch (error) {
+      console.error('PIN 별명 설정 실패:', error);
+      return false;
+    }
+  }
+
+  // PIN 별명 가져오기
+  async getPinNickname(pin) {
+    try {
+      const pinDoc = doc(db, 'connections', `pin_${pin}`);
+      const pinSnap = await getDoc(pinDoc);
+      if (pinSnap.exists()) {
+        return pinSnap.data().nickname || '';
+      }
+      return '';
+    } catch (error) {
+      console.error('PIN 별명 조회 실패:', error);
+      return '';
+    }
+  }
+
+  // 활성 연결에 별명 정보 추가
+  async getActiveConnectionsWithNicknames() {
+    try {
+      const activeConnections = await this.getActiveConnections();
+      
+      // 각 PIN에 별명 정보 추가
+      const connectionsWithNicknames = await Promise.all(
+        activeConnections.map(async (connection) => {
+          const nickname = await this.getPinNickname(connection.pin);
+          return {
+            ...connection,
+            nickname: nickname || ''
+          };
+        })
+      );
+      
+      return connectionsWithNicknames;
+    } catch (error) {
+      console.error('별명 포함 활성 연결 조회 실패:', error);
+      return [];
+    }
+  }
 }
 
 export default new ConnectionDB();

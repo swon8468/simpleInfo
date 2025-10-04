@@ -663,3 +663,140 @@ button[type="submit"]:disabled {
   border-radius: 5px;
   border: 1px solid #f5c6cb;
 }
+
+/* PIN 별명 관리 스타일 */
+.pin-item {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  transition: all 0.2s ease;
+}
+
+.pin-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pin-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pin-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pin-number {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.pin-info {
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+.nickname-display-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 5px;
+  border: 1px solid #e9ecef;
+}
+
+.nickname-label {
+  font-size: 1rem;
+  color: #495057;
+}
+
+.edit-nickname-btn {
+  padding: 6px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.edit-nickname-btn:hover {
+  background: #5a6268;
+}
+
+.nickname-edit-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #fff3cd;
+  border-radius: 5px;
+  border: 1px solid #ffeaa7;
+}
+
+.nickname-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+.save-nickname-btn {
+  padding: 6px 12px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-nickname-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+.save-nickname-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancel-nickname-btn {
+  padding: 6px 12px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancel-nickname-btn:hover {
+  background: #c82333;
+}
+
+.remove-pin-btn {
+  background: #dc3545 !important;
+  color: white !important;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.remove-pin-btn:hover {
+  background: #c82333 !important;
+  transform: translateY(-1px);
+}

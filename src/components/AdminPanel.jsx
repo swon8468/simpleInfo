@@ -20,6 +20,9 @@ function AdminPanel() {
   const [message, setMessage] = useState('');
   const [activePins, setActivePins] = useState([]);
   const [pinMessage, setPinMessage] = useState('');
+  const [pinNicknames, setPinNicknames] = useState({}); // PIN별 별명 정보
+  const [editingNicknamePin, setEditingNicknamePin] = useState(null);
+  const [nicknameValue, setNicknameValue] = useState('');
   const [campusLayoutImage, setCampusLayoutImage] = useState(null);
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
   const navigate = useNavigate();
@@ -49,12 +52,23 @@ function AdminPanel() {
       loadCampusLayoutImage();
       
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
-      const unsubscribe = ConnectionDB.subscribeToActiveConnections((activePins) => {
+      const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
         console.log('AdminPanel: 실시간 PIN 변경 감지:', activePins);
         if (activePins.length > 0) {
           console.log('AdminPanel: 실시간 감지로 PIN 업데이트:', activePins.length, '개');
+          
+          // 별명 정보 추가로 PIN 목록 업데이트
+          try {
+            const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
+            setActivePins(pinsWithNicknames);
+            console.log('AdminPanel: 별명 포함 PIN 목록 업데이트 완료');
+          } catch (error) {
+            console.error('AdminPanel: 별명 포함 PIN 목록 업데이트 실패:', error);
+            setActivePins(activePins); // 별명 없이라도 기본 PIN 목록은 유지
+          }
+        } else {
+          setActivePins(activePins);
         }
-        setActivePins(activePins);
       });
       
       return () => {
@@ -88,16 +102,17 @@ function AdminPanel() {
     }
   };
 
-  // 활성화된 PIN 가져오기
+  // 활성화된 PIN 가져오기 (별명 정보 포함)
   const fetchActivePins = async () => {
     try {
       console.log('AdminPanel.fetchActivePins: 시작 - 현재 시간:', new Date().toISOString());
-      const pins = await ConnectionDB.getActiveConnections();
-      console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록:', pins);
-      console.log('AdminPanel.fetchActivePins: PIN 개수:', pins.length);
-      console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pins.map(pin => ({ 
+      const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
+      console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록 (별명 포함):', pinsWithNicknames);
+      console.log('AdminPanel.fetchActivePins: PIN 개수:', pinsWithNicknames.length);
+      console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pinsWithNicknames.map(pin => ({ 
         sessionId: pin.sessionId, 
         pin: pin.pin, 
+        nickname: pin.nickname,
         deviceType: pin.deviceType, 
         status: pin.status,
         createdAt: pin.createdAt,
@@ -106,7 +121,7 @@ function AdminPanel() {
       })));
       
       // PIN이 없는 경우 추가로 다른 방법 시도
-      if (pins.length === 0) {
+      if (pinsWithNicknames.length === 0) {
         console.log('AdminPanel.fetchActivePins: 초기 PIN 목록이 없음 - 다른 방법 시도');
         
         // 직접 Firebase 쿼리로 모든 연결 상태 확인
@@ -128,7 +143,7 @@ function AdminPanel() {
                 data.pin && 
                 data.pin.length === 6 &&
                 (data.status === 'connected' || data.status === 'control_connected' || data.connectedControlSession)) {
-              allPins.push({ sessionId: doc.id, ...data });
+              allPins.push({ sessionId: doc.id, ...data, nickname: data.nickname || '' });
             }
           });
           
@@ -145,7 +160,7 @@ function AdminPanel() {
         }
       }
       
-      setActivePins(pins);
+      setActivePins(pinsWithNicknames);
       if (pins.length > 0) {
         setPinMessage(`정상적으로 ${pins.length}개의 PIN을 조회했습니다.`);
       }
@@ -166,6 +181,36 @@ function AdminPanel() {
 
   const handleBackToMain = () => {
     navigate('/');
+  };
+
+  // PIN 별명 편집 시작
+  const startEditNickname = (pin) => {
+    setEditingNicknamePin(pin);
+    setNicknameValue(pin.nickname || '');
+  };
+
+  // PIN 별명 저장
+  const saveNickname = async (pin) => {
+    try {
+      const success = await ConnectionDB.setPinNickname(pin.pin, nicknameValue);
+      if (success) {
+        setPinMessage(`PIN ${pin.pin} 별명이 "${nicknameValue}"로 설정되었습니다.`);
+        await fetchActivePins(); // PIN 목록 다시 가져오기
+        setEditingNicknamePin(null);
+        setNicknameValue('');
+      } else {
+        setPinMessage('별명 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('별명 저장 실패:', error);
+      setPinMessage('별명 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  // PIN 별명 편집 취소
+  const cancelEditNickname = () => {
+    setEditingNicknamePin(null);
+    setNicknameValue('');
   };
 
   // 활성화된 PIN 제거 핸들러
@@ -538,9 +583,52 @@ function AdminPanel() {
                   <ul className="pin-list">
                     {activePins.map((pin) => (
                       <li key={pin.pin} className="pin-item">
-                        <span>PIN: <strong>{pin.pin}</strong> (연결 시간: {pin.connectedAt?.toDate ? pin.connectedAt.toDate().toLocaleString() : '알 수 없음'})</span>
+                        <div className="pin-info-section">
+                          <div className="pin-main-info">
+                            <span className="pin-number">PIN: <strong>{pin.pin}</strong></span>
+                            <span className="pin-info">연결 시간: {pin.connectedAt?.toDate ? pin.connectedAt.toDate().toLocaleString() : '알 수 없음'}</span>
+                          </div>
+                          
+                          {editingNicknamePin && editingNicknamePin.pin === pin.pin ? (
+                            <div className="nickname-edit-section">
+                              <input
+                                type="text"
+                                value={nicknameValue}
+                                onChange={(e) => setNicknameValue(e.target.value)}
+                                placeholder="별명을 입력하세요"
+                                className="nickname-input"
+                                maxLength={10}
+                              />
+                              <button 
+                                className="btn save-nickname-btn" 
+                                onClick={() => saveNickname(pin)}
+                                disabled={nicknameValue.trim().length === 0}
+                              >
+                                저장
+                              </button>
+                              <button 
+                                className="btn cancel-nickname-btn" 
+                                onClick={cancelEditNickname}
+                              >
+                                취소
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="nickname-display-section">
+                              <span className="nickname-label">
+                                별명: <strong>{pin.nickname || '없음'}</strong>
+                              </span>
+                              <button 
+                                className="btn edit-nickname-btn" 
+                                onClick={() => startEditNickname(pin)}
+                              >
+                                {pin.nickname ? '편집' : '추가'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
                         <button className="btn remove-pin-btn" onClick={() => handleRemovePin(pin.pin)}>
-                          제거
+                          PIN 제거
                         </button>
                       </li>
                     ))}

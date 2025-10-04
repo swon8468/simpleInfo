@@ -11,6 +11,7 @@ function AdminMainNotice() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingNotice, setEditingNotice] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [pinNicknames, setPinNicknames] = useState({}); // PIN별 별명 정보
   
   const [noticeForm, setNoticeForm] = useState({
     title: '',
@@ -19,14 +20,22 @@ function AdminMainNotice() {
     isActive: false
   });
 
-  // 활성화된 PIN 가져오기
+  // 활성화된 PIN 가져오기 (별명 정보 포함)
   const fetchActivePins = async () => {
     try {
-      const pins = await ConnectionDB.getActiveConnections();
-      setActivePins(pins);
+      const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
+      setActivePins(pinsWithNicknames);
+      
+      // 별명 정보를 별도 상태로 저장
+      const nicknames = {};
+      pinsWithNicknames.forEach(pin => {
+        nicknames[pin.pin] = pin.nickname || '';
+      });
+      setPinNicknames(nicknames);
     } catch (error) {
       console.error('PIN 가져오기 실패:', error);
       setActivePins([]);
+      setPinNicknames({});
     }
   };
 
@@ -79,9 +88,11 @@ function AdminMainNotice() {
     retryFetchPins();
     
     // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
-    const unsubscribe = ConnectionDB.subscribeToActiveConnections((activePins) => {
+    const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
       console.log('AdminMainNotice: 실시간 PIN 변경 감지:', activePins);
-      setActivePins(activePins);
+      
+      // 별명 정보와 함께 PIN 목록 업데이트
+      await fetchActivePins();
       fetchActiveNotices(); // 공지사항도 함께 업데이트
     });
     
@@ -392,8 +403,13 @@ function AdminMainNotice() {
                       checked={noticeForm.targetPins.includes(pin.pin)}
                       onChange={() => handlePinToggle(pin.pin)}
                     />
-                    <span className="pin-label">PIN {pin.pin}</span>
-                    <small className="pin-status">({pin.status})</small>
+                    <div className="pin-label-section">
+                      <span className="pin-label">PIN {pin.pin}</span>
+                      {pin.nickname && (
+                        <span className="pin-nickname-inline">({pin.nickname})</span>
+                      )}
+                      <small className="pin-status">({pin.status})</small>
+                    </div>
                   </label>
                 ))}
               </div>
@@ -435,7 +451,12 @@ function AdminMainNotice() {
                 {activeNotices.map((notice) => (
                   <tr key={notice.sessionId}>
                     <td className="pin-cell">
-                      <span className="pin-badge">PIN {notice.pinId}</span>
+                      <div className="pin-with-nickname">
+                        <span className="pin-badge">PIN {notice.pinId}</span>
+                        {pinNicknames[notice.pinId] && (
+                          <span className="pin-nickname">({pinNicknames[notice.pinId]})</span>
+                        )}
+                      </div>
                     </td>
                     <td className="title-cell">
                       <button 
@@ -544,8 +565,13 @@ function AdminMainNotice() {
                             checked={noticeForm.targetPins.includes(pin.pin)}
                             onChange={() => handlePinToggle(pin.pin)}
                           />
-                          <span className="pin-label">PIN {pin.pin}</span>
-                          <small className="pin-status">({pin.status})</small>
+                          <div className="pin-label-section">
+                            <span className="pin-label">PIN {pin.pin}</span>
+                            {pin.nickname && (
+                              <span className="pin-nickname-inline">({pin.nickname})</span>
+                            )}
+                            <small className="pin-status">({pin.status})</small>
+                          </div>
                         </label>
                       ))}
                     </div>
