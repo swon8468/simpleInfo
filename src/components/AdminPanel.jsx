@@ -62,7 +62,7 @@ function AdminPanel() {
           
           // 별명 정보 추가로 PIN 목록 업데이트
           try {
-            const pinsWithNicknames = await ConnectionDB.getActiveConnections();
+            const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
             setActivePins(pinsWithNicknames);
             console.log('AdminPanel: 별명 포함 PIN 목록 업데이트 완료');
           } catch (error) {
@@ -109,7 +109,7 @@ function AdminPanel() {
   const fetchActivePins = async () => {
     try {
       console.log('AdminPanel.fetchActivePins: 시작 - 현재 시간:', new Date().toISOString());
-      const pinsWithNicknames = await ConnectionDB.getActiveConnections();
+      const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
       console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록 (별명 포함):', pinsWithNicknames);
       console.log('AdminPanel.fetchActivePins: PIN 개수:', pinsWithNicknames.length);
       console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pinsWithNicknames.map(pin => ({ 
@@ -693,9 +693,12 @@ function AdminPanel() {
                   <p
                     className="realtime-indicator"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                    onClick={fetchActivePins}
+                    onClick={() => {
+                      fetchActivePins();
+                      setActiveTab('pins');
+                    }}
                   >
-                    PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침 됩니다.
+                    PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침되고 PIN관리 탭으로 이동됩니다.
                   </p>
                   {activePins.length >= 10 && (
                     <p className="pin-warning">⚠️ 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
