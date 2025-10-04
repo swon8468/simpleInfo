@@ -396,3 +396,134 @@
 .version-update-btn.patch:hover {
   background-color: #1e7e34;
 }
+
+/* 수정 폼 스타일 */
+.patchnote-edit-form {
+  margin-top: 15px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.patchnote-edit-form h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.patchnote-edit-form .form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.patchnote-edit-form .form-row .form-group {
+  flex: 1;
+}
+
+.patchnote-edit-form .form-group {
+  margin-bottom: 15px;
+}
+
+.patchnote-edit-form .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.patchnote-edit-form .form-group input,
+.patchnote-edit-form .form-group select,
+.patchnote-edit-form .form-group textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.patchnote-edit-form .form-group input:focus,
+.patchnote-edit-form .form-group select:focus,
+.patchnote-edit-form .form-group textarea:focus {
+  outline: 0;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.patchnote-edit-form .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.patchnote-edit-form .cancel-btn {
+  padding: 10px 20px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.patchnote-edit-form .cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.patchnote-edit-form .submit-btn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.patchnote-edit-form .submit-btn:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.patchnote-edit-form .submit-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 애니메이션 */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .patchnote-edit-form .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .patchnote-edit-form .form-actions {
+    flex-direction: column;
+  }
+  
+  .patchnote-edit-form .cancel-btn,
+  .patchnote-edit-form .submit-btn {
+    width: 100%;
+    padding: 12px 20px;
+  }
+}

@@ -9,6 +9,7 @@ function AdminPatchnotes() {
   const [patchnotes, setPatchnotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingPatchnote, setEditingPatchnote] = useState(null);
+  const [expandedEditForm, setExpandedEditForm] = useState(null); // 어떤 패치 노트의 수정 폼이 열려있는지
   
   const [patchnoteForm, setPatchnoteForm] = useState({
     version: '',
@@ -18,12 +19,27 @@ function AdminPatchnotes() {
     type: 'major'
   });
 
+  // 버전 비교 함수 (v1.9.0 > v1.8.0 > v1.7.0)
+  const compareVersions = (a, b) => {
+    const parseVersion = (version) => {
+      const [, major, minor, patch] = version.match(/v?(\d+)\.(\d+)\.(\d+)/) || [0, 0, 0, 0];
+      return { major: parseInt(major), minor: parseInt(minor), patch: parseInt(patch) };
+    };
+    
+    const versionA = parseVersion(a.version);
+    const versionB = parseVersion(b.version);
+    
+    if (versionA.major !== versionB.major) return versionB.major - versionA.major;
+    if (versionA.minor !== versionB.minor) return versionB.minor - versionA.minor;
+    return versionB.patch - versionA.patch;
+  };
+
   // 패치 노트 목록 가져오기
   const fetchPatchnotes = async () => {
     try {
       setLoading(true);
       const data = await DataService.getPatchnotes();
-      setPatchnotes(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      setPatchnotes(data.sort(compareVersions)); // 버전 역순 정렬
     } catch (error) {
       setMessage('패치 노트 목록을 가져오는데 실패했습니다.');
     } finally {
@@ -124,7 +140,15 @@ function AdminPatchnotes() {
   };
 
   const handleEdit = (patchnote) => {
+    // 이미 같은 패치 노트의 수정 폼이 열려있다면 닫기
+    if (expandedEditForm === patchnote.id) {
+      setExpandedEditForm(null);
+      setEditingPatchnote(null);
+      return;
+    }
+    
     setEditingPatchnote(patchnote);
+    setExpandedEditForm(patchnote.id); // 해당 패치 노트의 수정 폼 열기
     setPatchnoteForm({
       version: patchnote.version,
       date: patchnote.date || new Date().toISOString().split('T')[0],
@@ -132,7 +156,7 @@ function AdminPatchnotes() {
       content: patchnote.content,
       type: patchnote.type || 'major'
     });
-    setShowForm(true);
+    setShowForm(true); // 폼 표시 활성화 (개별 수정용)
   };
 
   const handleDelete = async (patchnoteId) => {
@@ -351,7 +375,7 @@ function AdminPatchnotes() {
                     onClick={() => handleEdit(patchnote)}
                     disabled={loading}
                   >
-                    수정
+                    {expandedEditForm === patchnote.id ? '취소' : '수정'}
                   </button>
                   <button 
                     className="remove-btn"
@@ -361,6 +385,97 @@ function AdminPatchnotes() {
                     삭제
                   </button>
                 </div>
+                
+                {/* 수정 폼 - 해당 패치 노트 아래에 표시 */}
+                {expandedEditForm === patchnote.id && (
+                  <div className="patchnote-edit-form">
+                    <h4>패치 노트 수정</h4>
+                    <form onSubmit={handleSubmit}>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label htmlFor={`edit-version-${patchnote.id}`}>버전</label>
+                          <input
+                            type="text"
+                            id={`edit-version-${patchnote.id}`}
+                            value={patchnoteForm.version}
+                            onChange={(e) => setPatchnoteForm({...patchnoteForm, version: e.target.value})}
+                            placeholder="예: v1.9.0"
+                            disabled={loading}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor={`edit-date-${patchnote.id}`}>날짜</label>
+                          <input
+                            type="date"
+                            id={`edit-date-${patchnote.id}`}
+                            value={patchnoteForm.date}
+                            onChange={(e) => setPatchnoteForm({...patchnoteForm, date: e.target.value})}
+                            disabled={loading}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label htmlFor={`edit-type-${patchnote.id}`}>타입</label>
+                          <select
+                            id={`edit-type-${patchnote.id}`}
+                            value={patchnoteForm.type}
+                            onChange={(e) => setPatchnoteForm({...patchnoteForm, type: e.target.value})}
+                            disabled={loading}
+                          >
+                            <option value="major">Major (주요 변경)</option>
+                            <option value="minor">Minor (기능 변경)</option>
+                            <option value="security">Security (보안)</option>
+                            <option value="fix">Fix (버그 수정)</option>
+                          </select>
+                        </div>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor={`edit-title-${patchnote.id}`}>제목</label>
+                        <input
+                          type="text"
+                          id={`edit-title-${patchnote.id}`}
+                          value={patchnoteForm.title}
+                          onChange={(e) => setPatchnoteForm({...patchnoteForm, title: e.target.value})}
+                          placeholder="패치 노트 제목을 입력하세요"
+                          disabled={loading}
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor={`edit-content-${patchnote.id}`}>내용</label>
+                        <textarea
+                          id={`edit-content-${patchnote.id}`}
+                          value={patchnoteForm.content}
+                          onChange={(e) => setPatchnoteForm({...patchnoteForm, content: e.target.value})}
+                          placeholder="패치 노트 내용을 입력하세요"
+                          rows={5}
+                          disabled={loading}
+                        />
+                      </div>
+                      
+                      <div className="form-actions">
+                        <button 
+                          type="button" 
+                          className="cancel-btn"
+                          onClick={() => {
+                            setExpandedEditForm(null);
+                            setEditingPatchnote(null);
+                          }}
+                          disabled={loading}
+                        >
+                          취소
+                        </button>
+                        <button 
+                          type="submit" 
+                          className="submit-btn"
+                          disabled={loading || !patchnoteForm.version.trim() || !patchnoteForm.title.trim() || !patchnoteForm.content.trim()}
+                        >
+                          {loading ? '수정 중...' : '패치 노트 수정'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
               </div>
             ))}
           </div>
