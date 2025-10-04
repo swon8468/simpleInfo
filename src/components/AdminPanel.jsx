@@ -64,11 +64,19 @@ function AdminPanel() {
   // 활성화된 PIN 가져오기
   const fetchActivePins = async () => {
     try {
+      console.log('AdminPanel.fetchActivePins: 시작');
       const pins = await ConnectionDB.getActiveConnections();
-      console.log('AdminPanel: 가져온 PIN 목록:', pins);
-      setActivePins(pins)
+      console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록:', pins);
+      console.log('AdminPanel.fetchActivePins: PIN 개수:', pins.length);
+      console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pins.map(pin => ({ 
+        sessionId: pin.sessionId, 
+        pin: pin.pin, 
+        deviceType: pin.deviceType, 
+        status: pin.status 
+      })));
+      setActivePins(pins);
     } catch (error) {
-      console.error('AdminPanel: PIN 가져오기 실패:', error);
+      console.error('AdminPanel.fetchActivePins: PIN 가져오기 실패:', error);
       setActivePins([]);
     }
   };

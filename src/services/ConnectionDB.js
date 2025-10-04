@@ -157,15 +157,26 @@ class ConnectionDB {
   // 활성화된 연결 목록 가져오기
   async getActiveConnections() {
     try {
+      console.log('ConnectionDB.getActiveConnections: 쿼리 시작');
       const connectionsRef = collection(db, 'connections');
       const q = query(
         connectionsRef,
         where('deviceType', '==', 'output'),
         where('status', '==', 'connected')
       );
-      const querySnapshot = await getDocs(q);
+      console.log('ConnectionDB.getActiveConnections: 쿼리 생성 완료');
       
-      return querySnapshot.docs.map(doc => ({ sessionId: doc.id, ...doc.data() }));
+      const querySnapshot = await getDocs(q);
+      console.log('ConnectionDB.getActiveConnections: 쿼리 실행 완료, 문서 수:', querySnapshot.size);
+      
+      const results = querySnapshot.docs.map(doc => {
+        const data = { sessionId: doc.id, ...doc.data() };
+        console.log('ConnectionDB.getActiveConnections: 문서 데이터:', data);
+        return data;
+      });
+      
+      console.log('ConnectionDB.getActiveConnections: 최종 결과:', results);
+      return results;
     } catch (error) {
       console.error('활성화된 연결 목록 가져오기 실패:', error);
       return [];
