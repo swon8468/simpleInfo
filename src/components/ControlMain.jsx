@@ -62,8 +62,19 @@ function ControlMain() {
         }
       });
       
+      // Heartbeat 주기적 실행 (연결 유지) - 1분마다
+      const heartbeatInterval = setInterval(async () => {
+        try {
+          await ConnectionDB.heartbeatSession(controlSessionId);
+          await ConnectionDB.heartbeatSession(outputSessionId);
+        } catch (error) {
+          console.error('Heartbeat 실패:', error);
+        }
+      }, 60000); // 1분마다
+      
       return () => {
         unsubscribe();
+        clearInterval(heartbeatInterval);
       };
     } else {
       setConnectionStatus('연결 안됨');

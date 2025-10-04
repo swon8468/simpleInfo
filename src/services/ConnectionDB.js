@@ -330,6 +330,30 @@ class ConnectionDB {
     }
   }
 
+  // 세션 Heartbeat (연결 유지)
+  async heartbeatSession(sessionId) {
+    try {
+      const docRef = doc(db, 'connections', sessionId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        // 활성 세션인 경우 타임스탬프만 업데이트
+        if (data.status === 'connected' || data.status === 'control_connected') {
+          await updateDoc(docRef, {
+            lastHeartbeat: serverTimestamp(),
+            status: data.status // 상태 유지
+          });
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('세션 heartbeat 실패:', error);
+      return false;
+    }
+  }
+
   // 세션 정리 (만료된 세션)
   async cleanupSession(sessionId) {
     try {

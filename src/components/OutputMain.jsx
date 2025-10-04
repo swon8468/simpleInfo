@@ -83,6 +83,19 @@ function OutputMain() {
           console.log('');
         }
       });
+      
+      // Heartbeat 주기적 실행 (연결 유지) - 1분마다
+      const heartbeatInterval = setInterval(async () => {
+        try {
+          await ConnectionDB.heartbeatSession(outputSessionId);
+        } catch (error) {
+          console.error('Heartbeat 실패:', error);
+        }
+      }, 60000); // 1분마다
+      
+      return () => {
+        clearInterval(heartbeatInterval);
+      };
     } else {
       // 세션 정보가 없으면 메인 화면으로 리다이렉트
       navigate('/');
