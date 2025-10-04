@@ -694,8 +694,10 @@ function AdminPanel() {
                     className="realtime-indicator"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                     onClick={() => {
+                      console.log('새로고침 버튼 클릭됨');
                       fetchActivePins();
                       setActiveTab('pins');
+                      setPinMessage('새로고침 실행 중...');
                     }}
                   >
                     PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침되고 PIN관리 탭으로 이동됩니다.
