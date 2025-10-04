@@ -31,18 +31,66 @@ function AdminPanel() {
 
   console.log('관리자 패널 표시');
   return (
-    <div style={{ padding: '20px', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <h1>관리자 패널</h1>
-      <p>관리자 패널이 정상적으로 로드되었습니다.</p>
-      <button 
-        onClick={() => {
-          sessionStorage.removeItem('adminAuthenticated');
-          setIsAuthenticated(false);
-        }}
-        style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
-      >
-        로그아웃
-      </button>
+    <div style={{ 
+      padding: '20px', 
+      backgroundColor: '#f5f5f5', 
+      minHeight: '100vh',
+      position: 'relative',
+      zIndex: 9999
+    }}>
+      <h1 style={{ color: '#333', marginBottom: '20px' }}>🔧 관리자 패널</h1>
+      <div style={{ 
+        backgroundColor: 'white', 
+        padding: '20px', 
+        borderRadius: '8px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+        marginBottom: '20px'
+      }}>
+        <h2>✅ 관리자 패널이 정상적으로 로드되었습니다!</h2>
+        <p>문제가 해결되었습니다.</p>
+        <div style={{ margin: '20px 0' }}>
+          <strong>현재 URL:</strong> {window.location.href}<br/>
+          <strong>경로:</strong> {window.location.pathname}<br/>
+          <strong>시간:</strong> {new Date().toLocaleString()}
+        </div>
+      </div>
+      
+      <div style={{ display: 'flex', gap: '10px' }}>
+        <button 
+          onClick={() => {
+            sessionStorage.removeItem('adminAuthenticated');
+            setIsAuthenticated(false);
+            console.log('로그아웃됨');
+          }}
+          style={{ 
+            padding: '12px 24px', 
+            backgroundColor: '#dc3545', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          🔓 로그아웃
+        </button>
+        
+        <button 
+          onClick={() => {
+            console.log('새로고침');
+            window.location.reload();
+          }}
+          style={{ 
+            padding: '12px 24px', 
+            backgroundColor: '#007bff', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '6px',
+            cursor: 'pointer'
+          }}
+        >
+          🔄 새로고침
+        </button>
+      </div>
     </div>
   );
 }
