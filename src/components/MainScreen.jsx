@@ -164,6 +164,44 @@ function MainScreen() {
         )}
 
       </div>
+
+      {/* 패치 노트 및 버전 정보 */}
+      <div className="patchnote-section">
+        <div className="version-info">
+          <h4>🔄 버전 정보</h4>
+          <p className="version-number">v1.0.0</p>
+          <p className="version-date">최종 업데이트: 2025-10-04</p>
+        </div>
+        
+        <div className="patchnote-info">
+          <h4>📋 최근 주요 업데이트</h4>
+          <div className="patchnote-list">
+            <div className="patchnote-item">
+              <span className="feature-badge new">NEW</span>
+              <span>메인 공지사항 시스템 - PIN별 타겟팅 및 실시간 표시</span>
+            </div>
+            <div className="patchnote-item">
+              <span className="feature-badge new">NEW</span>
+              <span>PWA 지원 - 모바일 앱처럼 설치 및 오프라인 사용</span>
+            </div>
+            <div className="patchnote-item">
+              <span className="feature-badge improved">IMPROVED</span>
+              <span>실시간 PIN 연결 감지 및 자동 모니터링</span>
+            </div>
+            <div className="patchnote-item">
+              <span className="feature-badge improved">IMPROVED</span>
+              <span>모바일 반응형 디자인 최적화</span>
+            </div>
+            <div className="patchnote-item">
+              <span className="feature-badge fixed">FIXED</span>
+              <span>관리자 페이지 새로고침 없이 즉시 PIN 목록 표시</span>
+            </div>
+          </div>
+          <div className="patchnote-footer">
+            <p>자세한 사항은 관리자 페이지의 패치 노트에서 확인하세요.</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

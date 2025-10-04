@@ -576,6 +576,60 @@ class DataService {
       throw error;
     }
   }
+
+  // 패치 노트 관련 함수들
+  async getPatchnotes() {
+    try {
+      const patchnotesRef = collection(db, 'patchnotes');
+      const patchnotesSnapshot = await getDocs(patchnotesRef);
+      return patchnotesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      throw new Error('패치 노트 목록을 가져오는데 실패했습니다.');
+    }
+  },
+
+  async createPatchnote(patchnoteData) {
+    try {
+      const patchnotesRef = collection(db, 'patchnotes');
+
+      await addDoc(patchnotesRef, {
+        version: patchnoteData.version,
+        date: patchnoteData.date,
+        title: patchnoteData.title,
+        content: patchnoteData.content,
+        type: patchnoteData.type,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      throw new Error('패치 노트 등록에 실패했습니다.');
+    }
+  },
+
+  async updatePatchnote(patchnoteId, patchnoteData) {
+    try {
+      const patchnoteRef = doc(db, 'patchnotes', patchnoteId);
+      await updateDoc(patchnoteRef, {
+        version: patchnoteData.version,
+        date: patchnoteData.date,
+        title: patchnoteData.title,
+        content: patchnoteData.content,
+        type: patchnoteData.type,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      throw new Error('패치 노트 수정에 실패했습니다.');
+    }
+  },
+
+  async deletePatchnote(patchnoteId) {
+    try {
+      const patchnoteRef = doc(db, 'patchnotes', patchnoteId);
+      await deleteDoc(patchnoteRef);
+    } catch (error) {
+      throw new Error('패치 노트 삭제에 실패했습니다.');
+    }
+  }
 }
 
 export default new DataService();

@@ -113,7 +113,7 @@
 
 .admin-tabs {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr); /* 6 columns for all tabs */
   gap: 10px;
   margin-bottom: 30px;
   background-color: white;

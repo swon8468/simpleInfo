@@ -7,6 +7,7 @@ import AdminAnnouncementTable from './AdminAnnouncementTable';
 import AdminScheduleCalendar from './AdminScheduleCalendar';
 import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
+import AdminPatchnotes from './AdminPatchnotes';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -400,6 +401,12 @@ function AdminPanel() {
               메인 공지사항
             </button>
             <button 
+              className={`tab-btn ${activeTab === 'patchnotes' ? 'active' : ''}`}
+              onClick={() => setActiveTab('patchnotes')}
+            >
+              패치 노트
+            </button>
+            <button 
               className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
               onClick={() => setActiveTab('pins')}
             >
@@ -448,6 +455,12 @@ function AdminPanel() {
             {activeTab === 'mainNotice' && (
               <div className="form-section">
                 <AdminMainNotice />
+              </div>
+            )}
+
+            {activeTab === 'patchnotes' && (
+              <div className="form-section">
+                <AdminPatchnotes />
               </div>
             )}
 
