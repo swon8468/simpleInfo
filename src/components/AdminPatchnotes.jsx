@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import DataService from '../services/DataService';
+import NotificationService from '../services/NotificationService';
 import './AdminPatchnotes.css';
 
 function AdminPatchnotes() {
@@ -50,6 +51,13 @@ function AdminPatchnotes() {
       } else {
         await DataService.createPatchnote(patchnoteForm);
         setMessage('패치 노트가 성공적으로 등록되었습니다.');
+        
+        // 활성 사용자에게 알림 발송
+        try {
+          await NotificationService.showPatchnoteNotification(patchnoteForm);
+        } catch (error) {
+          console.error('알림 발송 실패:', error);
+        }
       }
       
       setPatchnoteForm({

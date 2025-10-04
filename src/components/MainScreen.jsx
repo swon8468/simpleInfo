@@ -4,6 +4,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
+import NotificationService from '../services/NotificationService';
 import logoImage from '/logo.png';
 import './MainScreen.css';
 
@@ -15,6 +16,8 @@ function MainScreen() {
   const [activePinCount, setActivePinCount] = useState(0);
   const [showPatchnoteModal, setShowPatchnoteModal] = useState(false);
   const [patchnotes, setPatchnotes] = useState([]);
+  const [notificationSupported, setNotificationSupported] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState(false);
 
   // 패치 노트 가져오기
   const fetchPatchnotes = async () => {
@@ -35,6 +38,26 @@ function MainScreen() {
   const handleCloseModal = () => {
     setShowPatchnoteModal(false);
   };
+
+  // 알림 권한 요청
+  const requestNotificationPermission = async () => {
+    try {
+      const granted = await NotificationService.requestPermission();
+      setNotificationPermission(granted);
+      if (granted) {
+        alert('알림 권한이 허용되었습니다! 새로운 패치노트나 공지사항을 받을 수 있습니다.');
+      }
+    } catch (error) {
+      alert('알림 권한 요청에 실패했습니다: ' + error.message);
+    }
+  };
+
+  // 알림 상태 초기화
+  useEffect(() => {
+    const status = NotificationService.getPermissionStatus();
+    setNotificationSupported(status.isSupported);
+    setNotificationPermission(status.canShow);
+  }, []);
 
   // 활성화된 PIN 확인 함수
   const checkActivePin = async () => {
@@ -188,7 +211,7 @@ function MainScreen() {
 
       </div>
 
-      {/* 버전 정보 - 클릭 가능 */}
+      {/* 버전 정보 및 알림 설정 */}
       <div className="version-section">
         <button className="version-button" onClick={handlePatchnoteClick}>
           <div className="version-content">
@@ -199,6 +222,14 @@ function MainScreen() {
             </div>
           </div>
         </button>
+        
+        {/* 알림 권한 요청 (PWA 지원시만) */}
+        {notificationSupported && !notificationPermission && (
+          <button className="notification-button" onClick={requestNotificationPermission}>
+            <span className="notification-icon">🔔</span>
+            <span>알림 허용</span>
+          </button>
+        )}
       </div>
 
       {/* 패치 노트 모달 */}
