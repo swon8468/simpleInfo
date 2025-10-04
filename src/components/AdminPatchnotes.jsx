@@ -12,7 +12,7 @@ function AdminPatchnotes() {
   
   const [patchnoteForm, setPatchnoteForm] = useState({
     version: '',
-    date: '',
+    date: new Date().toISOString().split('T')[0], // 오늘 날짜로 초기화
     title: '',
     content: '',
     type: 'major'
@@ -34,6 +34,59 @@ function AdminPatchnotes() {
   useEffect(() => {
     fetchPatchnotes();
   }, []);
+
+  // 다음 버전 자동 생성 함수
+  const generateNextVersion = () => {
+    if (patchnotes.length === 0) {
+      return '1.0.0';
+    }
+
+    // 최신 패치노트의 버전을 추출
+    const latestVersion = patchnotes[0].version;
+    const versionMatch = latestVersion.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    
+    if (!versionMatch) {
+      // 버전 형식이 맞지 않으면 1.0.0으로 시작
+      return '1.0.0';
+    }
+
+    const [, major, minor, patch] = versionMatch;
+    const newPatch = parseInt(patch) + 1;
+    
+    return `${major}.${minor}.${newPatch}`;
+  };
+
+  // Patch 버전 업데이트 (예: 1.0.0 → 1.0.1)
+  const updatePatchVersion = (currentVersion) => {
+    const versionMatch = currentVersion.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    if (!versionMatch) return null;
+    
+    const [, major, minor, patch] = versionMatch;
+    const newPatch = parseInt(patch) + 1;
+    return `${major}.${minor}.${newPatch}`;
+  };
+
+  // Minor 버전 업데이트 (예: 1.0.0 → 1.1.0)
+  const updateMinorVersion = (currentVersion) => {
+    const versionMatch = currentVersion.match(/^(\d+)\.(\d+)\.(\d+)$/);
+    if (!versionMatch) return null;
+    
+    const [, major, minor] = versionMatch;
+    const newMinor = parseInt(minor) + 1;
+    return `${major}.${newMinor}.0`;
+  };
+
+  // 폼 초기화 함수
+  const resetForm = () => {
+    setPatchnoteForm({
+      version: '',
+      date: new Date().toISOString().split('T')[0],
+      title: '',
+      content: '',
+      type: 'minor' // 중요한 업데이트는 주로 minor로 시작
+    });
+    setEditingPatchnote(null);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -60,15 +113,8 @@ function AdminPatchnotes() {
         }
       }
       
-      setPatchnoteForm({
-        version: '',
-        date: new Date().toISOString().split('T')[0],
-        title: '',
-        content: '',
-        type: 'major'
-      });
+      resetForm();
       setShowForm(false);
-      setEditingPatchnote(null);
       fetchPatchnotes();
     } catch (error) {
       setMessage('패치 노트 등록에 실패했습니다.');
@@ -106,14 +152,7 @@ function AdminPatchnotes() {
 
   const handleCancel = () => {
     setShowForm(false);
-    setEditingPatchnote(null);
-    setPatchnoteForm({
-      version: '',
-      date: new Date().toISOString().split('T')[0],
-      title: '',
-      content: '',
-      type: 'major'
-    });
+    resetForm();
   };
 
   return (
@@ -131,7 +170,17 @@ function AdminPatchnotes() {
         <button 
           type="button" 
           className="add-patchnote-btn"
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (!showForm) {
+              // 새로운 패치노트 작성 시 자동 버전 생성
+              setPatchnoteForm(prev => ({
+                ...prev,
+                version: generateNextVersion(),
+                date: new Date().toISOString().split('T')[0]
+              }));
+            }
+            setShowForm(!showForm);
+          }}
           disabled={loading}
         >
           {showForm ? '패치 노트 작성 취소' : '+ 패치 노트 추가'}
@@ -144,14 +193,52 @@ function AdminPatchnotes() {
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="version">버전 *</label>
-              <input
-                type="text"
-                id="version"
-                value={patchnoteForm.version}
-                onChange={(e) => setPatchnoteForm(prev => ({ ...prev, version: e.target.value }))}
-                placeholder="예: v1.0.0"
-                required
-              />
+              <div className="version-input-group">
+                <input
+                  type="text"
+                  id="version"
+                  value={patchnoteForm.version}
+                  onChange={(e) => setPatchnoteForm(prev => ({ ...prev, version: e.target.value }))}
+                  placeholder="예: v1.0.0"
+                  required
+                />
+                <div className="version-update-buttons">
+                  <button 
+                    type="button" 
+                    className="version-update-btn minor"
+                    onClick={() => {
+                      const updatedVersion = updateMinorVersion(patchnoteForm.version);
+                      if (updatedVersion) {
+                        setPatchnoteForm(prev => ({ 
+                          ...prev, 
+                          version: updatedVersion,
+                          type: 'minor'
+                        }));
+                      }
+                    }}
+                    title="Minor 업데이트 (예: 1.0.0 → 1.1.0)"
+                  >
+                    Minor+1
+                  </button>
+                  <button 
+                    type="button" 
+                    className="version-update-btn patch"
+                    onClick={() => {
+                      const updatedVersion = updatePatchVersion(patchnoteForm.version);
+                      if (updatedVersion) {
+                        setPatchnoteForm(prev => ({ 
+                          ...prev, 
+                          version: updatedVersion,
+                          type: 'fix'
+                        }));
+                      }
+                    }}
+                    title="Patch 업데이트 (예: 1.0.0 → 1.0.1)"
+                  >
+                    Patch+1
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="form-group">
               <label htmlFor="date">날짜 *</label>

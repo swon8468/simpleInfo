@@ -347,3 +347,52 @@
     width: 100%;
   }
 }
+
+/* 버전 업데이트 버튼 */
+.version-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.version-input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.version-update-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.version-update-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.version-update-btn.minor {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.version-update-btn.minor:hover {
+  background-color: #138496;
+}
+
+.version-update-btn.patch {
+  background-color: #28a745;
+  color: white;
+}
+
+.version-update-btn.patch:hover {
+  background-color: #1e7e34;
+}
