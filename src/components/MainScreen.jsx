@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import ConnectionDB from '../services/ConnectionDB';
+import DataService from '../services/DataService';
 import logoImage from '/logo.png';
 import './MainScreen.css';
 
@@ -12,6 +13,28 @@ function MainScreen() {
   const [hasActivePin, setHasActivePin] = useState(false);
   const [activePinNumber, setActivePinNumber] = useState(null);
   const [activePinCount, setActivePinCount] = useState(0);
+  const [showPatchnoteModal, setShowPatchnoteModal] = useState(false);
+  const [patchnotes, setPatchnotes] = useState([]);
+
+  // 패치 노트 가져오기
+  const fetchPatchnotes = async () => {
+    try {
+      const data = await DataService.getPatchnotes();
+      setPatchnotes(data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    } catch (error) {
+      console.error('패치 노트 로드 실패:', error);
+    }
+  };
+
+  // 모달 열기/닫기
+  const handlePatchnoteClick = () => {
+    setShowPatchnoteModal(true);
+    fetchPatchnotes();
+  };
+
+  const handleCloseModal = () => {
+    setShowPatchnoteModal(false);
+  };
 
   // 활성화된 PIN 확인 함수
   const checkActivePin = async () => {
@@ -165,43 +188,58 @@ function MainScreen() {
 
       </div>
 
-      {/* 패치 노트 및 버전 정보 */}
-      <div className="patchnote-section">
-        <div className="version-info">
-          <h4>🔄 버전 정보</h4>
-          <p className="version-number">v1.0.0</p>
-          <p className="version-date">최종 업데이트: 2025-10-04</p>
-        </div>
-        
-        <div className="patchnote-info">
-          <h4>📋 최근 주요 업데이트</h4>
-          <div className="patchnote-list">
-            <div className="patchnote-item">
-              <span className="feature-badge new">NEW</span>
-              <span>메인 공지사항 시스템 - PIN별 타겟팅 및 실시간 표시</span>
-            </div>
-            <div className="patchnote-item">
-              <span className="feature-badge new">NEW</span>
-              <span>PWA 지원 - 모바일 앱처럼 설치 및 오프라인 사용</span>
-            </div>
-            <div className="patchnote-item">
-              <span className="feature-badge improved">IMPROVED</span>
-              <span>실시간 PIN 연결 감지 및 자동 모니터링</span>
-            </div>
-            <div className="patchnote-item">
-              <span className="feature-badge improved">IMPROVED</span>
-              <span>모바일 반응형 디자인 최적화</span>
-            </div>
-            <div className="patchnote-item">
-              <span className="feature-badge fixed">FIXED</span>
-              <span>관리자 페이지 새로고침 없이 즉시 PIN 목록 표시</span>
+      {/* 버전 정보 - 클릭 가능 */}
+      <div className="version-section">
+        <button className="version-button" onClick={handlePatchnoteClick}>
+          <div className="version-content">
+            <span className="version-icon">🔄</span>
+            <div className="version-text">
+              <span className="version-number">v1.0.0</span>
+              <span className="version-label">패치 노트 보기</span>
             </div>
           </div>
-          <div className="patchnote-footer">
-            <p>자세한 사항은 관리자 페이지의 패치 노트에서 확인하세요.</p>
-          </div>
-        </div>
+        </button>
       </div>
+
+      {/* 패치 노트 모달 */}
+      {showPatchnoteModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>📋 패치 노트</h3>
+              <button className="modal-close" onClick={handleCloseModal}>×</button>
+            </div>
+            <div className="modal-body">
+              {patchnotes.length === 0 ? (
+                <p className="no-patchnotes">등록된 패치 노트가 없습니다.</p>
+              ) : (
+                <div className="patchnotes-list">
+                  {patchnotes.map((patchnote) => (
+                    <div key={patchnote.id} className="patchnote-card">
+                      <div className="patchnote-header">
+                        <span className={`version-badge ${patchnote.type}`}>
+                          {patchnote.version}
+                        </span>
+                        <span className="patchnote-date">
+                          {new Date(patchnote.createdAt).toLocaleDateString('ko-KR')}
+                        </span>
+                      </div>
+                      <div className="patchnote-content">
+                        <h4>{patchnote.title}</h4>
+                        <div className="patchnote-details">
+                          {patchnote.content.split('\n').map((line, index) => (
+                            <p key={index}>{line}</p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

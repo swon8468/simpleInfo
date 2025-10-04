@@ -185,145 +185,260 @@
   }
 }
 
-/* 패치 노트 및 버전 정보 */
-.patchnote-section {
+/* 버전 정보 버튼 */
+.version-section {
   margin-top: 40px;
-  padding: 30px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  display: flex;
+  justify-content: center;
+}
+
+.version-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
   border-radius: 15px;
-  border: 1px solid #dee2e6;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  padding: 20px 30px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  min-width: 200px;
 }
 
-.version-info {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.version-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
-.version-info h4 {
-  margin: 0 0 10px 0;
-  font-size: 1.3rem;
-  color: #495057;
+.version-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.version-icon {
+  font-size: 1.5rem;
+}
+
+.version-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .version-number {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #007bff;
-  margin: 10px 0;
+  margin-bottom: 2px;
 }
 
-.version-date {
+.version-label {
   font-size: 0.9rem;
-  color: #6c757d;
-  margin: 0;
+  opacity: 0.9;
 }
 
-.patchnote-info h4 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 1.2rem;
-  color: #495057;
-  text-align: center;
-}
-
-.patchnote-list {
-  background: white;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.patchnote-item {
+/* 패치 노트 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
-  padding: 12px 0;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 30px;
   border-bottom: 1px solid #e9ecef;
-  gap: 12px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 15px 15px 0 0;
 }
 
-.patchnote-item:last-child {
-  border-bottom: none;
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
 }
 
-.feature-badge {
-  display: inline-block;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  min-width: 70px;
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #6c757d;
+  transition: color 0.3s ease;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: #333;
+}
+
+.modal-body {
+  padding: 30px;
+}
+
+.no-patchnotes {
   text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 40px;
 }
 
-.feature-badge.new {
+.patchnotes-list {
+  display: grid;
+  gap: 20px;
+}
+
+.patchnote-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.patchnote-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.patchnote-header {
+  background: white;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.version-badge {
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.version-badge.major {
+  background-color: #dc3545;
+}
+
+.version-badge.minor {
   background-color: #28a745;
-  color: white;
 }
 
-.feature-badge.improved {
-  background-color: #17a2b8;
-  color: white;
+.version-badge.security {
+  background-color: #fd7e14;
 }
 
-.feature-badge.fixed {
+.version-badge.fix {
   background-color: #ffc107;
   color: #212529;
 }
 
-.patchnote-item span:last-child {
-  flex: 1;
-  font-size: 0.95rem;
+.patchnote-date {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.patchnote-content {
+  padding: 20px;
+}
+
+.patchnote-content h4 {
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.patchnote-details {
+  line-height: 1.6;
   color: #495057;
 }
 
-.patchnote-footer {
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 2px solid #007bff;
-  text-align: center;
-}
-
-.patchnote-footer p {
-  margin: 0;
-  font-size: 0.9rem;
-  color: #6c757d;
-  font-style: italic;
+.patchnote-details p {
+  margin: 8px 0;
 }
 
 /* 모바일 반응형 */
 @media (max-width: 768px) {
-  .patchnote-section {
+  .version-section {
     margin-top: 20px;
-    padding: 20px;
+    padding: 0 20px;
   }
   
-  .version-info {
-    padding: 15px;
+  .version-button {
+    padding: 15px 25px;
+    min-width: 150px;
+  }
+  
+  .version-content {
+    gap: 10px;
   }
   
   .version-number {
     font-size: 1.5rem;
   }
   
-  .patchnote-list {
+  .version-label {
+    font-size: 0.8rem;
+  }
+  
+  .modal-overlay {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    max-width: 100%;
+    max-height: 90vh;
+  }
+  
+  .modal-header {
+    padding: 20px;
+  }
+  
+  .modal-header h3 {
+    font-size: 1.3rem;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .patchnote-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .patchnote-content {
     padding: 15px;
   }
   
-  .patchnote-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 10px 0;
-  }
-  
-  .feature-badge {
-    min-width: 60px;
-    font-size: 0.7rem;
+  .patchnote-content h4 {
+    font-size: 1.1rem;
   }
 }
