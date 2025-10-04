@@ -632,20 +632,20 @@ function OutputMain() {
   // 메인 공지사항이 활성화된 경우 별도 화면 표시
   if (showMainNotice && mainNotice) {
     return (
-      <div className="output-main notice-display-active">
-        <div className="notice-display-screen">
-          <div className="notice-display-header">
+      <div className="output-main">
+        <div className="notice-notice-screen">
+          <div className="notice-notice-header">
             <h1>📢 메인 공지사항 활성화 중</h1>
           </div>
           
-          <div className="notice-display-content">
-            <div className="notice-display-text">
+          <div className="notice-notice-content">
+            <div className="notice-notice-text">
               <p><strong>{mainNotice.title}</strong></p>
               <p>{mainNotice.content}</p>
             </div>
             
-            <div className="notice-display-info">
-              <div className="notice-display-date">
+            <div className="notice-notice-info">
+              <div className="notice-notice-date">
                 작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
                   year: 'numeric',
                   month: 'long',

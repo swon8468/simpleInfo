@@ -491,7 +491,7 @@ class ConnectionDB {
       const connectionData = docSnap.data();
       
       // 세션 상태 확인
-      if (connectionData.status !== 'connected') {
+      if (connectionData.status !== 'connected' && connectionData.status !== 'expired') {
         throw new Error('출력용 세션이 연결되지 않았습니다.');
       }
       
