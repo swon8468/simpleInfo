@@ -281,8 +281,8 @@
 .modal-content {
   background: white;
   border-radius: 15px;
-  width: 100%;
-  max-width: 800px;
+  width: min(75vw, 800px); /* 최대 75% 너비, 하지만 800px 이하 */
+  min-width: 40vw; /* 최소 40% 너비 */
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -476,5 +476,11 @@
   
   .patchnote-content h4 {
     font-size: 1.1rem;
+  }
+  
+  .modal-content {
+    width: 80vw !important; /* 모바일에서는 80% 고정 너비 */
+    min-width: 80vw !important;
+    max-width: 80vw !important;
   }
 }

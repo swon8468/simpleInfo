@@ -610,7 +610,7 @@ function OutputMain() {
   // 메인 공지사항이 활성화된 경우 별도 화면 표시
   if (showMainNotice && mainNotice) {
     return (
-      <div className="output-main">
+      <div className="output-main main-notice-active">
         <div className="main-notice-screen">
           <div className="notice-header">
             <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
