@@ -629,15 +629,16 @@ function OutputMain() {
   // 메인 공지사항이 활성화된 경우 별도 화면 표시
   if (showMainNotice && mainNotice) {
     return (
-      <div className="output-main main-notice-active">
+      <div className="output-main">
         <div className="main-notice-screen">
           <div className="notice-header">
-            <h1 className="school-name">{schoolInfo.name || '광주동신여자고등학교'}</h1>
-            <h2 className="app-title">학교 생활 도우미</h2>
+            <h1>📢 메인 공지사항 활성화 중</h1>
           </div>
           
           <div className="notice-content">
-            <div className="notice-title">{mainNotice.title}</div>
+            <div className="notice-title">
+              <strong>{mainNotice.title}</strong>
+            </div>
             <div className="notice-body">{mainNotice.content}</div>
           </div>
           
