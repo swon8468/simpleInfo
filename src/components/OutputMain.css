@@ -119,15 +119,13 @@
 
 /* 월별 달력 스타일 */
 .calendar-container {
-  max-width: 1200px;
-  min-width: 800px;
-  margin: 0 auto;
   width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-height: 80vh;
-  overflow: hidden;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .calendar-header {
@@ -136,19 +134,18 @@
   gap: 2px;
   margin-bottom: 15px;
   width: 100%;
-  max-width: 1200px;
 }
 
 .day-header {
   background-color: #2196F3;
   color: white;
-  padding: 15px 10px;
+  padding: 12px 8px;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1rem;
   border-radius: 5px;
-  min-width: 0;
-  width: 100%;
   text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .calendar-body {
@@ -156,9 +153,6 @@
   flex-direction: column;
   gap: 2px;
   width: 100%;
-  max-width: 1200px;
-  max-height: 60vh;
-  overflow-y: auto;
 }
 
 .calendar-week {
@@ -171,12 +165,11 @@
   background-color: white;
   border: 1px solid #dee2e6;
   border-radius: 5px;
-  min-height: 120px;
-  padding: 10px;
+  min-height: 100px;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  min-width: 0;
-  width: 100%;
+  overflow: hidden;
 }
 
 .calendar-day.current-month {
@@ -207,15 +200,20 @@
   flex-direction: column;
   gap: 2px;
   width: 100%;
+  flex: 1;
+  overflow: hidden;
 }
 
 .event-item {
   background-color: #e3f2fd;
   color: #1976d2;
-  padding: 2px 4px;
-  border-radius: 2px;
-  font-size: 0.7rem;
-  text-align: center;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .week-range {
@@ -730,8 +728,24 @@
     font-size: 5rem;
   }
   
-  .schedule-table {
-    grid-template-columns: repeat(3, 1fr);
+  /* 캘린더 모바일 최적화 */
+  .calendar-container {
+    padding: 0 10px;
+  }
+  
+  .calendar-day {
+    min-height: 80px;
+    padding: 5px;
+  }
+  
+  .day-header {
+    padding: 10px 4px;
+    font-size: 0.9rem;
+  }
+  
+  .event-item {
+    font-size: 0.6rem;
+    padding: 2px 4px;
   }
   
   .meal-sections {
