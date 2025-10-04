@@ -265,7 +265,8 @@ function AdminPanel() {
 
   // 알레르기 정보 관리
   const [allergyForm, setAllergyForm] = useState({
-    items: []
+    items: [],
+    newItem: ''
   });
 
   const showMessage = (msg) => {
@@ -322,18 +323,10 @@ function AdminPanel() {
     e.preventDefault();
     setLoading(true);
     try {
-      
-      // 문자열을 배열로 변환
-      let items = [];
-      if (typeof allergyForm.items === 'string') {
-        items = allergyForm.items
-          .split(',')
-          .map(item => item.trim())
-          .filter(item => item.length > 0);
-      } else if (Array.isArray(allergyForm.items)) {
-        items = allergyForm.items.filter(item => item && item.trim().length > 0);
-      }
-      
+      // 배열에서 빈 항목 제거 후 저장
+      const items = Array.isArray(allergyForm.items) 
+        ? allergyForm.items.filter(item => item && item.trim().length > 0)
+        : [];
       
       if (items.length === 0) {
         showMessage('알레르기 정보를 입력해주세요.');
@@ -343,8 +336,8 @@ function AdminPanel() {
       await DataService.updateAllergyInfo(items);
       showMessage('알레르기 정보가 업데이트되었습니다.');
       
-      // 폼 초기화
-      setAllergyForm({ items: '' });
+      // 폼 초기화 (newItem도 유지)
+      setAllergyForm(prev => ({ ...prev, newItem: '' }));
     } catch (error) {
       console.error('알레르기 정보 업데이트 오류:', error);
       showMessage('알레르기 정보 업데이트에 실패했습니다: ' + error.message);
@@ -488,21 +481,81 @@ function AdminPanel() {
             {activeTab === 'allergy' && (
               <div className="form-section">
                 <h2>알레르기 정보 관리</h2>
-                <form onSubmit={handleAllergySubmit}>
-                  <div className="form-group">
-                    <label>알레르기 항목 (쉼표로 구분):</label>
-                    <input
-                      type="text"
-                      value={typeof allergyForm.items === 'string' ? allergyForm.items : Array.isArray(allergyForm.items) ? allergyForm.items.join(', ') : ''}
-                      onChange={(e) => setAllergyForm({ ...allergyForm, items: e.target.value })}
-                      placeholder="예: 난류, 우유, 메일 등등"
-                      required
-                    />
+                <div className="allergy-management">
+                  <div className="allergy-items-list">
+                    <h3>현재 알레르기 항목</h3>
+                    {Array.isArray(allergyForm.items) && allergyForm.items.length > 0 ? (
+                      <div className="allergy-items">
+                        {allergyForm.items.map((item, index) => (
+                          <div key={index} className="allergy-item">
+                            <input
+                              type="text"
+                              value={item}
+                              onChange={(e) => {
+                                const newItems = [...allergyForm.items];
+                                newItems[index] = e.target.value;
+                                setAllergyForm({ ...allergyForm, items: newItems });
+                              }}
+                              className="allergy-item-input"
+                              placeholder="알레르기 항목명"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newItems = allergyForm.items.filter((_, i) => i !== index);
+                                setAllergyForm({ ...allergyForm, items: newItems });
+                              }}
+                              className="remove-allergy-btn"
+                              title="항목 삭제"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-allergy-items">설정된 알레르기 항목이 없습니다.</p>
+                    )}
                   </div>
-                  <button type="submit" disabled={loading}>
-                    {loading ? '업데이트 중...' : '업데이트'}
-                  </button>
-                </form>
+                  
+                  <div className="add-allergy-section">
+                    <h3>새 항목 추가</h3>
+                    <div className="add-allergy-form">
+                      <input
+                        type="text"
+                        value={allergyForm.newItem || ''}
+                        onChange={(e) => setAllergyForm(prev => ({ ...prev, newItem: e.target.value }))}
+                        placeholder="새 알레르기 항목명 입력"
+                        className="new-allergy-input"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (allergyForm.newItem && allergyForm.newItem.trim()) {
+                            const newItems = Array.isArray(allergyForm.items) 
+                              ? [...allergyForm.items, allergyForm.newItem.trim()]
+                              : [allergyForm.newItem.trim()];
+                            setAllergyForm({ 
+                              ...allergyForm, 
+                              items: newItems,
+                              newItem: ''
+                            });
+                          }
+                        }}
+                        className="add-allergy-btn"
+                        disabled={!allergyForm.newItem || !allergyForm.newItem.trim()}
+                      >
+                        추가
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <form onSubmit={handleAllergySubmit} className="allergy-submit-form">
+                    <button type="submit" disabled={loading || !Array.isArray(allergyForm.items) || allergyForm.items.length === 0}>
+                      {loading ? '업데이트 중...' : '변경사항 저장'}
+                    </button>
+                  </form>
+                </div>
               </div>
             )}
 

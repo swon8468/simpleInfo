@@ -800,3 +800,182 @@ button[type="submit"]:disabled {
   background: #c82333 !important;
   transform: translateY(-1px);
 }
+
+/* 알레르기 관리 스타일 */
+.allergy-management {
+  max-width: 100%;
+}
+
+.allergy-items-list {
+  margin-bottom: 30px;
+}
+
+.allergy-items-list h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.allergy-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.allergy-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+}
+
+.allergy-item-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.allergy-item-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.remove-allergy-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-allergy-btn:hover {
+  background: #c82333;
+}
+
+.no-allergy-items {
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 5px;
+  border: 2px dashed #dee2e6;
+}
+
+.add-allergy-section {
+  margin-bottom: 30px;
+}
+
+.add-allergy-section h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.add-allergy-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.new-allergy-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.new-allergy-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.add-allergy-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.add-allergy-btn:hover:not(:disabled) {
+  background: #218838;
+}
+
+.add-allergy-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.allergy-submit-form {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 2px solid #dee2e6;
+}
+
+.allergy-submit-form button {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.allergy-submit-form button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.allergy-submit-form button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* 모바일 대응 */
+@media (max-width: 768px) {
+  .allergy-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .allergy-item-input {
+    width: 100%;
+  }
+  
+  .remove-allergy-btn {
+    align-self: flex-end;
+  }
+  
+  .add-allergy-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .new-allergy-input,
+  .add-allergy-btn {
+    width: 100%;
+  }
+}

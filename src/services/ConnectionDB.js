@@ -597,9 +597,24 @@ class ConnectionDB {
       const pinDoc = doc(db, 'connections', `pin_${pin}`);
       const pinData = {
         nickname: nickname.trim(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        pin: pin // PIN 번호도 함께 저장
       };
-      await updateDoc(pinDoc, pinData);
+      
+      // 먼저 기존 문서가 있는지 확인
+      const pinSnap = await getDoc(pinDoc);
+      
+      if (pinSnap.exists()) {
+        // 문서가 존재하면 업데이트
+        await updateDoc(pinDoc, {
+          nickname: nickname.trim(),
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        // 문서가 없으면 새로 생성
+        await setDoc(pinDoc, pinData);
+      }
+      
       console.log(`PIN ${pin} 별명 설정:`, nickname);
       return true;
     } catch (error) {
