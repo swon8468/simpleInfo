@@ -430,22 +430,6 @@ class DataService {
     }
   }
 
-  // 알레르기 정보 가져오기
-  async getAllergyInfo() {
-    try {
-      const allergyRef = doc(db, 'settings', 'allergy');
-      const docSnap = await getDoc(allergyRef);
-      
-      if (docSnap.exists()) {
-        return docSnap.data();
-      }
-      return { items: [] };
-    } catch (error) {
-      console.error('알레르기 정보 가져오기 실패:', error);
-      return { items: [] };
-    }
-  }
-
   // 알레르기 정보 업데이트
   async updateAllergyInfo(items) {
     try {

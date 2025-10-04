@@ -18,10 +18,21 @@ function ControlMeal() {
       console.log('ControlMeal: 알레르기 정보 로드 시작');
       const allergyData = await DataService.getAllergyInfo();
       console.log('ControlMeal: 가져온 알레르기 데이터:', allergyData);
-      setAllergyInfo(allergyData || []);
-      console.log('ControlMeal: 알레르기 정보 설정 완료, 길이:', (allergyData || []).length);
+      
+      // DataService.getAllergyInfo()는 items 배열을 직접 반환하므로
+      let allergyItems = [];
+      if (Array.isArray(allergyData)) {
+        allergyItems = allergyData;
+      } else if (allergyData && Array.isArray(allergyData.items)) {
+        allergyItems = allergyData.items;
+      }
+      
+      console.log('ControlMeal: 처리된 알레르기 아이템:', allergyItems);
+      setAllergyInfo(allergyItems);
+      console.log('ControlMeal: 알레르기 정보 설정 완료, 길이:', allergyItems.length);
     } catch (error) {
       console.error('알레르기 정보 로드 실패:', error);
+      setAllergyInfo([]);
     }
   };
 
