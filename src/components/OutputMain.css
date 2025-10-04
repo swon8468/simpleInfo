@@ -131,21 +131,33 @@
 .calendar-header {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
+  background-color: #2196F3;
+  border-radius: 5px;
+  overflow: hidden;
   margin-bottom: 15px;
   width: 100%;
 }
 
 .day-header {
-  background-color: #2196F3;
+  background-color: transparent;
   color: white;
   padding: 12px 8px;
   font-weight: bold;
   font-size: 1rem;
-  border-radius: 5px;
   text-align: center;
-  overflow: hidden;
-  white-space: nowrap;
+  border: none;
+  position: relative;
+}
+
+.day-header:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 60%;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .calendar-body {
