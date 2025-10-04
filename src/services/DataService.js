@@ -117,7 +117,7 @@ class DataService {
         updatedAt: serverTimestamp()
       });
       
-      console.log('학사일정이 추가되었습니다.');
+      console.log('학사일정이 추가되었습니다:', { year, month, day, title, target });
     } catch (error) {
       console.error('학사일정 추가 실패:', error);
       throw error;
@@ -224,6 +224,8 @@ class DataService {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
+      
+      console.log('급식 데이터가 추가되었습니다:', { date, lunch, dinner });
     } catch (error) {
       console.error('급식 데이터 추가 실패:', error);
     }
@@ -250,6 +252,8 @@ class DataService {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
+        
+        console.log('급식 데이터가 생성되었습니다:', { date, lunchItems, dinnerItems });
       }
       
       console.log('급식 정보가 업데이트되었습니다.');

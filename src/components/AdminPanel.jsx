@@ -253,11 +253,11 @@ function AdminPanel() {
     e.preventDefault();
     setLoading(true);
     try {
-      const eventDate = `${scheduleForm.year}-${String(scheduleForm.month).padStart(2, '0')}-${String(scheduleForm.day).padStart(2, '0')}`;
-      await DataService.addScheduleEvent(eventDate, scheduleForm.event, scheduleForm.target || []);
+      await DataService.addScheduleEvent(scheduleForm.year, scheduleForm.month, scheduleForm.day, scheduleForm.event, scheduleForm.target || []);
       showMessage('학사일정이 추가되었습니다.');
       setScheduleForm({ ...scheduleForm, event: '', target: [] });
     } catch (error) {
+      console.error('학사일정 추가 실패:', error);
       showMessage('학사일정 추가에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -274,6 +274,7 @@ function AdminPanel() {
       await DataService.updateMealData(mealForm.date, lunchItems, dinnerItems);
       showMessage('급식 정보가 업데이트되었습니다.');
     } catch (error) {
+      console.error('급식 정보 업데이트 실패:', error);
       showMessage('급식 정보 업데이트에 실패했습니다.');
     } finally {
       setLoading(false);
