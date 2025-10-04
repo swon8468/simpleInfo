@@ -28,6 +28,9 @@ function AdminPanel() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // 관리자 화면 body 색 설정
+    document.body.style.background = '#f5f5f5';
+    
     // 세션에서 인증 상태 확인
     const authStatus = sessionStorage.getItem('adminAuthenticated');
     if (authStatus === 'true') {

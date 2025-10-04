@@ -82,6 +82,14 @@ function MainScreen() {
     
     // 초기 버전 설정
     fetchPatchnotes();
+    
+    // 메인 화면 body 색 설정
+    document.body.style.background = '#f5f5f5';
+    
+    // cleanup에서 원래 색상으로 되돌리기
+    return () => {
+      document.body.style.background = '#f5f5f5';
+    };
   }, []);
 
 

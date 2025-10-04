@@ -29,6 +29,9 @@ function ControlMain() {
   }, [showMainNotice, mainNotice]);
 
   useEffect(() => {
+    // 제어용 화면 body 색 설정
+    document.body.style.background = '#f5f5f5';
+    
     // 연결 상태 확인
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     const outputSessionId = sessionStorage.getItem('outputSessionId');

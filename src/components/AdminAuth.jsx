@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminAuth.css';
 
@@ -10,6 +10,15 @@ function AdminAuth({ onSuccess }) {
   const navigate = useNavigate();
 
   const ADMIN_PASSWORD = 'swon8468';
+
+  useEffect(() => {
+    // 관리자 인증 화면 body 색 설정
+    document.body.style.background = '#f5f5f5';
+    
+    return () => {
+      document.body.style.background = '#f5f5f5';
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

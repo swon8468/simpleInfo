@@ -39,6 +39,9 @@ function OutputMain() {
   }, [showMainNotice, mainNotice]);
 
   useEffect(() => {
+    // 출력용 화면 body 색 설정
+    document.body.style.background = '#f5f5f5';
+    
     // 연결된 PIN으로 실시간 데이터 구독
     const savedPin = sessionStorage.getItem('currentPin');
     const outputSessionId = sessionStorage.getItem('outputSessionId');
@@ -630,30 +633,27 @@ function OutputMain() {
   if (showMainNotice && mainNotice) {
     return (
       <div className="output-main">
-        <div className="main-notice-screen">
-          <div className="notice-header">
+        <div className="notice-display-screen">
+          <div className="notice-display-header">
             <h1>📢 메인 공지사항 활성화 중</h1>
           </div>
           
-          <div className="notice-content">
-            <div className="notice-title">
-              <strong>{mainNotice.title}</strong>
+          <div className="notice-display-content">
+            <div className="notice-display-text">
+              <p><strong>{mainNotice.title}</strong></p>
+              <p>{mainNotice.content}</p>
             </div>
-            <div className="notice-body">{mainNotice.content}</div>
-          </div>
-          
-          <div className="notice-footer">
-            <div className="notice-date">
-              작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </div>
-            <div className="notice-status">
-              공지사항 표시 중 - 평소 화면은 일시 중단됩니다
+            
+            <div className="notice-display-info">
+              <div className="notice-display-date">
+                작성일: {new Date(mainNotice.createdAt).toLocaleDateString('ko-KR', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </div>
             </div>
           </div>
         </div>
