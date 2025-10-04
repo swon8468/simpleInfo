@@ -86,18 +86,7 @@ function AdminPanel() {
   // 알레르기 정보 로드 (새로운 컬렉션 사용)
   const loadAllergyData = async () => {
     try {
-      let allergyItems = await DataService.getAllergyItems();
-      
-      // 새로운 컬렉션이 비어있다면 기존 데이터 마이그레이션
-      if (allergyItems.length === 0) {
-        console.log('새로운 알레르기 컬렉션이 비어있음. 기존 데이터 마이그레이션 실행...');
-        const migrated = await DataService.migrateAllergyData();
-        if (migrated) {
-          // 마이그레이션 후 다시 로드
-          allergyItems = await DataService.getAllergyItems();
-        }
-      }
-      
+      const allergyItems = await DataService.getAllergyItems();
       setAllergyForm({
         items: allergyItems.map(item => ({ id: item.id, name: item.name }))
       });
