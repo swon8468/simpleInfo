@@ -76,17 +76,10 @@ class NotificationService {
     });
   }
 
-  // 메인 공지사항 알림 발송
+  // 메인 공지사항 알림 발송 (비활성화됨 - 알림 발송하지 않음)
   async showMainNoticeNotification(notice) {
-    const title = `📢 메인 공지사항 활성화`;
-    const body = notice.title;
-    
-    return await this.showNotification(title, {
-      body: body,
-      tag: 'main-notice',
-      requireInteraction: true, // 중요한 알림이므로 사용자 상호작용 필요
-      urgent: true
-    });
+    // 메인 공지사항은 알림하지 않음
+    return false;
   }
 
   // 일반 공지사항 알림 발송
@@ -98,6 +91,21 @@ class NotificationService {
       body: body,
       tag: 'announcement',
       requireInteraction: false
+    });
+  }
+
+  // 학교 차단 알림 발송
+  async showBlockingNotification(isBlocked) {
+    const title = isBlocked ? '🚫 학교 생활 도우미 가 서비스 차단됨' : '✅ 학교 생활 도우미 서비스 정상화';
+    const body = isBlocked 
+      ? '시스템 점검으로 인해 일시적으로 서비스가 차단되었습니다.'
+      : '시스템 점검이 완료되어 정상적으로 서비스를 이용할 수 있습니다.';
+    
+    return await this.showNotification(title, {
+      body: body,
+      tag: 'school-blocking',
+      requireInteraction: true, // 중요한 알림이므로 사용자 상호작용 필요
+      urgent: true
     });
   }
 

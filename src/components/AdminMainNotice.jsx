@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
-import NotificationService from '../services/NotificationService';
 import './AdminMainNotice.css';
 
 function AdminMainNotice() {
@@ -204,15 +203,7 @@ function AdminMainNotice() {
         })
       );
 
-      // 활성 사용자에게 알림 발송
-      try {
-        await NotificationService.showMainNoticeNotification({
-          title: noticeForm.title,
-          content: noticeForm.content
-        });
-      } catch (error) {
-        console.error('메인 공지사항 알림 발송 실패:', error);
-      }
+      // 메인 공지사항은 알림 발송하지 않음
 
       setMessage('메인 공지사항이 성공적으로 전송되었습니다.');
       setNoticeForm({

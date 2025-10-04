@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
+import NotificationService from '../services/NotificationService';
 import './AdminSchoolBlocking.css';
 
 function AdminSchoolBlocking() {
@@ -40,6 +41,14 @@ function AdminSchoolBlocking() {
       await ConnectionDB.setSchoolBlockingStatus(true);
       // 모든 연결된 디바이스에 차단 알림 전송
       await ConnectionDB.notifyBlockingStatus(true);
+      
+      // PWA 알림 발송
+      try {
+        await NotificationService.showBlockingNotification(true);
+      } catch (error) {
+        console.error('차단 알림 발송 실패:', error);
+      }
+      
       setMessage('학교 생활 도우미가 차단되었습니다. 모든 디바이스에 즉시 적용됩니다.');
       setBlockingStatus(true);
     } catch (error) {
@@ -59,6 +68,14 @@ function AdminSchoolBlocking() {
       await ConnectionDB.setSchoolBlockingStatus(false);
       // 모든 연결된 디바이스에 차단 해제 알림 전송
       await ConnectionDB.notifyBlockingStatus(false);
+      
+      // PWA 알림 발송
+      try {
+        await NotificationService.showBlockingNotification(false);
+      } catch (error) {
+        console.error('차단 해제 알림 발송 실패:', error);
+      }
+      
       setMessage('학교 생활 도우미 차단이 해제되었습니다. 모든 디바이스가 정상 작동합니다.');
       setBlockingStatus(false);
     } catch (error) {
