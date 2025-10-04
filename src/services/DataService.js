@@ -620,7 +620,7 @@ class DataService {
     } catch (error) {
       throw new Error('패치 노트 수정에 실패했습니다.');
     }
-  },
+  }
 
   async deletePatchnote(patchnoteId) {
     try {
