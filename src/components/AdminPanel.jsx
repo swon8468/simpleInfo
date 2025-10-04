@@ -83,12 +83,12 @@ function AdminPanel() {
     }
   }, []);
 
-  // 알레르기 정보 로드
+  // 알레르기 정보 로드 (새로운 컬렉션 사용)
   const loadAllergyData = async () => {
     try {
-      const allergyData = await DataService.getAllergyInfo();
+      const allergyItems = await DataService.getAllergyItems();
       setAllergyForm({
-        items: allergyData.items || []
+        items: allergyItems.map(item => ({ id: item.id, name: item.name }))
       });
     } catch (error) {
       console.error('알레르기 정보 로드 실패:', error);
@@ -326,18 +326,29 @@ function AdminPanel() {
     e.preventDefault();
     setLoading(true);
     try {
-      // 배열에서 빈 항목 제거 후 저장
+      // 빈 항목 제거 후 처리
       const items = Array.isArray(allergyForm.items) 
-        ? allergyForm.items.filter(item => item && item.trim().length > 0)
+        ? allergyForm.items.filter(item => item && item.name && item.name.trim().length > 0)
         : [];
       
       if (items.length === 0) {
-        showMessage('알레르기 정보를 입력해주세요.');
-        return;
+        // 모든 항목이 제거된 경우 전체 삭제
+        await DataService.deleteAllAllergyItems();
+        showMessage('모든 알레르기 정보가 삭제되었습니다.');
+      } else {
+        // 기존 모든 항목을 삭제하고 새로운 항목들 추가
+        await DataService.deleteAllAllergyItems();
+        
+        // 새로운 항목들을 하나씩 추가
+        for (const item of items) {
+          await DataService.addAllergyItem(item.name);
+        }
+        
+        showMessage(`${items.length}개의 알레르기 정보가 업데이트되었습니다.`);
       }
       
-      await DataService.updateAllergyInfo(items);
-      showMessage('알레르기 정보가 업데이트되었습니다.');
+      // 데이터 다시 로드
+      await loadAllergyData();
       
       // 폼 초기화 (newItem도 유지)
       setAllergyForm(prev => ({ ...prev, newItem: '' }));
@@ -490,13 +501,13 @@ function AdminPanel() {
                     {Array.isArray(allergyForm.items) && allergyForm.items.length > 0 ? (
                       <div className="allergy-items">
                         {allergyForm.items.map((item, index) => (
-                          <div key={index} className="allergy-item">
+                          <div key={item.id || index} className="allergy-item">
                             <input
                               type="text"
-                              value={item}
+                              value={item.name}
                               onChange={(e) => {
                                 const newItems = [...allergyForm.items];
-                                newItems[index] = e.target.value;
+                                newItems[index] = { ...item, name: e.target.value };
                                 setAllergyForm({ ...allergyForm, items: newItems });
                               }}
                               className="allergy-item-input"
@@ -563,12 +574,13 @@ function AdminPanel() {
                             
                             // 쉼표가 포함된 경우 여러 항목으로 분리
                             if (inputValue.includes(',')) {
-                              const newItems = inputValue
+                              const newItemNames = inputValue
                                 .split(',')
                                 .map(item => item.trim())
-                                .filter(item => item.length > 0 && !existingItems.includes(item));
+                                .filter(item => item.length > 0 && !existingItems.some(existing => existing.name === item));
                               
-                              if (newItems.length > 0) {
+                              if (newItemNames.length > 0) {
+                                const newItems = newItemNames.map(name => ({ id: `temp_${Date.now()}_${Math.random()}`, name }));
                                 setAllergyForm({ 
                                   ...allergyForm, 
                                   items: [...existingItems, ...newItems],
@@ -579,10 +591,11 @@ function AdminPanel() {
                               }
                             } else {
                               // 단일 항목인 경우
-                              if (!existingItems.includes(inputValue)) {
+                              if (!existingItems.some(existing => existing.name === inputValue)) {
+                                const newItem = { id: `temp_${Date.now()}_${Math.random()}`, name: inputValue };
                                 setAllergyForm({ 
                                   ...allergyForm, 
-                                  items: [...existingItems, inputValue],
+                                  items: [...existingItems, newItem],
                                   newItem: ''
                                 });
                               } else {

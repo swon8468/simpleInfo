@@ -630,6 +630,63 @@ class DataService {
       throw new Error('패치 노트 삭제에 실패했습니다.');
     }
   }
+
+  // 알레르기 정보 관리 (새로운 컬렉션)
+  async getAllergyItems() {
+    try {
+      const allergyItemsRef = collection(db, 'allergyItems');
+      const allergyItemsSnapshot = await getDocs(allergyItemsRef);
+      return allergyItemsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      throw new Error('알레르기 항목 목록을 가져오는데 실패했습니다.');
+    }
+  }
+
+  async addAllergyItem(itemName) {
+    try {
+      const allergyItemsRef = collection(db, 'allergyItems');
+      await addDoc(allergyItemsRef, {
+        name: itemName.trim(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      throw new Error('알레르기 항목 추가에 실패했습니다.');
+    }
+  }
+
+  async updateAllergyItem(itemId, itemName) {
+    try {
+      const itemRef = doc(db, 'allergyItems', itemId);
+      await updateDoc(itemRef, {
+        name: itemName.trim(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      throw new Error('알레르기 항목 수정에 실패했습니다.');
+    }
+  }
+
+  async deleteAllergyItem(itemId) {
+    try {
+      const itemRef = doc(db, 'allergyItems', itemId);
+      await deleteDoc(itemRef);
+    } catch (error) {
+      throw new Error('알레르기 항목 삭제에 실패했습니다.');
+    }
+  }
+
+  async deleteAllAllergyItems() {
+    try {
+      const allergyItemsRef = collection(db, 'allergyItems');
+      const allergyItemsSnapshot = await getDocs(allergyItemsRef);
+      
+      const deletePromises = allergyItemsSnapshot.docs.map(doc => deleteDoc(doc.ref));
+      await Promise.all(deletePromises);
+    } catch (error) {
+      throw new Error('모든 알레르기 항목 삭제에 실패했습니다.');
+    }
+  }
 }
 
 export default new DataService();
