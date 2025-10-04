@@ -498,7 +498,8 @@ function AdminPanel() {
                 <h2>활성화된 PIN 관리</h2>
                 {pinMessage && <p className="pin-message">{pinMessage}</p>}
                 <div className="pin-info">
-                  <p>현재 활성화된 PIN: <strong>{activePins.length}</strong>개 / 최대 10개</p>
+                  <p>📌 현재 활성화된 PIN: <strong style={{ color: '#007bff', fontSize: '1.2rem' }}>{activePins.length}</strong>개 / 최대 10개</p>
+                  <p className="realtime-indicator">🔄 실시간 업데이트 중...</p>
                   {activePins.length >= 10 && (
                     <p className="pin-warning">⚠️ 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
                   )}

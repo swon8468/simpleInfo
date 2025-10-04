@@ -502,6 +502,29 @@ class ConnectionDB {
       throw error;
     }
   }
+
+  // 전체 디바이스에 메인 공지사항 활성 상태 알림
+  async notifyMainNoticeActive(isActive) {
+    try {
+      // 현재 활성화된 모든 연결에 알림 전송
+      const connectionsRef = collection(db, 'connections');
+      const allDocs = await getDocs(connectionsRef);
+      
+      const updatePromises = allDocs.docs.map(async (docSnapshot) => {
+        const docRef = doc(db, 'connections', docSnapshot.id);
+        await updateDoc(docRef, {
+          mainNoticeAlert: {
+            isActive: isActive,
+            timestamp: new Date().toISOString()
+          }
+        });
+      });
+      
+      await Promise.all(updatePromises);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default new ConnectionDB();

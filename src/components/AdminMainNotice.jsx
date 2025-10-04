@@ -9,6 +9,7 @@ function AdminMainNotice() {
   const [activeNotices, setActiveNotices] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingNotice, setEditingNotice] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   
   const [noticeForm, setNoticeForm] = useState({
     title: '',
@@ -131,6 +132,13 @@ function AdminMainNotice() {
     }
 
     setLoading(true);
+    
+    // 전송 시작 시 배경색 변경 효과 함수 호출
+    try {
+      await ConnectionDB.notifyMainNoticeActive(true);
+    } catch (error) {
+      // 배경색 변경 실패해도 메인 공지사항 전송은 계속 진행
+    }
     try {
       // 각 선택된 PIN이 이미 공지사항을 가지고 있는지 확인
       const existingNotices = [];
@@ -317,7 +325,21 @@ function AdminMainNotice() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="main-notice-form">
+      {/* 추가 버튼 추가 */}
+      <div className="add-notice-section">
+        <button 
+          type="button" 
+          className="add-notice-btn"
+          onClick={() => setShowForm(!showForm)}
+          disabled={loading}
+        >
+          {showForm ? '메인 공지사항 작성 취소' : '+ 메인 공지사항 추가'}
+        </button>
+      </div>
+
+      {/* 폼 조건부 렌더링 */}
+      {showForm && (
+        <form onSubmit={handleSubmit} className="main-notice-form">
         <div className="form-group">
           <label htmlFor="title">제목 *</label>
           <input
@@ -377,7 +399,8 @@ function AdminMainNotice() {
             {loading ? '전송 중...' : '메인 공지사항 전송'}
           </button>
         </div>
-      </form>
+        </form>
+      )}
 
       {/* 현재 활성화된 공지사항 목록 */}
       <div className="active-notices-section">

@@ -11,6 +11,40 @@
   text-align: center;
 }
 
+/* 추가 공지사항 버튼 섹션 */
+.add-notice-section {
+  margin-bottom: 25px;
+  text-align: right;
+}
+
+.add-notice-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-notice-btn:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+.add-notice-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .main-notice-form {
   background: #f8f9fa;
   padding: 25px;

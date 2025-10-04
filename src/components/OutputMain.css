@@ -765,6 +765,7 @@
   color: white;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   line-height: 1.2;
+  text-align: center;
 }
 
 .notice-body {
