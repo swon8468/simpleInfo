@@ -134,6 +134,9 @@
   gap: 0;
   margin-bottom: 15px;
   width: 100%;
+  background-color: #2196F3;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 .day-header {
