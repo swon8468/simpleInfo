@@ -161,8 +161,8 @@ function AdminPanel() {
       }
       
       setActivePins(pinsWithNicknames);
-      if (pins.length > 0) {
-        setPinMessage(`정상적으로 ${pins.length}개의 PIN을 조회했습니다.`);
+      if (pinsWithNicknames.length > 0) {
+        setPinMessage(`정상적으로 ${pinsWithNicknames.length}개의 PIN을 조회했습니다.`);
       }
     } catch (error) {
       console.error('AdminPanel.fetchActivePins: PIN 가져오기 실패:', error);
@@ -524,22 +524,50 @@ function AdminPanel() {
                       <input
                         type="text"
                         value={allergyForm.newItem || ''}
-                        onChange={(e) => setAllergyForm(prev => ({ ...prev, newItem: e.target.value }))}
-                        placeholder="새 알레르기 항목명 입력"
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          setAllergyForm(prev => ({ ...prev, newItem: inputValue }));
+                          
+                          // 쉼표로 구분된 입력 자동 처리
+                          if (inputValue.includes(',')) {
+                            const newItems = inputValue
+                              .split(',')
+                              .map(item => item.trim())
+                              .filter(item => item.length > 0);
+                            
+                            if (newItems.length > 0) {
+                              const existingItems = Array.isArray(prev.items) ? prev.items : [];
+                              const combinedItems = [...existingItems, ...newItems.filter(item => !existingItems.includes(item))];
+                              setAllergyForm(prev => ({ 
+                                ...prev, 
+                                items: combinedItems,
+                                newItem: ''
+                              }));
+                            }
+                          }
+                        }}
+                        placeholder="알레르기 항목명 입력 (쉼표로 구분 가능: 난류, 우유, 견과류)"
                         className="new-allergy-input"
                       />
                       <button
                         type="button"
                         onClick={() => {
                           if (allergyForm.newItem && allergyForm.newItem.trim()) {
-                            const newItems = Array.isArray(allergyForm.items) 
-                              ? [...allergyForm.items, allergyForm.newItem.trim()]
-                              : [allergyForm.newItem.trim()];
-                            setAllergyForm({ 
-                              ...allergyForm, 
-                              items: newItems,
-                              newItem: ''
-                            });
+                            const newItems = allergyForm.newItem.trim();
+                            const existingItems = Array.isArray(allergyForm.items) 
+                              ? allergyForm.items
+                              : [];
+                            
+                            // 이미 존재하는 항목인지 확인
+                            if (!existingItems.includes(newItems)) {
+                              setAllergyForm({ 
+                                ...allergyForm, 
+                                items: [...existingItems, newItems],
+                                newItem: ''
+                              });
+                            } else {
+                              setAllergyForm(prev => ({ ...prev, newItem: '' }));
+                            }
                           }
                         }}
                         className="add-allergy-btn"
@@ -548,6 +576,9 @@ function AdminPanel() {
                         추가
                       </button>
                     </div>
+                    <p className="allergy-input-hint">
+                      💡 쉼표로 여러 항목을 한 번에 입력할 수 있습니다: "난류, 우유, 견과류"
+                    </p>
                   </div>
                   
                   <form onSubmit={handleAllergySubmit} className="allergy-submit-form">

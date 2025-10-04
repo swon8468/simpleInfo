@@ -927,6 +927,13 @@ button[type="submit"]:disabled {
   cursor: not-allowed;
 }
 
+.allergy-input-hint {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-top: 8px;
+  font-style: italic;
+}
+
 .allergy-submit-form {
   text-align: center;
   padding-top: 20px;
