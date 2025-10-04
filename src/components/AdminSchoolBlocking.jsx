@@ -38,7 +38,9 @@ function AdminSchoolBlocking() {
     setLoading(true);
     try {
       await ConnectionDB.setSchoolBlockingStatus(true);
-      setMessage('학교 생활 도우미가 차단되었습니다.');
+      // 모든 연결된 디바이스에 차단 알림 전송
+      await ConnectionDB.notifyBlockingStatus(true);
+      setMessage('학교 생활 도우미가 차단되었습니다. 모든 디바이스에 즉시 적용됩니다.');
       setBlockingStatus(true);
     } catch (error) {
       setMessage('차단 설정에 실패했습니다.');
@@ -55,7 +57,9 @@ function AdminSchoolBlocking() {
     setLoading(true);
     try {
       await ConnectionDB.setSchoolBlockingStatus(false);
-      setMessage('학교 생활 도우미 차단이 해제되었습니다.');
+      // 모든 연결된 디바이스에 차단 해제 알림 전송
+      await ConnectionDB.notifyBlockingStatus(false);
+      setMessage('학교 생활 도우미 차단이 해제되었습니다. 모든 디바이스가 정상 작동합니다.');
       setBlockingStatus(false);
     } catch (error) {
       setMessage('차단 해제에 실패했습니다.');

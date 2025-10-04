@@ -18,6 +18,7 @@ function OutputMain() {
   });
   const [mainNotice, setMainNotice] = useState(null);
   const [showMainNotice, setShowMainNotice] = useState(false);
+  const [blockingActive, setBlockingActive] = useState(false);
 
   useEffect(() => {
     // 연결된 PIN으로 실시간 데이터 구독
@@ -80,6 +81,23 @@ function OutputMain() {
       // cleanup 함수에서 세션 삭제하지 않음 (페이지 언로드 시에만 삭제)
     };
   }, [navigate]);
+
+  // 차단 상태 실시간 모니터링
+  useEffect(() => {
+    const unsubscribe = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
+      setBlockingActive(isActive);
+      // 차단 활성화 시 즉시 페이지 리로드하여 차단 화면 표시
+      if (isActive) {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      }
+    });
+    
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   const loadInitialData = async () => {
     try {

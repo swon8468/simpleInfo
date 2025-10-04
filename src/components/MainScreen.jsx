@@ -18,6 +18,7 @@ function MainScreen() {
   const [patchnotes, setPatchnotes] = useState([]);
   const [notificationSupported, setNotificationSupported] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(false);
+  const [blockingActive, setBlockingActive] = useState(false);
 
   // 패치 노트 가져오기
   const fetchPatchnotes = async () => {
@@ -57,6 +58,30 @@ function MainScreen() {
     const status = NotificationService.getPermissionStatus();
     setNotificationSupported(status.isSupported);
     setNotificationPermission(status.canShow);
+  }, []);
+
+  // 차단 상태 실시간 모니터링
+  useEffect(() => {
+    let unsubscribe = null;
+    
+    // 관리자 페이지가 아닌 경우에만 차단 모니터링
+    if (!window.location.pathname.includes('/admin')) {
+      unsubscribe = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
+        setBlockingActive(isActive);
+        // 차단 활성화 시 즉시 페이지 리로드하여 차단 화면 표시
+        if (isActive) {
+          setTimeout(() => {
+            window.location.reload();
+          }, 500);
+        }
+      });
+    }
+    
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, []);
 
   // 활성화된 PIN 확인 함수

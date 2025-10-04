@@ -572,6 +572,24 @@ class ConnectionDB {
       }
     });
   }
+
+  // 모든 연결된 디바이스에 차단 상태 알림 전송
+  async notifyBlockingStatus(isActive) {
+    const connectionsRef = collection(db, 'connections');
+    const querySnapshot = await getDocs(connectionsRef);
+    
+    const updatePromises = [];
+    querySnapshot.forEach((doc) => {
+      updatePromises.push(
+        updateDoc(doc.ref, {
+          blockingAlert: isActive,
+          blockingTimestamp: new Date().toISOString()
+        })
+      );
+    });
+    
+    await Promise.all(updatePromises);
+  }
 }
 
 export default new ConnectionDB();
