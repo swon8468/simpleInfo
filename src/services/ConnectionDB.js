@@ -158,7 +158,7 @@ class ConnectionDB {
   // 활성화된 연결 목록 가져오기
   async getActiveConnections() {
     try {
-      console.log('ConnectionDB.getActiveConnections: 쿼리 시작');
+      // ConnectionDB.getActiveConnections: 쿼리 시작
       const connectionsRef = collection(db, 'connections');
       
       // 모든 연결 상태에서 PIN이 있는 출력용 디바이스 조회

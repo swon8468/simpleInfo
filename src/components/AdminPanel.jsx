@@ -12,7 +12,6 @@ import AdminSchoolBlocking from './AdminSchoolBlocking';
 import './AdminPanel.css';
 
 function AdminPanel() {
-  console.log('AdminPanel 컴포넌트 렌더링 시작');
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState('schedule');
@@ -43,7 +42,6 @@ function AdminPanel() {
       const retryDelays = [1000, 3000, 5000, 8000];
       retryDelays.forEach((delay, index) => {
         setTimeout(() => {
-          console.log(`AdminPanel: ${index + 1}차 PIN 목록 업데이트 실행 (${delay}ms 후)`);
           fetchActivePins();
         }, delay);
       });
@@ -56,17 +54,12 @@ function AdminPanel() {
       
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
       const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
-        console.log('AdminPanel: 실시간 PIN 변경 감지:', activePins);
         if (activePins.length > 0) {
-          console.log('AdminPanel: 실시간 감지로 PIN 업데이트:', activePins.length, '개');
-          
           // 별명 정보 추가로 PIN 목록 업데이트
           try {
             const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
             setActivePins(pinsWithNicknames);
-            console.log('AdminPanel: 별명 포함 PIN 목록 업데이트 완료');
           } catch (error) {
-            console.error('AdminPanel: 별명 포함 PIN 목록 업데이트 실패:', error);
             setActivePins(activePins); // 별명 없이라도 기본 PIN 목록은 유지
           }
         } else {
@@ -77,7 +70,6 @@ function AdminPanel() {
       return () => {
         if (unsubscribe && typeof unsubscribe === 'function') {
           unsubscribe();
-          console.log('AdminPanel: 실시간 모니터링 구독 해제');
         }
       };
     }
@@ -91,7 +83,7 @@ function AdminPanel() {
         items: allergyItems.map(item => ({ id: item.id, name: item.name }))
       });
     } catch (error) {
-      console.error('알레르기 정보 로드 실패:', error);
+      // 알레르기 정보 로드 실패
     }
   };
 
@@ -101,31 +93,17 @@ function AdminPanel() {
       const imageURL = await DataService.getCampusLayoutImage();
       setCampusLayoutImage(imageURL);
     } catch (error) {
-      console.error('교실 배치 이미지 로드 실패:', error);
+      // 교실 배치 이미지 로드 실패
     }
   };
 
   // 활성화된 PIN 가져오기 (별명 정보 포함)
   const fetchActivePins = async () => {
     try {
-      console.log('AdminPanel.fetchActivePins: 시작 - 현재 시간:', new Date().toISOString());
       const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
-      console.log('AdminPanel.fetchActivePins: 가져온 PIN 목록 (별명 포함):', pinsWithNicknames);
-      console.log('AdminPanel.fetchActivePins: PIN 개수:', pinsWithNicknames.length);
-      console.log('AdminPanel.fetchActivePins: PIN 상세 정보:', pinsWithNicknames.map(pin => ({ 
-        sessionId: pin.sessionId, 
-        pin: pin.pin, 
-        nickname: pin.nickname,
-        deviceType: pin.deviceType, 
-        status: pin.status,
-        createdAt: pin.createdAt,
-        connectedAt: pin.connectedAt,
-        hasControlDevice: pin.hasControlDevice
-      })));
       
       // PIN이 없는 경우 추가로 다른 방법 시도
       if (pinsWithNicknames.length === 0) {
-        console.log('AdminPanel.fetchActivePins: 초기 PIN 목록이 없음 - 다른 방법 시도');
         
         // 직접 Firebase 쿼리로 모든 연결 상태 확인
         try {
@@ -134,12 +112,10 @@ function AdminPanel() {
           
           const connectionsRef = collection(db, 'connections');
           const allDocs = await getDocs(connectionsRef);
-          console.log('AdminPanel.fetchActivePins: Firebase 직접 쿼리 - 전체 문서 수:', allDocs.size);
           
           const allPins = [];
           allDocs.forEach((doc) => {
             const data = doc.data();
-            console.log('AdminPanel.fetchActivePins: Firebase 직접 쿼리 문서:', doc.id, data);
             
             // 출력용 디바이스이면서 6자리 PIN이 있는 경우 포함
             if (data.deviceType === 'output' && 
@@ -151,7 +127,6 @@ function AdminPanel() {
           });
           
           if (allPins.length > 0) {
-            console.log('AdminPanel.fetchActivePins: 직접 쿼리로 발견된 PIN들:', allPins);
             setActivePins(allPins);
             setPinMessage(`직접 쿼리로 ${allPins.length}개의 PIN을 발견했습니다.`);
             return; // 직접 쿼리로 찾은 PIN들을 사용
@@ -159,7 +134,7 @@ function AdminPanel() {
             setPinMessage('현재 활성화된 PIN이 없습니다.');
           }
         } catch (firebaseError) {
-          console.error('AdminPanel.fetchActivePins: Firebase 직접 쿼리 실패:', firebaseError);
+          // Firebase 직접 쿼리 실패
         }
       }
       
@@ -168,7 +143,6 @@ function AdminPanel() {
         setPinMessage(`정상적으로 ${pinsWithNicknames.length}개의 PIN을 조회했습니다.`);
       }
     } catch (error) {
-      console.error('AdminPanel.fetchActivePins: PIN 가져오기 실패:', error);
       setActivePins([]);
     }
   };
@@ -205,7 +179,6 @@ function AdminPanel() {
         setPinMessage('별명 저장에 실패했습니다.');
       }
     } catch (error) {
-      console.error('별명 저장 실패:', error);
       setPinMessage('별명 저장 중 오류가 발생했습니다.');
     }
   };
@@ -252,7 +225,6 @@ function AdminPanel() {
           setPinMessage(`PIN ${pinId}을(를) 찾을 수 없습니다.`);
         }
       } catch (error) {
-        console.error('PIN 제거 실패:', error);
         setPinMessage(`PIN ${pinId} 제거에 실패했습니다.`);
       }
       
@@ -353,7 +325,6 @@ function AdminPanel() {
       // 폼 초기화 (newItem도 유지)
       setAllergyForm(prev => ({ ...prev, newItem: '' }));
     } catch (error) {
-      console.error('알레르기 정보 업데이트 오류:', error);
       showMessage('알레르기 정보 업데이트에 실패했습니다: ' + error.message);
     } finally {
       setLoading(false);
