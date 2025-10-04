@@ -596,7 +596,7 @@ function OutputMain() {
         </div>
         <div className="announcement-content">
           <h3>{currentAnnouncement.title}</h3>
-          <p>{currentAnnouncement.content}</p>
+          <p style={{ whiteSpace: 'pre-line' }}>{currentAnnouncement.content}</p>
           <div className="announcement-meta">
             <span>등록일: {currentAnnouncement.createdAt?.toDate?.()?.toLocaleDateString() || '2024.10.01'}</span>
             <span>조회수: {currentAnnouncement.views || 0}</span>
