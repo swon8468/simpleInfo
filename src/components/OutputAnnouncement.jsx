@@ -1,3 +1,4 @@
+import { LocationOn } from '@mui/icons-material';
 import './OutputAnnouncement.css';
 
 function OutputAnnouncement() {
@@ -25,7 +26,7 @@ function OutputAnnouncement() {
         </div>
       </div>
       
-      <div className="location-icon">📍</div>
+      <div className="location-icon"><LocationOn sx={{ fontSize: 24 }} /></div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
 import NotificationService from '../services/NotificationService';
+import { Warning, Refresh, Notifications } from '@mui/icons-material';
 import logoImage from '/logo.png';
 import './MainScreen.css';
 
@@ -210,7 +211,7 @@ function MainScreen() {
       <div className="mode-selection">
         {activePinCount >= 10 ? (
           <div className="active-pin-warning">
-            <h3>⚠️ 최대 연결 수에 도달했습니다</h3>
+            <h3><Warning sx={{ fontSize: 24, marginRight: 1 }} /> 최대 연결 수에 도달했습니다</h3>
             <p>현재 활성화된 연결: <strong>{activePinCount}</strong>개 / 최대 10개</p>
             <p>새로운 연결을 위해서는 관리자 페이지에서 기존 PIN을 제거해야 합니다.</p>
             <div className="warning-buttons">
@@ -249,7 +250,7 @@ function MainScreen() {
       <div className="version-section">
         <button className="version-button" onClick={handlePatchnoteClick}>
           <div className="version-content">
-            <span className="version-icon">🔄</span>
+            <span className="version-icon"><Refresh sx={{ fontSize: 24 }} /></span>
             <div className="version-text">
               <span className="version-number">{latestVersion}</span>
               <span className="version-label">패치 노트 보기</span>
@@ -260,7 +261,7 @@ function MainScreen() {
         {/* 알림 권한 요청 (PWA 지원시만) */}
         {notificationSupported && !notificationPermission && (
           <button className="notification-button" onClick={requestNotificationPermission}>
-            <span className="notification-icon">🔔</span>
+            <span className="notification-icon"><Notifications sx={{ fontSize: 24 }} /></span>
             <span>알림 허용</span>
           </button>
         )}
@@ -271,7 +272,7 @@ function MainScreen() {
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>📋 패치 노트</h3>
+              <h3>패치 노트</h3>
               <button className="modal-close" onClick={handleCloseModal}>×</button>
             </div>
             <div className="modal-body">

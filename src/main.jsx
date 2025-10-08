@@ -9,9 +9,10 @@ createRoot(document.getElementById('root')).render(
   </StrictMode>,
 )
 
-// PWA 서비스워커 등록 (vite-plugin-pwa)
-if ('serviceWorker' in navigator) {
+// PWA 서비스워커 등록은 프로덕션에서만
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/simpleInfo/sw.js').catch(() => {})
+    const swUrl = `${import.meta.env.BASE_URL}sw.js`
+    navigator.serviceWorker.register(swUrl).catch(() => {})
   })
 }

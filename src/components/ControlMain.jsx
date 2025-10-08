@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
+import { Campaign, Home } from '@mui/icons-material';
 import './ControlMain.css';
 
 function ControlMain() {
@@ -147,7 +148,7 @@ function ControlMain() {
       <div className="control-main">
         <div className="notice-block-screen">
           <div className="notice-block-header">
-            <h1>📢 메인 공지사항 활성화 중</h1>
+            <h1><Campaign sx={{ fontSize: 32, marginRight: 1 }} /> 메인 공지사항 활성화 중</h1>
           </div>
           
           <div className="notice-block-content">
@@ -207,7 +208,7 @@ function ControlMain() {
           <span>{connectionStatus}</span>
         </div>
         <button className="main-screen-btn" onClick={handleBackToMain}>
-          🏠 메인화면
+          <Home sx={{ fontSize: 20, marginRight: 1 }} /> 메인화면
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
 import NotificationService from '../services/NotificationService';
+import { School, Block, CheckCircle, Assignment, Warning } from '@mui/icons-material';
 import './AdminSchoolBlocking.css';
 
 function AdminSchoolBlocking() {
@@ -88,7 +89,7 @@ function AdminSchoolBlocking() {
   return (
     <div className="admin-school-blocking">
       <div className="blocking-header">
-        <h2>🏫 학교 생활 도우미 차단 관리</h2>
+        <h2><School sx={{ fontSize: 24, marginRight: 1 }} /> 학교 생활 도우미 차단 관리</h2>
         <p>시스템 점검이나 긴급상황 시 학교 생활 도우미를 일시적으로 차단할 수 있습니다.</p>
       </div>
 
@@ -96,7 +97,7 @@ function AdminSchoolBlocking() {
       <div className="status-section">
         <div className={`status-indicator ${blockingStatus ? 'blocked' : 'active'}`}>
           <span className="status-icon">
-            {blockingStatus ? '🚫' : '✅'}
+            {blockingStatus ? <Block sx={{ fontSize: 24 }} /> : <CheckCircle sx={{ fontSize: 24 }} />}
           </span>
           <span className="status-text">
             {blockingStatus ? '차단됨 (사용자 접근 불가)' : '정상 운영 중'}
@@ -122,7 +123,7 @@ function AdminSchoolBlocking() {
               onClick={handleDisableBlocking}
               disabled={loading}
             >
-              <span className="btn-icon">✅</span>
+              <span className="btn-icon"><CheckCircle sx={{ fontSize: 20 }} /></span>
               <span className="btn-text">차단 해제</span>
             </button>
           )}
@@ -132,7 +133,7 @@ function AdminSchoolBlocking() {
       {/* 안내 메시지 */}
       <div className="info-section">
         <div className="info-card">
-          <h3>📋 차단 기능 안내</h3>
+          <h3><Assignment sx={{ fontSize: 20, marginRight: 0.5 }} /> 차단 기능 안내</h3>
           <ul className="info-list">
             <li>
               <strong>차단 시작:</strong> 모든 사용자가 차단 화면을 보게 됩니다.
@@ -150,7 +151,7 @@ function AdminSchoolBlocking() {
         </div>
 
         <div className="warning-card">
-          <h3>⚠️ 주의사항</h3>
+          <h3><Warning sx={{ fontSize: 20, marginRight: 0.5 }} /> 주의사항</h3>
           <ul className="warning-list">
             <li>차단 시 모든 학생과 교사가 서비스를 이용할 수 없습니다.</li>
             <li>긴급 상황이나 시스템 점검 시에만 사용하세요.</li>

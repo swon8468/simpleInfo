@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
+import { School, Campaign } from '@mui/icons-material';
 import './OutputMain.css';
 
 function OutputMain() {
@@ -18,6 +19,8 @@ function OutputMain() {
   });
   const [mainNotice, setMainNotice] = useState(null);
   const [showMainNotice, setShowMainNotice] = useState(false);
+  const [photoGallery, setPhotoGallery] = useState([]);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   // 메인 공지사항 활성화 시 body 배경색 변경
   useEffect(() => {
@@ -116,6 +119,18 @@ function OutputMain() {
     };
   }, [navigate]);
 
+  // 사진 슬라이드쇼 자동 전환
+  useEffect(() => {
+    if (photoGallery.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentPhotoIndex((prevIndex) => 
+          (prevIndex + 1) % photoGallery.length
+        );
+      }, 20000); // 20초마다 전환
+
+      return () => clearInterval(interval);
+    }
+  }, [photoGallery]);
 
   const loadInitialData = async () => {
     try {
@@ -137,6 +152,10 @@ function OutputMain() {
       const today = new Date().toISOString().split('T')[0];
       const mealData = await generateMealData(today);
       setMealData(mealData);
+
+      // 사진관 데이터 로드
+      const photos = await DataService.getPhotoGallery();
+      setPhotoGallery(photos);
 
     } catch (error) {
       console.error('초기 데이터 로드 실패:', error);
@@ -293,11 +312,31 @@ function OutputMain() {
         return <AnnouncementDisplay announcements={announcements} controlData={controlData} />;
         
       default:
-        // 메인 화면 - 로고와 제목만 표시
+        // 메인 화면 - 사진 슬라이드쇼와 제목 표시
         return (
           <div className="main-display">
             <div className="logo-section">
-              <div className="school-logo">🏫</div>
+              {photoGallery.length > 0 ? (
+                <div className="photo-slideshow">
+                  <div className="photo-container">
+                    <img 
+                      src={photoGallery[currentPhotoIndex]?.imageURL} 
+                      alt={photoGallery[currentPhotoIndex]?.title}
+                      className="school-photo"
+                    />
+                    <div className="photo-info">
+                      <h3 className="photo-title">{photoGallery[currentPhotoIndex]?.title}</h3>
+                      <p className="photo-description">{photoGallery[currentPhotoIndex]?.description}</p>
+                      <p className="photo-date">
+                        {photoGallery[currentPhotoIndex]?.eventDate?.toDate?.()?.toLocaleDateString('ko-KR') || 
+                         new Date(photoGallery[currentPhotoIndex]?.eventDate).toLocaleDateString('ko-KR')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="school-logo"><School sx={{ fontSize: 80 }} /></div>
+              )}
               <h1 className="main-title">{schoolInfo.name}</h1>
               <h2 className="main-subtitle">학교 생활 도우미</h2>
             </div>
@@ -647,7 +686,7 @@ function OutputMain() {
     return (
       <div className="output-main notice-notice-active">
         <div className="notice-notice-header">
-          <h1>📢 메인 공지사항 활성화 중</h1>
+          <h1><Campaign sx={{ fontSize: 32, marginRight: 1 }} /> 메인 공지사항 활성화 중</h1>
         </div>
         
         <div className="notice-notice-content">

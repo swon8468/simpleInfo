@@ -9,6 +9,8 @@ import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
+import AdminPhotoGallery from './AdminPhotoGallery';
+import { Lightbulb, PushPin, Warning } from '@mui/icons-material';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -24,6 +26,8 @@ function AdminPanel() {
   const [nicknameValue, setNicknameValue] = useState('');
   const [campusLayoutImage, setCampusLayoutImage] = useState(null);
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
+  const [photoGallery, setPhotoGallery] = useState([]);
+  const [photoGalleryLoading, setPhotoGalleryLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +55,9 @@ function AdminPanel() {
       
       // 교실 배치 이미지 로드
       loadCampusLayoutImage();
+      
+      // 사진관 데이터 로드
+      loadPhotoGallery();
       
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
       const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
@@ -94,6 +101,16 @@ function AdminPanel() {
       setCampusLayoutImage(imageURL);
     } catch (error) {
       // 교실 배치 이미지 로드 실패
+    }
+  };
+
+  // 사진관 데이터 로드
+  const loadPhotoGallery = async () => {
+    try {
+      const photos = await DataService.getPhotoGallery();
+      setPhotoGallery(photos);
+    } catch (error) {
+      console.error('사진관 데이터 로드 실패:', error);
     }
   };
 
@@ -370,6 +387,36 @@ function AdminPanel() {
     }
   };
 
+  // 사진관 사진 추가
+  const handlePhotoGalleryAdd = async (photoData) => {
+    setPhotoGalleryLoading(true);
+    try {
+      await DataService.addPhotoGallery(photoData);
+      showMessage('사진이 추가되었습니다.');
+      await loadPhotoGallery(); // 사진 목록 새로고침
+    } catch (error) {
+      showMessage('사진 추가에 실패했습니다.');
+    } finally {
+      setPhotoGalleryLoading(false);
+    }
+  };
+
+  // 사진관 사진 삭제
+  const handlePhotoGalleryDelete = async (photoId) => {
+    if (window.confirm('정말로 이 사진을 삭제하시겠습니까?')) {
+      setPhotoGalleryLoading(true);
+      try {
+        await DataService.deletePhotoGallery(photoId);
+        showMessage('사진이 삭제되었습니다.');
+        await loadPhotoGallery(); // 사진 목록 새로고침
+      } catch (error) {
+        showMessage('사진 삭제에 실패했습니다.');
+      } finally {
+        setPhotoGalleryLoading(false);
+      }
+    }
+  };
+
   return (
     <>
       {!isAuthenticated ? (
@@ -438,6 +485,12 @@ function AdminPanel() {
               onClick={() => setActiveTab('schoolBlocking')}
             >
               학교 차단
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'photoGallery' ? 'active' : ''}`}
+              onClick={() => setActiveTab('photoGallery')}
+            >
+              우리 학교 사진관
             </button>
             <button 
               className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
@@ -583,7 +636,7 @@ function AdminPanel() {
                       </button>
                     </div>
                     <p className="allergy-input-hint">
-                      💡 쉼표로 여러 항목을 한 번에 입력할 수 있습니다: "난류, 우유, 견과류"
+                      <Lightbulb sx={{ fontSize: 16, marginRight: 0.5 }} /> 쉼표로 여러 항목을 한 번에 입력할 수 있습니다: "난류, 우유, 견과류"
                     </p>
                   </div>
                   
@@ -611,6 +664,17 @@ function AdminPanel() {
             {activeTab === 'schoolBlocking' && (
               <div className="form-section">
                 <AdminSchoolBlocking />
+              </div>
+            )}
+
+            {activeTab === 'photoGallery' && (
+              <div className="form-section">
+                <AdminPhotoGallery 
+                  photos={photoGallery}
+                  onAdd={handlePhotoGalleryAdd}
+                  onDelete={handlePhotoGalleryDelete}
+                  loading={photoGalleryLoading}
+                />
               </div>
             )}
 
@@ -661,7 +725,7 @@ function AdminPanel() {
                 <h2>활성화된 PIN 관리</h2>
                 {pinMessage && <p className="pin-message">{pinMessage}</p>}
                 <div className="pin-info">
-                  <p>📌 현재 활성화된 PIN: <strong style={{ color: '#007bff', fontSize: '1.2rem' }}>{activePins.length}</strong>개 / 최대 10개</p>
+                  <p><PushPin sx={{ fontSize: 16, marginRight: 0.5 }} /> 현재 활성화된 PIN: <strong style={{ color: '#007bff', fontSize: '1.2rem' }}>{activePins.length}</strong>개 / 최대 10개</p>
                   <p
                     className="realtime-indicator"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
@@ -675,7 +739,7 @@ function AdminPanel() {
                     PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침되고 PIN관리 탭으로 이동됩니다.
                   </p>
                   {activePins.length >= 10 && (
-                    <p className="pin-warning">⚠️ 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
+                    <p className="pin-warning"><Warning sx={{ fontSize: 16, marginRight: 0.5 }} /> 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>
                   )}
                 </div>
                 {activePins.length === 0 ? (

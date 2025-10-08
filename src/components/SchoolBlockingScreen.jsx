@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
+import { School, Build, Rocket, AccessTime } from '@mui/icons-material';
 import './SchoolBlockingScreen.css';
 
 function SchoolBlockingScreen() {
@@ -40,7 +41,7 @@ function SchoolBlockingScreen() {
       <div className="school-blocking-screen">
         <div className="blocking-container">
           <div className="blocking-icon">
-            🏫
+            <School sx={{ fontSize: 80 }} />
           </div>
           <h1 className="blocking-title">학교 생활 도우미 일시 중단</h1>
           <p className="blocking-message">
@@ -49,15 +50,15 @@ function SchoolBlockingScreen() {
           </p>
           <div className="blocking-details">
             <div className="detail-item">
-              <span className="detail-icon">🔧</span>
+              <span className="detail-icon"><Build sx={{ fontSize: 24 }} /></span>
               <span>시스템 점검 및 업그레이드</span>
             </div>
             <div className="detail-item">
-              <span className="detail-icon">🚀</span>
+              <span className="detail-icon"><Rocket sx={{ fontSize: 24 }} /></span>
               <span>더 나은 서비스를 위한 준비</span>
             </div>
             <div className="detail-item">
-              <span className="detail-icon">⏰</span>
+              <span className="detail-icon"><AccessTime sx={{ fontSize: 24 }} /></span>
               <span>곧 다시 만나요!</span>
             </div>
            </div>

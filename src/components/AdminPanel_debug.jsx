@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Build, CheckCircle, Logout } from '@mui/icons-material';
 import AdminAuth from './AdminAuth';
 
 function AdminPanel() {
@@ -38,7 +39,7 @@ function AdminPanel() {
       position: 'relative',
       zIndex: 9999
     }}>
-      <h1 style={{ color: '#333', marginBottom: '20px' }}>🔧 관리자 패널</h1>
+      <h1 style={{ color: '#333', marginBottom: '20px' }}><Build sx={{ fontSize: 24, marginRight: 1 }} /> 관리자 패널</h1>
       <div style={{ 
         backgroundColor: 'white', 
         padding: '20px', 
@@ -46,7 +47,7 @@ function AdminPanel() {
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
         marginBottom: '20px'
       }}>
-        <h2>✅ 관리자 패널이 정상적으로 로드되었습니다!</h2>
+        <h2><CheckCircle sx={{ fontSize: 20, marginRight: 1 }} /> 관리자 패널이 정상적으로 로드되었습니다!</h2>
         <p>문제가 해결되었습니다.</p>
         <div style={{ margin: '20px 0' }}>
           <strong>현재 URL:</strong> {window.location.href}<br/>
@@ -71,7 +72,7 @@ function AdminPanel() {
             cursor: 'pointer'
           }}
         >
-          🔓 로그아웃
+          <Logout sx={{ fontSize: 16, marginRight: 0.5 }} /> 로그아웃
         </button>
         
         <button 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import DataService from '../services/DataService';
 import NotificationService from '../services/NotificationService';
+import { Inventory, Bolt, Security, BugReport } from '@mui/icons-material';
 import './AdminPatchnotes.css';
 
 function AdminPatchnotes() {
@@ -387,10 +388,10 @@ function AdminPatchnotes() {
                       {patchnote.version}
                     </span>
                     <span className="patchnote-type">
-                      {patchnote.type === 'major' && '📦 주요 변경'}
-                      {patchnote.type === 'minor' && '⚡ 기능 변경'}
-                      {patchnote.type === 'security' && '🔒 보안'}
-                      {patchnote.type === 'fix' && '🐛 버그 수정'}
+                      {patchnote.type === 'major' && <><Inventory sx={{ fontSize: 16, marginRight: 0.5 }} /> 주요 변경</>}
+                      {patchnote.type === 'minor' && <><Bolt sx={{ fontSize: 16, marginRight: 0.5 }} /> 기능 변경</>}
+                      {patchnote.type === 'security' && <><Security sx={{ fontSize: 16, marginRight: 0.5 }} /> 보안</>}
+                      {patchnote.type === 'fix' && <><BugReport sx={{ fontSize: 16, marginRight: 0.5 }} /> 버그 수정</>}
                     </span>
                   </div>
                   <div className="patchnote-date">

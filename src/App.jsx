@@ -7,8 +7,8 @@ import AdminPanel from './components/AdminPanel';
 import SchoolBlockingScreen from './components/SchoolBlockingScreen';
 
 function App() {
-  // 개발과 프로덕션 모두에서 일관되게 basename 사용
-  const basename = '/simpleInfo';
+  // Vite가 제공하는 BASE_URL을 사용하여 개발('/')과 배포('/simpleInfo/') 모두 지원
+  const basename = import.meta.env.BASE_URL;
   
   return (
     <Router basename={basename}>

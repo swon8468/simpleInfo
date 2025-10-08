@@ -692,6 +692,127 @@ class DataService {
     }
   }
 
+  // 사진관 관리
+  async getPhotoGallery() {
+    try {
+      const photoGalleryRef = collection(db, 'photoGallery');
+      const q = query(photoGalleryRef, orderBy('eventDate', 'desc'));
+      const photoGallerySnapshot = await getDocs(q);
+      return photoGallerySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error('사진관 데이터 가져오기 실패:', error);
+      return [];
+    }
+  }
+
+  async addPhotoGallery(photoData) {
+    try {
+      const photoGalleryRef = collection(db, 'photoGallery');
+      await addDoc(photoGalleryRef, {
+        title: photoData.title,
+        description: photoData.description,
+        target: photoData.target || [],
+        eventDate: photoData.eventDate,
+        imageURL: photoData.imageURL,
+        fileName: photoData.fileName,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('사진관 데이터 추가 실패:', error);
+      throw error;
+    }
+  }
+
+  async updatePhotoGallery(photoId, photoData) {
+    try {
+      const photoRef = doc(db, 'photoGallery', photoId);
+      await updateDoc(photoRef, {
+        title: photoData.title,
+        description: photoData.description,
+        target: photoData.target || [],
+        eventDate: photoData.eventDate,
+        imageURL: photoData.imageURL,
+        fileName: photoData.fileName,
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('사진관 데이터 수정 실패:', error);
+      throw error;
+    }
+  }
+
+  async deletePhotoGallery(photoId) {
+    try {
+      // Firestore에서 사진 정보 가져오기
+      const photoRef = doc(db, 'photoGallery', photoId);
+      const photoSnap = await getDoc(photoRef);
+      
+      if (photoSnap.exists()) {
+        const data = photoSnap.data();
+        const fileName = data.fileName;
+        
+        // Storage에서 이미지 삭제
+        if (fileName) {
+          const imageRef = ref(storage, `photo-gallery/${fileName}`);
+          await deleteObject(imageRef);
+        }
+      }
+      
+      // Firestore에서 문서 삭제
+      await deleteDoc(photoRef);
+    } catch (error) {
+      console.error('사진관 데이터 삭제 실패:', error);
+      throw error;
+    }
+  }
+
+  async uploadPhotoGalleryImage(file) {
+    try {
+      console.log('사진관 이미지 업로드 시작:', file.name, file.size, file.type);
+      
+      // 파일 유효성 검사
+      if (!file.type.startsWith('image/')) {
+        throw new Error('이미지 파일만 업로드 가능합니다.');
+      }
+      
+      if (file.size > 10 * 1024 * 1024) { // 10MB 제한
+        throw new Error('파일 크기는 10MB를 초과할 수 없습니다.');
+      }
+      
+      // 고유한 파일명 생성
+      const timestamp = Date.now();
+      const fileName = `photo-gallery-${timestamp}.${file.name.split('.').pop()}`;
+      const imageRef = ref(storage, `photo-gallery/${fileName}`);
+      
+      console.log('Storage 참조 생성:', imageRef.fullPath);
+      
+      // 이미지 업로드 (메타데이터 포함)
+      const metadata = {
+        contentType: file.type,
+        customMetadata: {
+          uploadedBy: 'admin',
+          uploadTime: timestamp.toString()
+        }
+      };
+      
+      const uploadResult = await uploadBytes(imageRef, file, metadata);
+      console.log('업로드 완료:', uploadResult);
+      
+      // 다운로드 URL 가져오기
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+      console.log('다운로드 URL:', downloadURL);
+      
+      return {
+        imageURL: downloadURL,
+        fileName: fileName
+      };
+    } catch (error) {
+      console.error('사진관 이미지 업로드 실패:', error);
+      throw error;
+    }
+  }
+
 }
 
 export default new DataService();

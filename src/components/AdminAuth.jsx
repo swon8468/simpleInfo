@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Lock, Visibility, VisibilityOff, Warning, Security } from '@mui/icons-material';
 import './AdminAuth.css';
 
 function AdminAuth({ onSuccess }) {
@@ -71,7 +72,7 @@ function AdminAuth({ onSuccess }) {
             <h1 className="auth-title">관리자 인증</h1>
             <p className="auth-subtitle">학교 생활 도우미 관리자 페이지 접근</p>
             <div className="security-badge">
-              <span className="security-icon">🔒</span>
+              <span className="security-icon"><Lock sx={{ fontSize: 20 }} /></span>
               <span>보안 인증 필요</span>
             </div>
           </div>
@@ -96,14 +97,14 @@ function AdminAuth({ onSuccess }) {
                   className="toggle-password-btn"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                  {showPassword ? <VisibilityOff sx={{ fontSize: 20 }} /> : <Visibility sx={{ fontSize: 20 }} />}
                 </button>
               </div>
             </div>
             
             {error && (
               <div className="error-container">
-                <span className="error-icon">⚠️</span>
+                <span className="error-icon"><Warning sx={{ fontSize: 20 }} /></span>
                 <span className="error-message">{error}</span>
               </div>
             )}
@@ -136,7 +137,7 @@ function AdminAuth({ onSuccess }) {
               
               <div className="security-info">
                 <span className="security-text">
-                  🛡️ 이 페이지는 관리자 전용입니다
+                  <Security sx={{ fontSize: 16, marginRight: 0.5 }} /> 이 페이지는 관리자 전용입니다
                 </span>
               </div>
             </div>
