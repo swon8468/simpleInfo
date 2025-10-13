@@ -54,14 +54,37 @@ function AdminPanel() {
       if (savedAdminInfo) {
         try {
           const adminInfo = JSON.parse(savedAdminInfo);
-          setCurrentAdmin(adminInfo);
           
-          // 권한이 있는 첫 번째 탭으로 이동
-          const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'];
-          const firstAvailableTab = availableTabs.find(tab => adminInfo.permissions?.includes(tab));
-          if (firstAvailableTab) {
-            setActiveTab(firstAvailableTab);
-          }
+          // Firebase에서 최신 관리자 정보 가져오기
+          DataService.getAdminByCode(adminInfo.adminCode).then(latestAdminInfo => {
+            if (latestAdminInfo) {
+              setCurrentAdmin(latestAdminInfo);
+              
+              // 세션 정보 업데이트
+              sessionStorage.setItem('adminInfo', JSON.stringify({
+                id: latestAdminInfo.id,
+                name: latestAdminInfo.name,
+                adminCode: latestAdminInfo.adminCode,
+                permissions: latestAdminInfo.permissions,
+                level: latestAdminInfo.level
+              }));
+              
+              // 권한이 있는 첫 번째 탭으로 이동
+              const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'];
+              const firstAvailableTab = availableTabs.find(tab => latestAdminInfo.permissions?.includes(tab));
+              if (firstAvailableTab) {
+                setActiveTab(firstAvailableTab);
+              }
+            } else {
+              // 관리자 정보를 찾을 수 없으면 로그아웃
+              sessionStorage.removeItem('adminInfo');
+              sessionStorage.removeItem('adminAuthenticated');
+              setIsAuthenticated(false);
+            }
+          }).catch(error => {
+            sessionStorage.removeItem('adminInfo');
+            sessionStorage.removeItem('adminAuthenticated');
+          });
         } catch (error) {
           sessionStorage.removeItem('adminInfo');
           sessionStorage.removeItem('adminAuthenticated');
@@ -509,7 +532,6 @@ function AdminPanel() {
           <div className="admin-info">
             <span className="admin-name">{currentAdmin?.name}</span>
             <span className="admin-code">{currentAdmin?.adminCode}</span>
-            <span className="admin-permissions">권한: {currentAdmin?.permissions?.join(', ') || '없음'}</span>
           </div>
               <button className="logout-btn" onClick={handleLogout}>
                 로그아웃
@@ -610,12 +632,6 @@ function AdminPanel() {
               >
                 시스템 관리
               </button>
-            )}
-            {/* 디버깅: 시스템 관리 권한 확인 */}
-            {currentAdmin && (
-              <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-                시스템 관리 권한: {hasPermission('systemManagement') ? '있음' : '없음'}
-              </div>
             )}
             {/* 권한이 없는 경우 메시지 표시 */}
             {!currentAdmin?.permissions?.length && (

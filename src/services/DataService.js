@@ -284,41 +284,20 @@ class DataService {
   // 공지사항 데이터 관리
   async getAnnouncements() {
     try {
-      console.log('DataService.getAnnouncements 시작');
-      console.log('Firebase db 객체:', db);
-      console.log('Firebase 연결 상태 확인 중...');
-      
-      // Firebase 연결 테스트
-      const testRef = collection(db, 'announcements');
-      console.log('테스트 컬렉션 참조:', testRef);
-      
       const announcementRef = collection(db, 'announcements');
-      console.log('announcementRef:', announcementRef);
-      
       const q = query(announcementRef);
-      console.log('쿼리 객체 (orderBy 제거):', q);
-      
-      console.log('Firebase 쿼리 실행 중...');
       const querySnapshot = await getDocs(q);
-      console.log('Firebase 쿼리 결과:', querySnapshot.size, '개 문서');
-      console.log('쿼리 소스:', querySnapshot.metadata.fromCache ? '캐시에서' : '서버에서');
       
       const announcements = [];
       querySnapshot.forEach((doc) => {
-        console.log('문서 ID:', doc.id, '데이터:', doc.data());
         announcements.push({
           id: doc.id,
           ...doc.data()
         });
       });
       
-      console.log('최종 공지사항 배열:', announcements);
       return announcements;
     } catch (error) {
-      console.error('공지사항 데이터 가져오기 실패:', error);
-      console.error('에러 상세:', error.message);
-      console.error('에러 코드:', error.code);
-      console.error('에러 스택:', error.stack);
       return [];
     }
   }
@@ -331,7 +310,7 @@ class DataService {
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      console.error('공지사항 조회수 증가 실패:', error);
+      // 공지사항 조회수 증가 실패
     }
   }
 
@@ -346,7 +325,7 @@ class DataService {
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      console.error('공지사항 추가 실패:', error);
+      throw error;
     }
   }
 
@@ -359,7 +338,7 @@ class DataService {
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      console.error('공지사항 업데이트 실패:', error);
+      throw error;
     }
   }
 
@@ -368,7 +347,7 @@ class DataService {
       const announcementRef = doc(db, 'announcements', id);
       await deleteDoc(announcementRef);
     } catch (error) {
-      console.error('공지사항 삭제 실패:', error);
+      throw error;
     }
   }
 
@@ -385,7 +364,7 @@ class DataService {
         });
       }
     } catch (error) {
-      console.error('공지사항 조회수 증가 실패:', error);
+      // 공지사항 조회수 증가 실패
     }
   }
 
