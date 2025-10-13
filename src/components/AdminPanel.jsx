@@ -11,6 +11,7 @@ import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
 import AdminManagement from './AdminManagement';
+import AdminSystemManagement from './AdminSystemManagement';
 import { Lightbulb, PushPin, Warning, Block, CheckCircle, Monitor, Link } from '@mui/icons-material';
 import './AdminPanel.css';
 
@@ -238,6 +239,7 @@ function AdminPanel() {
     sessionStorage.removeItem('adminInfo');
     setIsAuthenticated(false);
     setCurrentAdmin(null);
+    navigate('/');
   };
 
   const handleBackToMain = () => {
@@ -588,6 +590,14 @@ function AdminPanel() {
                 관리자 관리
               </button>
             )}
+            {hasPermission('systemManagement') && (
+              <button 
+                className={`tab-btn ${activeTab === 'systemManagement' ? 'active' : ''}`}
+                onClick={() => setActiveTab('systemManagement')}
+              >
+                시스템 관리
+              </button>
+            )}
             {/* 권한이 없는 경우 메시지 표시 */}
             {!currentAdmin?.permissions?.length && (
               <div className="no-permission-message">
@@ -892,6 +902,12 @@ function AdminPanel() {
             {activeTab === 'adminManagement' && (
               <div className="form-section">
                 <AdminManagement currentAdmin={currentAdmin} />
+              </div>
+            )}
+
+            {activeTab === 'systemManagement' && (
+              <div className="form-section">
+                <AdminSystemManagement currentAdmin={currentAdmin} />
               </div>
             )}
           </div>
