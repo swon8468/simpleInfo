@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import ConnectionDB from '../services/ConnectionDB';
 import './ControlConnectionInfo.css';
 
@@ -12,8 +14,23 @@ function ControlConnectionInfo() {
   const [passwordInput, setPasswordInput] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [systemPinCode, setSystemPinCode] = useState('040507');
 
   useEffect(() => {
+    // 시스템 PIN 코드 로드
+    const loadSystemPinCode = async () => {
+      try {
+        const pinDoc = await getDoc(doc(db, 'system', 'pinCode'));
+        if (pinDoc.exists()) {
+          setSystemPinCode(pinDoc.data().code || '040507');
+        }
+      } catch (error) {
+        console.error('시스템 PIN 코드 로드 실패:', error);
+      }
+    };
+    
+    loadSystemPinCode();
+    
     // 현재 연결된 PIN 정보 가져오기 (실제로는 sessionStorage나 context에서 관리)
     const savedPin = sessionStorage.getItem('currentPin');
     if (savedPin) {
@@ -50,7 +67,7 @@ function ControlConnectionInfo() {
       return;
     }
 
-    if (passwordInput !== '040507') {
+    if (passwordInput !== systemPinCode) {
       setErrorMessage('비밀번호가 올바르지 않습니다.');
       return;
     }

@@ -97,8 +97,13 @@ function AdminSystemManagement({ currentAdmin }) {
   };
 
   const handlePinCodeUpdate = async () => {
-    if (!pinCode || pinCode.length < 4) {
-      showMessage('PIN 코드는 최소 4자리 이상이어야 합니다', 'error');
+    if (!pinCode || pinCode.length !== 6) {
+      showMessage('PIN 코드는 정확히 6자리 숫자여야 합니다', 'error');
+      return;
+    }
+    
+    if (!/^\d{6}$/.test(pinCode)) {
+      showMessage('PIN 코드는 숫자만 입력 가능합니다', 'error');
       return;
     }
 
@@ -206,9 +211,14 @@ function AdminSystemManagement({ currentAdmin }) {
                   type="text"
                   id="pinCode"
                   value={pinCode}
-                  onChange={(e) => setPinCode(e.target.value)}
-                  placeholder="PIN 코드를 입력하세요"
-                  maxLength={10}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ''); // 숫자만 허용
+                    if (value.length <= 6) {
+                      setPinCode(value);
+                    }
+                  }}
+                  placeholder="6자리 숫자를 입력하세요"
+                  maxLength={6}
                 />
                 <button 
                   className="test-btn"
@@ -219,14 +229,14 @@ function AdminSystemManagement({ currentAdmin }) {
                 </button>
               </div>
               <small className="form-help">
-                제어용과 출력용 디바이스 연결 해제 시 사용되는 PIN 코드입니다.
+                제어용과 출력용 디바이스 연결 해제 시 사용되는 PIN 코드입니다. (6자리 숫자)
               </small>
             </div>
             
             <button 
               className="update-btn"
               onClick={handlePinCodeUpdate}
-              disabled={loading || !pinCode}
+              disabled={loading || !pinCode || pinCode.length !== 6}
             >
               {loading ? '업데이트 중...' : 'PIN 코드 업데이트'}
             </button>

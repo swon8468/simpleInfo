@@ -64,6 +64,11 @@ class ConnectionService {
   // PIN 검증 및 연결 (제어용 디바이스용)
   async connectWithPin(pin) {
     try {
+      // PIN 형식 검증
+      if (!pin || pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+        throw new Error('PIN은 6자리 숫자여야 합니다.');
+      }
+      
       console.log('ConnectionService: PIN 연결 시도:', pin);
       const docRef = doc(db, 'connections', pin);
       const docSnap = await getDoc(docRef);

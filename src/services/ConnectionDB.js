@@ -65,6 +65,11 @@ class ConnectionDB {
   // 제어용 디바이스 연결 (PIN으로 연결)
   async connectControlDevice(pin) {
     try {
+      // PIN 형식 검증
+      if (!pin || pin.length !== 6 || !/^\d{6}$/.test(pin)) {
+        return { success: false, error: 'PIN은 6자리 숫자여야 합니다.' };
+      }
+      
       console.log('ConnectionDB: 제어용 디바이스 연결 시도, PIN:', pin);
       
       // PIN으로 출력용 세션 찾기
