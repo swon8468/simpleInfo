@@ -41,8 +41,9 @@
 
 .header-left {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
 }
 
 .school-blocking-status {
