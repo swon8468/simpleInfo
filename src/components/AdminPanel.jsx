@@ -10,7 +10,7 @@ import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
 import AdminPhotoGallery from './AdminPhotoGallery';
-import { Lightbulb, PushPin, Warning } from '@mui/icons-material';
+import { Lightbulb, PushPin, Warning, Block, CheckCircle } from '@mui/icons-material';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -28,6 +28,7 @@ function AdminPanel() {
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
   const [photoGallery, setPhotoGallery] = useState([]);
   const [photoGalleryLoading, setPhotoGalleryLoading] = useState(false);
+  const [schoolBlockingStatus, setSchoolBlockingStatus] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,8 +60,11 @@ function AdminPanel() {
       // 사진관 데이터 로드
       loadPhotoGallery();
       
+      // 학교 차단 상태 확인
+      checkSchoolBlockingStatus();
+      
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
-      const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
+      const unsubscribePins = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
         if (activePins.length > 0) {
           // 별명 정보 추가로 PIN 목록 업데이트
           try {
@@ -73,10 +77,18 @@ function AdminPanel() {
           setActivePins(activePins);
         }
       });
+
+      // 실시간으로 학교 차단 상태 모니터링
+      const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
+        setSchoolBlockingStatus(isActive);
+      });
       
       return () => {
-        if (unsubscribe && typeof unsubscribe === 'function') {
-          unsubscribe();
+        if (unsubscribePins && typeof unsubscribePins === 'function') {
+          unsubscribePins();
+        }
+        if (unsubscribeBlocking && typeof unsubscribeBlocking === 'function') {
+          unsubscribeBlocking();
         }
       };
     }
@@ -111,6 +123,16 @@ function AdminPanel() {
       setPhotoGallery(photos);
     } catch (error) {
       console.error('사진관 데이터 로드 실패:', error);
+    }
+  };
+
+  // 학교 차단 상태 확인
+  const checkSchoolBlockingStatus = async () => {
+    try {
+      const status = await ConnectionDB.getSchoolBlockingStatus();
+      setSchoolBlockingStatus(status);
+    } catch (error) {
+      console.error('학교 차단 상태 확인 실패:', error);
     }
   };
 
@@ -424,7 +446,22 @@ function AdminPanel() {
       ) : (
         <div className="admin-panel">
           <div className="admin-header">
-            <h1>관리자 패널</h1>
+            <div className="header-left">
+              <h1>관리자 패널</h1>
+              <div className="school-blocking-status">
+                {schoolBlockingStatus ? (
+                  <span className="blocking-status blocked">
+                    <Block sx={{ fontSize: 20, marginRight: 0.5 }} />
+                    학교 차단 중
+                  </span>
+                ) : (
+                  <span className="blocking-status active">
+                    <CheckCircle sx={{ fontSize: 20, marginRight: 0.5 }} />
+                    정상 운영 중
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="header-buttons">
               <button className="logout-btn" onClick={handleLogout}>
                 로그아웃
