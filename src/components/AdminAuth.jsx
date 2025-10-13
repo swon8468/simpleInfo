@@ -43,6 +43,10 @@ function AdminAuth({ onSuccess }) {
       const admin = await DataService.getAdminByCode(password);
       
       if (admin && admin.isActive) {
+        console.log('로그인 성공한 관리자 정보:', admin);
+        console.log('관리자 권한:', admin.permissions);
+        console.log('systemManagement 권한 있음:', admin.permissions?.includes('systemManagement'));
+        
         // 세션에 관리자 정보 저장
         sessionStorage.setItem('adminAuthenticated', 'true');
         sessionStorage.setItem('adminInfo', JSON.stringify({

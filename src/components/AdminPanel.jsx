@@ -255,8 +255,19 @@ function AdminPanel() {
 
   // 권한 확인 함수
   const hasPermission = (permission) => {
-    if (!currentAdmin) return false;
-    return currentAdmin.permissions?.includes(permission) || false;
+    if (!currentAdmin) {
+      console.log(`권한 확인 실패: currentAdmin이 없음 (${permission})`);
+      return false;
+    }
+    
+    const hasPermission = currentAdmin.permissions?.includes(permission) || false;
+    console.log(`권한 확인: ${permission} = ${hasPermission}`, {
+      currentAdmin: currentAdmin,
+      permissions: currentAdmin.permissions,
+      permission: permission
+    });
+    
+    return hasPermission;
   };
 
   // 인증 성공 핸들러
@@ -538,6 +549,8 @@ function AdminPanel() {
           <div className="admin-info">
             <span className="admin-name">{currentAdmin?.name}</span>
             <span className="admin-code">{currentAdmin?.adminCode}</span>
+            <span className="admin-permissions">권한: {currentAdmin?.permissions?.join(', ') || '없음'}</span>
+            <span className="admin-level">등급: {currentAdmin?.level || '알 수 없음'}</span>
           </div>
               <button className="logout-btn" onClick={handleLogout}>
                 로그아웃
@@ -638,6 +651,15 @@ function AdminPanel() {
               >
                 시스템 관리
               </button>
+            )}
+            {/* 디버깅: 시스템 관리 권한 확인 */}
+            {currentAdmin && (
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '10px', padding: '10px', background: '#f0f0f0', borderRadius: '5px' }}>
+                <div>시스템 관리 권한: {hasPermission('systemManagement') ? '✅ 있음' : '❌ 없음'}</div>
+                <div>관리자 등급: {currentAdmin.level}</div>
+                <div>전체 권한 수: {currentAdmin.permissions?.length || 0}개</div>
+                <div>권한 목록: {currentAdmin.permissions?.join(', ') || '없음'}</div>
+              </div>
             )}
             {/* 권한이 없는 경우 메시지 표시 */}
             {!currentAdmin?.permissions?.length && (
