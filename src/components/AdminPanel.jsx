@@ -472,6 +472,10 @@ function AdminPanel() {
               </div>
             </div>
             <div className="header-buttons">
+              <div className="admin-info">
+                <span className="admin-name">{currentAdmin?.name}</span>
+                <span className="admin-code">{currentAdmin?.adminCode}</span>
+              </div>
               <button className="logout-btn" onClick={handleLogout}>
                 로그아웃
               </button>
@@ -563,6 +567,13 @@ function AdminPanel() {
               >
                 관리자 관리
               </button>
+            )}
+            {/* 권한이 없는 경우 메시지 표시 */}
+            {!currentAdmin?.permissions?.length && (
+              <div className="no-permission-message">
+                <Warning sx={{ fontSize: 20, marginRight: 1 }} />
+                접근 권한이 없습니다. 관리자에게 문의하세요.
+              </div>
             )}
           </div>
 
