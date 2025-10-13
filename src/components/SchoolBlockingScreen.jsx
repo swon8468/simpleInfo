@@ -10,8 +10,9 @@ function SchoolBlockingScreen() {
 
   useEffect(() => {
     // 현재 경로 기준으로 차단 화면 표시 여부 결정
-    const onAdmin = location.pathname.includes('/admin');
-    if (onAdmin) {
+    const params = new URLSearchParams(location.search);
+    const adminMode = params.get('admin') === 'true';
+    if (adminMode) {
       // 관리자 페이지에서는 차단 화면을 표시하지 않음
       setBlockingActive(false);
       return;
