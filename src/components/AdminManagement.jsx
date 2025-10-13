@@ -9,7 +9,11 @@ import {
   CheckCircle,
   Cancel,
   Save,
-  Warning
+  Warning,
+  Check,
+  Close,
+  ArrowUpward,
+  ArrowDownward
 } from '@mui/icons-material';
 import DataService from '../services/DataService';
 import './AdminManagement.css';
@@ -21,6 +25,10 @@ function AdminManagement({ currentAdmin }) {
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [codeCheckStatus, setCodeCheckStatus] = useState(''); // 'checking', 'available', 'duplicate'
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [hoveredAdmin, setHoveredAdmin] = useState(null);
 
   // 폼 데이터
   const [formData, setFormData] = useState({
@@ -78,7 +86,64 @@ function AdminManagement({ currentAdmin }) {
     });
     setShowAddForm(false);
     setEditingAdmin(null);
+    setCodeCheckStatus('');
   };
+
+  // 관리자 코드 중복 확인
+  const checkCodeDuplicate = async () => {
+    if (!formData.adminCode.trim()) {
+      setCodeCheckStatus('');
+      return;
+    }
+
+    setCodeCheckStatus('checking');
+    try {
+      const exists = await DataService.checkAdminCodeExists(formData.adminCode, editingAdmin?.id);
+      setCodeCheckStatus(exists ? 'duplicate' : 'available');
+    } catch (error) {
+      console.error('코드 중복 확인 실패:', error);
+      setCodeCheckStatus('');
+    }
+  };
+
+  // 정렬 함수
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // 정렬된 관리자 목록
+  const sortedAdmins = [...admins].sort((a, b) => {
+    let aValue = a[sortField];
+    let bValue = b[sortField];
+    
+    if (sortField === 'level') {
+      // 등급 정렬: 최고 관리자 > 일반 관리자
+      const levelOrder = { '최고 관리자': 2, '일반 관리자': 1 };
+      aValue = levelOrder[aValue] || 0;
+      bValue = levelOrder[bValue] || 0;
+    }
+    
+    if (typeof aValue === 'string') {
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
+    }
+    
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  // 필터링된 관리자 목록 (일반 관리자는 일반 관리자만 보기)
+  const filteredAdmins = currentAdmin?.level === '최고 관리자' 
+    ? sortedAdmins 
+    : sortedAdmins.filter(admin => admin.level === '일반 관리자');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -219,16 +284,36 @@ function AdminManagement({ currentAdmin }) {
 
           <div className="form-group">
             <label>관리자 코드</label>
-            <input
-              type="text"
-              name="adminCode"
-              value={formData.adminCode}
-              onChange={handleInputChange}
-              placeholder="관리자 코드를 입력하세요"
-              disabled={editingAdmin} // 수정 시에는 관리자 코드 변경 불가
-            />
+            <div className="code-input-container">
+              <input
+                type="text"
+                name="adminCode"
+                value={formData.adminCode}
+                onChange={handleInputChange}
+                placeholder="관리자 코드를 입력하세요"
+                disabled={editingAdmin || codeCheckStatus === 'available'} // 수정 시 또는 중복 확인 완료 시 비활성화
+              />
+              {!editingAdmin && (
+                <button 
+                  type="button"
+                  className={`check-btn ${codeCheckStatus}`}
+                  onClick={checkCodeDuplicate}
+                  disabled={!formData.adminCode.trim() || codeCheckStatus === 'checking'}
+                >
+                  {codeCheckStatus === 'checking' ? '확인중...' : 
+                   codeCheckStatus === 'available' ? <Check sx={{ fontSize: 16 }} /> :
+                   codeCheckStatus === 'duplicate' ? <Close sx={{ fontSize: 16 }} /> : '중복확인'}
+                </button>
+              )}
+            </div>
             {editingAdmin && (
               <small className="disabled-note">관리자 코드는 수정할 수 없습니다.</small>
+            )}
+            {codeCheckStatus === 'available' && (
+              <small className="success-note">사용 가능한 관리자 코드입니다.</small>
+            )}
+            {codeCheckStatus === 'duplicate' && (
+              <small className="error-note">이미 존재하는 관리자 코드입니다.</small>
             )}
           </div>
 
@@ -284,22 +369,65 @@ function AdminManagement({ currentAdmin }) {
         ) : (
           <div className="admin-table">
             <div className="table-header">
-              <div>이름</div>
-              <div>관리자 코드</div>
-              <div>등급</div>
+              <div 
+                className="sortable-header"
+                onClick={() => handleSort('name')}
+              >
+                이름
+                {sortField === 'name' && (
+                  sortDirection === 'asc' ? <ArrowUpward sx={{ fontSize: 16 }} /> : <ArrowDownward sx={{ fontSize: 16 }} />
+                )}
+              </div>
+              <div 
+                className="sortable-header"
+                onClick={() => handleSort('adminCode')}
+              >
+                관리자 코드
+                {sortField === 'adminCode' && (
+                  sortDirection === 'asc' ? <ArrowUpward sx={{ fontSize: 16 }} /> : <ArrowDownward sx={{ fontSize: 16 }} />
+                )}
+              </div>
+              <div 
+                className="sortable-header"
+                onClick={() => handleSort('level')}
+              >
+                등급
+                {sortField === 'level' && (
+                  sortDirection === 'asc' ? <ArrowUpward sx={{ fontSize: 16 }} /> : <ArrowDownward sx={{ fontSize: 16 }} />
+                )}
+              </div>
               <div>권한</div>
               <div>생성일</div>
               <div>작업</div>
             </div>
-            {admins.map(admin => (
+            {filteredAdmins.map(admin => (
               <div key={admin.id} className="table-row">
-                <div className="admin-name">
+                <div 
+                  className="admin-name"
+                  onMouseEnter={() => setHoveredAdmin(admin)}
+                  onMouseLeave={() => setHoveredAdmin(null)}
+                >
                   <Person sx={{ fontSize: 20, marginRight: 0.5 }} />
                   {admin.name}
+                  {hoveredAdmin?.id === admin.id && (
+                    <div className="permissions-tooltip">
+                      <div className="tooltip-title">권한 목록</div>
+                      <div className="tooltip-permissions">
+                        {admin.permissions?.map(permission => {
+                          const permissionLabel = permissionOptions.find(opt => opt.key === permission)?.label || permission;
+                          return (
+                            <div key={permission} className="tooltip-permission">
+                              {permissionLabel}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="admin-code">
                   <Security sx={{ fontSize: 20, marginRight: 0.5 }} />
-                  {admin.adminCode}
+                  {currentAdmin?.level === '최고 관리자' ? admin.adminCode : '***'}
                 </div>
                 <div className={`admin-level ${admin.level === '최고 관리자' ? 'super' : 'normal'}`}>
                   {admin.level}

@@ -136,10 +136,73 @@
   font-style: italic;
 }
 
+/* 코드 입력 컨테이너 */
+.code-input-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.code-input-container input {
+  flex: 1;
+}
+
+.check-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.check-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.check-btn.checking {
+  background-color: #ff9800;
+  color: white;
+}
+
+.check-btn.available {
+  background-color: #4caf50;
+  color: white;
+}
+
+.check-btn.duplicate {
+  background-color: #f44336;
+  color: white;
+}
+
+.check-btn:not(.checking):not(.available):not(.duplicate) {
+  background-color: #2196f3;
+  color: white;
+}
+
+.success-note {
+  display: block;
+  margin-top: 5px;
+  color: #4caf50;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.error-note {
+  display: block;
+  margin-top: 5px;
+  color: #f44336;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .permissions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
   margin-top: 10px;
 }
 
@@ -234,6 +297,24 @@
   color: #333;
 }
 
+.sortable-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  padding: 15px 10px;
+  border-right: 1px solid #e0e0e0;
+}
+
+.sortable-header:hover {
+  background-color: #e8e8e8;
+}
+
+.sortable-header:last-child {
+  border-right: none;
+}
+
 .table-header > div {
   padding: 15px 10px;
   border-right: 1px solid #e0e0e0;
@@ -273,13 +354,15 @@
   align-items: center;
   justify-content: flex-start;
   font-weight: 600;
+  position: relative;
 }
 
 .admin-level {
   font-weight: 600;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  display: inline-block;
 }
 
 .admin-level.super {
@@ -339,6 +422,41 @@
   color: #4caf50;
   font-weight: 600;
   font-size: 12px;
+}
+
+/* 권한 툴팁 */
+.permissions-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #333;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.tooltip-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 4px;
+}
+
+.tooltip-permissions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip-permission {
+  font-size: 12px;
+  padding: 2px 0;
+  color: #e0e0e0;
 }
 
 /* 반응형 디자인 */
