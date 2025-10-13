@@ -87,6 +87,14 @@ function OutputMain() {
         }
       });
       
+      // 학교 차단 상태 실시간 모니터링
+      const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isBlocked) => {
+        if (isBlocked) {
+          // 차단 상태가 되면 메인 화면으로 이동
+          navigate('/');
+        }
+      });
+      
       // Heartbeat 주기적 실행 (연결 유지) - 1분마다
       const heartbeatInterval = setInterval(async () => {
         try {
@@ -98,6 +106,7 @@ function OutputMain() {
       
       return () => {
         clearInterval(heartbeatInterval);
+        unsubscribeBlocking();
       };
     } else {
       // 세션 정보가 없으면 메인 화면으로 리다이렉트

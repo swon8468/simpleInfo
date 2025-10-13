@@ -806,13 +806,35 @@ class DataService {
       await this.createAdmin({
         name: '시스템 관리자',
         adminCode: 'swon8468',
-        permissions: ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'],
+        permissions: ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'],
         level: '최고 관리자'
       });
       
       console.log('초기 관리자 생성 완료');
     } catch (error) {
       console.error('초기 관리자 생성 실패:', error);
+      throw error;
+    }
+  }
+
+  // 관리자 세션 연결 해제
+  async disconnectAdminSessions(adminCode) {
+    try {
+      // 현재 활성화된 모든 연결을 가져와서 해당 관리자와 관련된 세션 해제
+      const connectionsRef = collection(db, 'connections');
+      const querySnapshot = await getDocs(connectionsRef);
+      
+      const disconnectPromises = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        // 관리자 코드가 일치하는 세션이 있으면 해제
+        if (data.adminCode === adminCode || data.connectedAdminCode === adminCode) {
+          disconnectPromises.push(deleteDoc(doc.ref));
+        }
+      });
+      
+      await Promise.all(disconnectPromises);
+    } catch (error) {
       throw error;
     }
   }

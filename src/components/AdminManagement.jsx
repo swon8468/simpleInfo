@@ -49,7 +49,8 @@ function AdminManagement({ currentAdmin }) {
     { key: 'patchnotes', label: '패치노트 관리' },
     { key: 'schoolBlocking', label: '학교 차단 관리' },
     { key: 'pins', label: 'PIN 관리' },
-    { key: 'adminManagement', label: '관리자 관리' }
+    { key: 'adminManagement', label: '관리자 관리' },
+    { key: 'systemManagement', label: '시스템 관리' }
   ];
 
   useEffect(() => {
@@ -145,12 +146,58 @@ function AdminManagement({ currentAdmin }) {
     ? sortedAdmins 
     : sortedAdmins.filter(admin => admin.level === '일반 관리자');
 
+  // 관리자 수정/삭제 권한 체크
+  const canEditAdmin = (admin) => {
+    // 본인은 수정 가능
+    if (admin.id === currentAdmin?.id) return true;
+    
+    // 최고 관리자는 다른 최고 관리자 수정 불가
+    if (currentAdmin?.level === '최고 관리자' && admin.level === '최고 관리자') {
+      return false;
+    }
+    
+    // 최고 관리자는 일반 관리자 수정 가능
+    if (currentAdmin?.level === '최고 관리자' && admin.level === '일반 관리자') {
+      return true;
+    }
+    
+    // 일반 관리자는 다른 관리자 수정 불가
+    return false;
+  };
+
+  const canDeleteAdmin = (admin) => {
+    // 본인은 삭제 불가
+    if (admin.id === currentAdmin?.id) return false;
+    
+    // 최고 관리자는 다른 최고 관리자 삭제 불가
+    if (currentAdmin?.level === '최고 관리자' && admin.level === '최고 관리자') {
+      return false;
+    }
+    
+    // 최고 관리자는 일반 관리자 삭제 가능
+    if (currentAdmin?.level === '최고 관리자' && admin.level === '일반 관리자') {
+      return true;
+    }
+    
+    // 일반 관리자는 다른 관리자 삭제 불가
+    return false;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: value
+      };
+      
+      // 최고 관리자로 변경 시 모든 권한 자동 부여
+      if (name === 'level' && value === '최고 관리자') {
+        newData.permissions = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'];
+      }
+      
+      return newData;
+    });
   };
 
   const handlePermissionChange = (permissionKey) => {
@@ -169,7 +216,8 @@ function AdminManagement({ currentAdmin }) {
         return;
       }
 
-      if (formData.permissions.length === 0) {
+      // 최고 관리자는 권한 체크 생략
+      if (formData.level !== '최고 관리자' && formData.permissions.length === 0) {
         showMessage('최소 하나의 권한을 선택해주세요.', 'error');
         return;
       }
@@ -201,12 +249,27 @@ function AdminManagement({ currentAdmin }) {
         return;
       }
 
-      if (formData.permissions.length === 0) {
+      // 최고 관리자는 권한 체크 생략
+      if (formData.level !== '최고 관리자' && formData.permissions.length === 0) {
         showMessage('최소 하나의 권한을 선택해주세요.', 'error');
         return;
       }
 
+      // 관리자 정보 변경 전 원본 정보 저장
+      const originalAdmin = editingAdmin;
+      
       await DataService.updateAdmin(editingAdmin.id, formData);
+      
+      // 관리자 정보가 변경된 경우 해당 관리자 연결 해제
+      if (originalAdmin.adminCode !== formData.adminCode || 
+          originalAdmin.name !== formData.name ||
+          JSON.stringify(originalAdmin.permissions) !== JSON.stringify(formData.permissions) ||
+          originalAdmin.level !== formData.level) {
+        
+        // 해당 관리자의 모든 세션 연결 해제
+        await DataService.disconnectAdminSessions(formData.adminCode);
+      }
+      
       showMessage('관리자 정보가 성공적으로 수정되었습니다.');
       resetForm();
       loadAdmins();
@@ -404,7 +467,33 @@ function AdminManagement({ currentAdmin }) {
               <div key={admin.id} className="table-row">
                 <div 
                   className="admin-name"
-                  onMouseEnter={() => setHoveredAdmin(admin)}
+                  onMouseEnter={(e) => {
+                    setHoveredAdmin(admin);
+                    // 툴팁 위치 계산
+                    const rect = e.target.getBoundingClientRect();
+                    const tooltip = document.querySelector('.permissions-tooltip');
+                    if (tooltip) {
+                      const tooltipRect = tooltip.getBoundingClientRect();
+                      const viewportWidth = window.innerWidth;
+                      const viewportHeight = window.innerHeight;
+                      
+                      let left = rect.left;
+                      let top = rect.bottom + 5;
+                      
+                      // 오른쪽으로 넘어가면 왼쪽으로 이동
+                      if (left + tooltipRect.width > viewportWidth) {
+                        left = rect.right - tooltipRect.width;
+                      }
+                      
+                      // 아래로 넘어가면 위쪽으로 이동
+                      if (top + tooltipRect.height > viewportHeight) {
+                        top = rect.top - tooltipRect.height - 5;
+                      }
+                      
+                      tooltip.style.left = `${left}px`;
+                      tooltip.style.top = `${top}px`;
+                    }
+                  }}
                   onMouseLeave={() => setHoveredAdmin(null)}
                 >
                   <Person sx={{ fontSize: 20, marginRight: 0.5 }} />
@@ -439,21 +528,21 @@ function AdminManagement({ currentAdmin }) {
                   {admin.createdAt?.toDate?.()?.toLocaleDateString() || '알 수 없음'}
                 </div>
                 <div className="admin-actions">
-                  {canManageAdmins && admin.id !== currentAdmin?.id && (
-                    <>
-                      <button 
-                        className="edit-btn"
-                        onClick={() => handleEditAdmin(admin)}
-                      >
-                        <Edit sx={{ fontSize: 16 }} />
-                      </button>
-                      <button 
-                        className="delete-btn"
-                        onClick={() => handleDeleteAdmin(admin)}
-                      >
-                        <Delete sx={{ fontSize: 16 }} />
-                      </button>
-                    </>
+                  {canEditAdmin(admin) && (
+                    <button 
+                      className="edit-btn"
+                      onClick={() => handleEditAdmin(admin)}
+                    >
+                      <Edit sx={{ fontSize: 16 }} />
+                    </button>
+                  )}
+                  {canDeleteAdmin(admin) && (
+                    <button 
+                      className="delete-btn"
+                      onClick={() => handleDeleteAdmin(admin)}
+                    >
+                      <Delete sx={{ fontSize: 16 }} />
+                    </button>
                   )}
                   {admin.id === currentAdmin?.id && (
                     <span className="current-admin">현재 관리자</span>

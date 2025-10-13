@@ -32,7 +32,6 @@ function AdminMainNotice() {
       });
       setPinNicknames(nicknames);
     } catch (error) {
-      console.error('PIN 가져오기 실패:', error);
       setActivePins([]);
       setPinNicknames({});
     }
@@ -45,13 +44,11 @@ function AdminMainNotice() {
       const pinsWithNicknames = await ConnectionDB.getActiveConnectionsWithNicknames();
       const notices = [];
       
-      console.log('AdminMainNotice.fetchActiveNotices: PIN 목록 (별명 포함):', pinsWithNicknames);
       
       for (const pin of pinsWithNicknames) {
         const sessions = await ConnectionDB.findOutputSessionByPin(pin.pin);
         if (sessions && sessions.length > 0) {
           const sessionData = sessions[0];
-          console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 세션 데이터:`, sessionData);
           
           if (sessionData.mainNotice && sessionData.mainNotice.isActive) {
             notices.push({
@@ -62,19 +59,14 @@ function AdminMainNotice() {
               createdAt: sessionData.mainNotice.createdAt,
               timestamp: sessionData.mainNotice.timestamp
             });
-            console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 공지사항 추가됨`);
           } else {
-            console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin}에는 활성 공지사항 없음`);
           }
         } else {
-          console.log(`AdminMainNotice.fetchActiveNotices: PIN ${pin.pin} 세션을 찾을 수 없음`);
         }
       }
       
-      console.log('AdminMainNotice.fetchActiveNotices: 최종 공지사항 목록:', notices);
       setActiveNotices(notices);
     } catch (error) {
-      console.error('AdminMainNotice.fetchActiveNotices: 공지사항 목록 가져오기 실패:', error);
       setActiveNotices([]);
     }
   };
@@ -87,11 +79,9 @@ function AdminMainNotice() {
     // 여러 차례 시도로 PIN 목록 확실히 가져오기
     const retryFetchPins = () => {
       setTimeout(() => {
-        console.log('AdminMainNotice: PIN 목록 재시도');
         fetchActivePins();
       }, 2000);
       setTimeout(() => {
-        console.log('AdminMainNotice: PIN 목록 재시도 2차');
         fetchActivePins();
       }, 5000);
     };
@@ -99,7 +89,6 @@ function AdminMainNotice() {
     
     // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
     const unsubscribe = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
-      console.log('AdminMainNotice: 실시간 PIN 변경 감지:', activePins);
       
       // 별명 정보와 함께 PIN 목록 업데이트
       await fetchActivePins();
@@ -110,7 +99,6 @@ function AdminMainNotice() {
     return () => {
       if (unsubscribe && typeof unsubscribe === 'function') {
         unsubscribe();
-        console.log('AdminMainNotice: 실시간 모니터링 구독 해제');
       }
     };
   }, []);
@@ -178,7 +166,6 @@ function AdminMainNotice() {
       
       if (existingNotices.length > 0) {
         // 기존 공지사항을 자동으로 비활성화하고 새로 전송
-        console.log(`기존 공지사항 비활성화 후 새로 전송: ${existingNotices.join(', ')}`);
         for (const pinId of existingNotices) {
           const sessions = await ConnectionDB.findOutputSessionByPin(pinId);
           if (sessions && sessions.length > 0) {
@@ -215,7 +202,6 @@ function AdminMainNotice() {
       refreshAfterSuccess(); // 목록 새로고침
       setShowForm(false); // 폼 닫기
     } catch (error) {
-      console.error('공지사항 전송 실패:', error);
       setMessage('공지사항 전송에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -231,7 +217,6 @@ function AdminMainNotice() {
         setMessage('공지사항이 성공적으로 삭제되었습니다.');
         fetchActiveNotices(); // 목록 새로고침
       } catch (error) {
-        console.error('공지사항 삭제 실패:', error);
         setMessage('공지사항 삭제에 실패했습니다.');
       } finally {
         setLoading(false);
@@ -328,7 +313,6 @@ function AdminMainNotice() {
       handleCloseEditModal();
       refreshAfterSuccess();
     } catch (error) {
-      console.error('공지사항 수정 실패:', error);
       setMessage('공지사항 수정에 실패했습니다.');
     } finally {
       setLoading(false);

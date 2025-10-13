@@ -63,7 +63,6 @@ function AdminPanel() {
             setActiveTab(firstAvailableTab);
           }
         } catch (error) {
-          console.error('관리자 정보 복원 실패:', error);
           sessionStorage.removeItem('adminInfo');
           sessionStorage.removeItem('adminAuthenticated');
         }
@@ -161,7 +160,7 @@ function AdminPanel() {
       const status = await ConnectionDB.getSchoolBlockingStatus();
       setSchoolBlockingStatus(status);
     } catch (error) {
-      console.error('학교 차단 상태 확인 실패:', error);
+      // 학교 차단 상태 확인 실패
     }
   };
 
@@ -343,7 +342,6 @@ function AdminPanel() {
       showMessage('학사일정이 추가되었습니다.');
       setScheduleForm({ ...scheduleForm, event: '', target: [] });
     } catch (error) {
-      console.error('학사일정 추가 실패:', error);
       showMessage('학사일정 추가에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -360,7 +358,6 @@ function AdminPanel() {
       await DataService.updateMealData(mealForm.date, lunchItems, dinnerItems);
       showMessage('급식 정보가 업데이트되었습니다.');
     } catch (error) {
-      console.error('급식 정보 업데이트 실패:', error);
       showMessage('급식 정보 업데이트에 실패했습니다.');
     } finally {
       setLoading(false);
@@ -827,7 +824,6 @@ function AdminPanel() {
                     className="realtime-indicator"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
                     onClick={() => {
-                      console.log('새로고침 버튼 클릭됨');
                       fetchActivePins();
                       setActiveTab('pins');
                       setPinMessage('새로고침 실행 중...');
