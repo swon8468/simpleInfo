@@ -9,7 +9,6 @@ import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
-import AdminPhotoGallery from './AdminPhotoGallery';
 import { Lightbulb, PushPin, Warning, Block, CheckCircle } from '@mui/icons-material';
 import './AdminPanel.css';
 
@@ -26,8 +25,6 @@ function AdminPanel() {
   const [nicknameValue, setNicknameValue] = useState('');
   const [campusLayoutImage, setCampusLayoutImage] = useState(null);
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
-  const [photoGallery, setPhotoGallery] = useState([]);
-  const [photoGalleryLoading, setPhotoGalleryLoading] = useState(false);
   const [schoolBlockingStatus, setSchoolBlockingStatus] = useState(false);
   const navigate = useNavigate();
 
@@ -57,8 +54,6 @@ function AdminPanel() {
       // 교실 배치 이미지 로드
       loadCampusLayoutImage();
       
-      // 사진관 데이터 로드
-      loadPhotoGallery();
       
       // 학교 차단 상태 확인
       checkSchoolBlockingStatus();
@@ -116,15 +111,6 @@ function AdminPanel() {
     }
   };
 
-  // 사진관 데이터 로드
-  const loadPhotoGallery = async () => {
-    try {
-      const photos = await DataService.getPhotoGallery();
-      setPhotoGallery(photos);
-    } catch (error) {
-      console.error('사진관 데이터 로드 실패:', error);
-    }
-  };
 
   // 학교 차단 상태 확인
   const checkSchoolBlockingStatus = async () => {
@@ -409,35 +395,6 @@ function AdminPanel() {
     }
   };
 
-  // 사진관 사진 추가
-  const handlePhotoGalleryAdd = async (photoData) => {
-    setPhotoGalleryLoading(true);
-    try {
-      await DataService.addPhotoGallery(photoData);
-      showMessage('사진이 추가되었습니다.');
-      await loadPhotoGallery(); // 사진 목록 새로고침
-    } catch (error) {
-      showMessage('사진 추가에 실패했습니다.');
-    } finally {
-      setPhotoGalleryLoading(false);
-    }
-  };
-
-  // 사진관 사진 삭제
-  const handlePhotoGalleryDelete = async (photoId) => {
-    if (window.confirm('정말로 이 사진을 삭제하시겠습니까?')) {
-      setPhotoGalleryLoading(true);
-      try {
-        await DataService.deletePhotoGallery(photoId);
-        showMessage('사진이 삭제되었습니다.');
-        await loadPhotoGallery(); // 사진 목록 새로고침
-      } catch (error) {
-        showMessage('사진 삭제에 실패했습니다.');
-      } finally {
-        setPhotoGalleryLoading(false);
-      }
-    }
-  };
 
   return (
     <>
@@ -522,12 +479,6 @@ function AdminPanel() {
               onClick={() => setActiveTab('schoolBlocking')}
             >
               학교 차단
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'photoGallery' ? 'active' : ''}`}
-              onClick={() => setActiveTab('photoGallery')}
-            >
-              우리 학교 사진관
             </button>
             <button 
               className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
@@ -704,16 +655,6 @@ function AdminPanel() {
               </div>
             )}
 
-            {activeTab === 'photoGallery' && (
-              <div className="form-section">
-                <AdminPhotoGallery 
-                  photos={photoGallery}
-                  onAdd={handlePhotoGalleryAdd}
-                  onDelete={handlePhotoGalleryDelete}
-                  loading={photoGalleryLoading}
-                />
-              </div>
-            )}
 
             {activeTab === 'campusLayout' && (
               <div className="form-section">
