@@ -959,3 +959,104 @@
   color: #666;
   margin: 0;
 }
+
+/* TTS 컨트롤 스타일 */
+.announcement-header-with-tts {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.announcement-header-with-tts h3 {
+  margin: 0;
+  flex: 1;
+}
+
+.tts-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.tts-btn {
+  background: #2196F3;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tts-btn:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.tts-btn:active {
+  transform: translateY(0);
+}
+
+.play-btn {
+  background: #4CAF50;
+}
+
+.play-btn:hover {
+  background: #45a049;
+}
+
+.pause-btn {
+  background: #FF9800;
+}
+
+.pause-btn:hover {
+  background: #f57c00;
+}
+
+.resume-btn {
+  background: #4CAF50;
+}
+
+.resume-btn:hover {
+  background: #45a049;
+}
+
+.stop-btn {
+  background: #f44336;
+}
+
+.stop-btn:hover {
+  background: #da190b;
+}
+
+.tts-status {
+  color: #2196F3;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .announcement-header-with-tts {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .tts-controls {
+    align-self: flex-end;
+  }
+  
+  .tts-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+}

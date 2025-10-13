@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
+import TTSService from '../services/TTSService';
 import { School, Campaign } from '@mui/icons-material';
 import './OutputMain.css';
 
@@ -613,6 +614,11 @@ function OutputMain() {
   const AnnouncementDisplay = ({ announcements, controlData }) => {
     const [announcementData, setAnnouncementData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [ttsStatus, setTtsStatus] = useState({
+      isPlaying: false,
+      isPaused: false,
+      isSupported: TTSService.isSupported()
+    });
 
     useEffect(() => {
       const loadAnnouncementData = async () => {
@@ -636,6 +642,33 @@ function OutputMain() {
 
       loadAnnouncementData();
     }, [controlData?.announcementIndex]);
+
+    // 공지사항이 변경될 때마다 TTS로 내용 읽기
+    useEffect(() => {
+      if (announcementData && controlData?.announcementIndex !== undefined) {
+        const currentIndex = controlData.announcementIndex || 0;
+        const currentAnnouncement = announcementData[currentIndex] || announcementData[0];
+        
+        if (currentAnnouncement && currentAnnouncement.content) {
+          // 약간의 지연 후 TTS 시작 (화면 렌더링 완료 후)
+          const timer = setTimeout(() => {
+            TTSService.speakAnnouncementContent(currentAnnouncement);
+            setTtsStatus(TTSService.getStatus());
+          }, 1000);
+
+          return () => clearTimeout(timer);
+        }
+      }
+    }, [announcementData, controlData?.announcementIndex]);
+
+    // TTS 상태 업데이트를 위한 주기적 체크
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setTtsStatus(TTSService.getStatus());
+      }, 500);
+
+      return () => clearInterval(interval);
+    }, []);
     
     const currentIndex = controlData?.announcementIndex || 0;
     const currentAnnouncement = announcementData?.[currentIndex] || announcementData?.[0];
@@ -679,11 +712,68 @@ function OutputMain() {
           ))}
         </div>
         <div className="announcement-content">
-          <h3>{currentAnnouncement.title}</h3>
+          <div className="announcement-header-with-tts">
+            <h3>{currentAnnouncement.title}</h3>
+            {ttsStatus.isSupported && (
+              <div className="tts-controls">
+                {ttsStatus.isPlaying ? (
+                  ttsStatus.isPaused ? (
+                    <button 
+                      className="tts-btn resume-btn"
+                      onClick={() => {
+                        TTSService.resume();
+                        setTtsStatus(TTSService.getStatus());
+                      }}
+                      title="음성 재개"
+                    >
+                      ▶️
+                    </button>
+                  ) : (
+                    <button 
+                      className="tts-btn pause-btn"
+                      onClick={() => {
+                        TTSService.pause();
+                        setTtsStatus(TTSService.getStatus());
+                      }}
+                      title="음성 일시정지"
+                    >
+                      ⏸️
+                    </button>
+                  )
+                ) : (
+                  <button 
+                    className="tts-btn play-btn"
+                    onClick={() => {
+                      TTSService.speakAnnouncementContent(currentAnnouncement);
+                      setTtsStatus(TTSService.getStatus());
+                    }}
+                    title="음성으로 읽기"
+                  >
+                    🔊
+                  </button>
+                )}
+                <button 
+                  className="tts-btn stop-btn"
+                  onClick={() => {
+                    TTSService.stop();
+                    setTtsStatus(TTSService.getStatus());
+                  }}
+                  title="음성 중지"
+                >
+                  ⏹️
+                </button>
+              </div>
+            )}
+          </div>
           <p style={{ whiteSpace: 'pre-line' }}>{currentAnnouncement.content}</p>
           <div className="announcement-meta">
             <span>등록일: {currentAnnouncement.createdAt?.toDate?.()?.toLocaleDateString() || '2024.10.01'}</span>
             <span>조회수: {currentAnnouncement.views || 0}</span>
+            {ttsStatus.isPlaying && (
+              <span className="tts-status">
+                {ttsStatus.isPaused ? '음성 일시정지 중' : '음성 재생 중'}
+              </span>
+            )}
           </div>
         </div>
       </div>
