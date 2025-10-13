@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DataService from '../services/DataService';
 import ConnectionDB from '../services/ConnectionDB';
+import SystemMonitoringService from '../services/SystemMonitoringService';
 import AdminAuth from './AdminAuth';
 import AdminAnnouncementTable from './AdminAnnouncementTable';
 import AdminScheduleCalendar from './AdminScheduleCalendar';
@@ -9,7 +10,7 @@ import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
-import { Lightbulb, PushPin, Warning, Block, CheckCircle } from '@mui/icons-material';
+import { Lightbulb, PushPin, Warning, Block, CheckCircle, Monitor, Activity } from '@mui/icons-material';
 import './AdminPanel.css';
 
 function AdminPanel() {
@@ -26,6 +27,14 @@ function AdminPanel() {
   const [campusLayoutImage, setCampusLayoutImage] = useState(null);
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
   const [schoolBlockingStatus, setSchoolBlockingStatus] = useState(false);
+  const [systemStatus, setSystemStatus] = useState({
+    isOnline: false,
+    isRecentlyActive: false,
+    statusText: '확인 중...',
+    statusColor: '#666',
+    activeConnections: 0,
+    lastActivity: null
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +67,9 @@ function AdminPanel() {
       // 학교 차단 상태 확인
       checkSchoolBlockingStatus();
       
+      // 시스템 모니터링 시작
+      SystemMonitoringService.startMonitoring();
+      
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
       const unsubscribePins = ConnectionDB.subscribeToActiveConnections(async (activePins) => {
         if (activePins.length > 0) {
@@ -77,6 +89,11 @@ function AdminPanel() {
       const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
         setSchoolBlockingStatus(isActive);
       });
+
+      // 실시간으로 시스템 상태 모니터링
+      const unsubscribeSystem = SystemMonitoringService.subscribe((status) => {
+        setSystemStatus(status);
+      });
       
       return () => {
         if (unsubscribePins && typeof unsubscribePins === 'function') {
@@ -84,6 +101,9 @@ function AdminPanel() {
         }
         if (unsubscribeBlocking && typeof unsubscribeBlocking === 'function') {
           unsubscribeBlocking();
+        }
+        if (unsubscribeSystem && typeof unsubscribeSystem === 'function') {
+          unsubscribeSystem();
         }
       };
     }
@@ -417,6 +437,19 @@ function AdminPanel() {
                     정상 운영 중
                   </span>
                 )}
+              </div>
+              <div className="system-status">
+                <span 
+                  className="system-status-indicator" 
+                  style={{ color: systemStatus.statusColor }}
+                >
+                  <Monitor sx={{ fontSize: 20, marginRight: 0.5 }} />
+                  {systemStatus.statusText}
+                </span>
+                <span className="system-details">
+                  <Activity sx={{ fontSize: 16, marginRight: 0.5 }} />
+                  연결: {systemStatus.activeConnections}개
+                </span>
               </div>
             </div>
             <div className="header-buttons">
