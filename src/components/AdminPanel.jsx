@@ -57,7 +57,7 @@ function AdminPanel() {
           setCurrentAdmin(adminInfo);
           
           // 권한이 있는 첫 번째 탭으로 이동
-          const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'];
+          const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'];
           const firstAvailableTab = availableTabs.find(tab => adminInfo.permissions?.includes(tab));
           if (firstAvailableTab) {
             setActiveTab(firstAvailableTab);
@@ -68,29 +68,44 @@ function AdminPanel() {
         }
       }
       
-      // 즉시 PIN 목록 가져오기
-      fetchActivePins();
+      // 모든 초기 데이터를 즉시 로드
+      const initializeData = async () => {
+        try {
+          // 학교 차단 상태 확인 (즉시)
+          await checkSchoolBlockingStatus();
+          
+          // 시스템 모니터링 시작 (즉시)
+          SystemMonitoringService.startMonitoring();
+          
+          // 시스템 상태 즉시 체크
+          await SystemMonitoringService.checkSystemHealth();
+          const initialSystemStatus = await SystemMonitoringService.getCurrentStatus();
+          if (initialSystemStatus) {
+            setSystemStatus(initialSystemStatus);
+          }
+          
+          // PIN 목록 가져오기 (즉시)
+          await fetchActivePins();
+          
+          // 알레르기 정보 로드 (즉시)
+          await loadAllergyData();
+          
+          // 교실 배치 이미지 로드 (즉시)
+          await loadCampusLayoutImage();
+          
+          // 여러 번 시도로 접속 전 연결된 PIN 포함
+          const retryDelays = [1000, 3000, 5000, 8000];
+          retryDelays.forEach((delay, index) => {
+            setTimeout(() => {
+              fetchActivePins();
+            }, delay);
+          });
+        } catch (error) {
+          // 초기화 실패 시에도 기본 기능은 유지
+        }
+      };
       
-      // 여러 번 시도로 접속 전 연결된 PIN 포함
-      const retryDelays = [1000, 3000, 5000, 8000];
-      retryDelays.forEach((delay, index) => {
-        setTimeout(() => {
-          fetchActivePins();
-        }, delay);
-      });
-      
-      // 알레르기 정보 로드
-      loadAllergyData();
-      
-      // 교실 배치 이미지 로드
-      loadCampusLayoutImage();
-      
-      
-      // 학교 차단 상태 확인
-      checkSchoolBlockingStatus();
-      
-      // 시스템 모니터링 시작
-      SystemMonitoringService.startMonitoring();
+      initializeData();
       
       // 실시간으로 활성화된 PIN 상태 모니터링 (스냅샷 리스너)
       const unsubscribePins = ConnectionDB.subscribeToActiveConnections(async (activePins) => {

@@ -194,6 +194,11 @@ class SystemMonitoringService {
     return '#ff9800'; // 주황색
   }
 
+  // 현재 상태 가져오기
+  getCurrentStatus() {
+    return Promise.resolve(this.getSystemStatus());
+  }
+
   // 정리
   cleanup() {
     this.stopMonitoring();
