@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Build, CheckCircle, Logout } from '@mui/icons-material';
+import { Build, CheckCircle, Logout, Refresh } from '@mui/icons-material';
 import AdminAuth from './AdminAuth';
 
 function AdminPanel() {
@@ -89,7 +89,7 @@ function AdminPanel() {
             cursor: 'pointer'
           }}
         >
-          🔄 새로고침
+          <Refresh sx={{ fontSize: 16, marginRight: 0.5 }} /> 새로고침
         </button>
       </div>
     </div>

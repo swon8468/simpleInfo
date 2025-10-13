@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
 import NotificationService from '../services/NotificationService';
-import { School, Block, CheckCircle, Assignment, Warning } from '@mui/icons-material';
+import { School, Block, CheckCircle, Assignment, Warning, Block as BlockIcon, Refresh } from '@mui/icons-material';
 import './AdminSchoolBlocking.css';
 
 function AdminSchoolBlocking() {
@@ -114,7 +114,7 @@ function AdminSchoolBlocking() {
               onClick={handleEnableBlocking}
               disabled={loading}
             >
-              <span className="btn-icon">🚫</span>
+              <span className="btn-icon"><BlockIcon sx={{ fontSize: 20 }} /></span>
               <span className="btn-text">차단 시작</span>
             </button>
           ) : (
@@ -167,7 +167,7 @@ function AdminSchoolBlocking() {
           onClick={checkBlockingStatus}
           disabled={loading}
         >
-          <span className="btn-icon">🔄</span>
+          <span className="btn-icon"><Refresh sx={{ fontSize: 20 }} /></span>
           <span className="btn-text">상태 새로고침</span>
         </button>
       </div>
