@@ -394,18 +394,35 @@ function AdminManagement({ currentAdmin }) {
 
           <div className="form-group">
             <label>권한 설정</label>
-            <div className="permissions-grid">
-              {permissionOptions.map(option => (
-                <label key={option.key} className="permission-item">
-                  <input
-                    type="checkbox"
-                    checked={formData.permissions.includes(option.key)}
-                    onChange={() => handlePermissionChange(option.key)}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
+            {formData.level === '최고 관리자' ? (
+              <div className="permissions-disabled">
+                <div className="disabled-message">
+                  <CheckCircle sx={{ fontSize: 20, marginRight: 0.5, color: '#4caf50' }} />
+                  최고 관리자는 모든 권한이 자동으로 부여됩니다.
+                </div>
+                <div className="permissions-list">
+                  {permissionOptions.map(option => (
+                    <div key={option.key} className="permission-item-disabled">
+                      <CheckCircle sx={{ fontSize: 16, marginRight: 0.5, color: '#4caf50' }} />
+                      <span>{option.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="permissions-grid">
+                {permissionOptions.map(option => (
+                  <label key={option.key} className="permission-item">
+                    <input
+                      type="checkbox"
+                      checked={formData.permissions.includes(option.key)}
+                      onChange={() => handlePermissionChange(option.key)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-actions">

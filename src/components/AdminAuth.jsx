@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Visibility, VisibilityOff, Warning, Security } from '@mui/icons-material';
 import DataService from '../services/DataService';
+import ActivityLogService from '../services/ActivityLogService';
 import './AdminAuth.css';
 
 function AdminAuth({ onSuccess }) {
@@ -51,6 +52,10 @@ function AdminAuth({ onSuccess }) {
           permissions: admin.permissions,
           level: admin.level
         }));
+        
+        // 로그인 로그 기록
+        await ActivityLogService.logAdminLogin(admin);
+        
         onSuccess(admin);
       } else {
         setError('잘못된 관리자 코드이거나 비활성화된 계정입니다.');

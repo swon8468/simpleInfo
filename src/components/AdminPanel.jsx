@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataService from '../services/DataService';
 import ConnectionDB from '../services/ConnectionDB';
 import SystemMonitoringService from '../services/SystemMonitoringService';
+import ActivityLogService from '../services/ActivityLogService';
 import AdminAuth from './AdminAuth';
 import AdminAnnouncementTable from './AdminAnnouncementTable';
 import AdminScheduleCalendar from './AdminScheduleCalendar';
@@ -272,6 +273,11 @@ function AdminPanel() {
   };
 
   const handleLogout = () => {
+    // 로그아웃 로그 기록
+    if (currentAdmin) {
+      ActivityLogService.logAdminLogout(currentAdmin);
+    }
+    
     sessionStorage.removeItem('adminAuthenticated');
     sessionStorage.removeItem('adminInfo');
     setIsAuthenticated(false);

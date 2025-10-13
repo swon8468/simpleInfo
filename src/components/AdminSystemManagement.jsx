@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, doc, getDoc, setDoc, addDoc, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { Settings, Security, History, Warning, CheckCircle, Error } from '@mui/icons-material';
+import { Settings, Security, History, Warning, CheckCircle, Error, Refresh, FilterList, Search } from '@mui/icons-material';
+import ActivityLogService from '../services/ActivityLogService';
 import './AdminSystemManagement.css';
 
 function AdminSystemManagement({ currentAdmin }) {
@@ -10,11 +11,31 @@ function AdminSystemManagement({ currentAdmin }) {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
   const [activityLogs, setActivityLogs] = useState([]);
+  const [filteredLogs, setFilteredLogs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [levelFilter, setLevelFilter] = useState('all');
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsCount, setLogsCount] = useState(100);
 
   useEffect(() => {
     loadPinCode();
     loadActivityLogs();
-  }, []);
+    
+    // 실시간 로그 구독
+    const unsubscribe = ActivityLogService.subscribeToActivityLogs((logs) => {
+      setActivityLogs(logs);
+      applyFilters(logs);
+    }, logsCount);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [logsCount]);
+
+  // 필터 적용
+  useEffect(() => {
+    applyFilters(activityLogs);
+  }, [searchTerm, levelFilter, activityLogs]);
 
   const loadPinCode = async () => {
     try {
@@ -29,37 +50,47 @@ function AdminSystemManagement({ currentAdmin }) {
 
   const loadActivityLogs = async () => {
     try {
-      const logsRef = collection(db, 'systemLogs');
-      const q = query(logsRef, orderBy('timestamp', 'desc'), limit(50));
-      const querySnapshot = await getDocs(q);
-      
-      const logs = [];
-      querySnapshot.forEach((doc) => {
-        logs.push({ id: doc.id, ...doc.data() });
-      });
-      
+      setLogsLoading(true);
+      const logs = await ActivityLogService.getActivityLogs(logsCount);
       setActivityLogs(logs);
+      applyFilters(logs);
     } catch (error) {
       showMessage('활동 로그 로드 실패', 'error');
+    } finally {
+      setLogsLoading(false);
     }
+  };
+
+  // 필터 적용 함수
+  const applyFilters = (logs) => {
+    let filtered = [...logs];
+
+    // 검색어 필터
+    if (searchTerm) {
+      filtered = filtered.filter(log => 
+        log.action.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        log.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        log.adminName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        log.adminId.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // 레벨 필터
+    if (levelFilter !== 'all') {
+      filtered = filtered.filter(log => log.level === levelFilter);
+    }
+
+    setFilteredLogs(filtered);
+  };
+
+  // 로그 새로고침
+  const refreshLogs = () => {
+    loadActivityLogs();
   };
 
   const logActivity = async (action, level, details) => {
     try {
-      const logData = {
-        timestamp: new Date(),
-        adminId: currentAdmin?.adminCode || 'unknown',
-        adminName: currentAdmin?.name || 'unknown',
-        action,
-        level, // 'major', 'medium', 'minor'
-        details,
-        ip: 'admin-panel' // 실제 환경에서는 IP 주소를 가져와야 함
-      };
-
-      await addDoc(collection(db, 'systemLogs'), logData);
-      
-      // 로그 목록 새로고침
-      loadActivityLogs();
+      await ActivityLogService.logActivity(action, level, details, currentAdmin);
     } catch (error) {
       console.error('활동 로그 작성 실패:', error);
     }
@@ -204,35 +235,124 @@ function AdminSystemManagement({ currentAdmin }) {
 
         {/* 활동 로그 */}
         <div className="activity-logs-section">
-          <h3>시스템 활동 로그</h3>
+          <div className="logs-header">
+            <h3>시스템 활동 로그</h3>
+            <div className="logs-controls">
+              <div className="search-container">
+                <Search sx={{ fontSize: 20, marginRight: 0.5 }} />
+                <input
+                  type="text"
+                  placeholder="검색..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              <select
+                value={levelFilter}
+                onChange={(e) => setLevelFilter(e.target.value)}
+                className="level-filter"
+              >
+                <option value="all">모든 레벨</option>
+                <option value="major">대</option>
+                <option value="medium">중</option>
+                <option value="minor">소</option>
+              </select>
+              <select
+                value={logsCount}
+                onChange={(e) => setLogsCount(Number(e.target.value))}
+                className="logs-count-select"
+              >
+                <option value={50}>50개</option>
+                <option value={100}>100개</option>
+                <option value={200}>200개</option>
+                <option value={500}>500개</option>
+              </select>
+              <button 
+                className="refresh-btn"
+                onClick={refreshLogs}
+                disabled={logsLoading}
+              >
+                <Refresh sx={{ fontSize: 20 }} />
+                새로고침
+              </button>
+            </div>
+          </div>
+          
+          <div className="logs-stats">
+            <div className="stat-item">
+              <span className="stat-label">전체 로그:</span>
+              <span className="stat-value">{activityLogs.length}개</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">필터된 로그:</span>
+              <span className="stat-value">{filteredLogs.length}개</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">대:</span>
+              <span className="stat-value">{activityLogs.filter(log => log.level === 'major').length}개</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">중:</span>
+              <span className="stat-value">{activityLogs.filter(log => log.level === 'medium').length}개</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">소:</span>
+              <span className="stat-value">{activityLogs.filter(log => log.level === 'minor').length}개</span>
+            </div>
+          </div>
+
           <div className="logs-container">
-            {activityLogs.length === 0 ? (
+            {logsLoading ? (
+              <div className="loading-logs">
+                <Refresh sx={{ fontSize: 48, color: '#ccc', animation: 'spin 1s linear infinite' }} />
+                <p>로그를 불러오는 중...</p>
+              </div>
+            ) : filteredLogs.length === 0 ? (
               <div className="no-logs">
                 <History sx={{ fontSize: 48, color: '#ccc' }} />
                 <p>활동 로그가 없습니다</p>
               </div>
             ) : (
-              <div className="logs-list">
-                {activityLogs.map((log) => (
-                  <div key={log.id} className={`log-item ${log.level}`}>
-                    <div className="log-header">
-                      <div className="log-level">
-                        {getLevelIcon(log.level)}
-                        <span className="level-text">{getLevelText(log.level)}</span>
-                      </div>
-                      <div className="log-timestamp">
-                        {formatTimestamp(log.timestamp)}
-                      </div>
-                    </div>
-                    <div className="log-content">
-                      <div className="log-action">{log.action}</div>
-                      <div className="log-details">{log.details}</div>
-                      <div className="log-admin">
-                        관리자: {log.adminName} ({log.adminId})
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="logs-table-container">
+                <table className="logs-table">
+                  <thead>
+                    <tr>
+                      <th>시간</th>
+                      <th>레벨</th>
+                      <th>작업</th>
+                      <th>상세 내용</th>
+                      <th>관리자</th>
+                      <th>IP</th>
+                      <th>세션</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredLogs.map((log) => (
+                      <tr key={log.id} className={`log-row ${log.level}`}>
+                        <td className="log-timestamp">
+                          {formatTimestamp(log.timestamp)}
+                        </td>
+                        <td className="log-level-cell">
+                          <div className="log-level">
+                            {getLevelIcon(log.level)}
+                            <span className="level-text">{getLevelText(log.level)}</span>
+                          </div>
+                        </td>
+                        <td className="log-action">{log.action}</td>
+                        <td className="log-details">{log.details}</td>
+                        <td className="log-admin">
+                          <div className="admin-info">
+                            <div className="admin-name">{log.adminName}</div>
+                            <div className="admin-code">({log.adminId})</div>
+                          </div>
+                        </td>
+                        <td className="log-ip">{log.ip || 'N/A'}</td>
+                        <td className="log-session">{log.sessionId ? log.sessionId.substring(0, 8) + '...' : 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
