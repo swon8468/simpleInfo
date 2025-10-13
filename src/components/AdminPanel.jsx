@@ -48,6 +48,26 @@ function AdminPanel() {
     if (authStatus === 'true') {
       setIsAuthenticated(true);
       
+      // 세션에서 관리자 정보 복원
+      const savedAdminInfo = sessionStorage.getItem('adminInfo');
+      if (savedAdminInfo) {
+        try {
+          const adminInfo = JSON.parse(savedAdminInfo);
+          setCurrentAdmin(adminInfo);
+          
+          // 권한이 있는 첫 번째 탭으로 이동
+          const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'];
+          const firstAvailableTab = availableTabs.find(tab => adminInfo.permissions?.includes(tab));
+          if (firstAvailableTab) {
+            setActiveTab(firstAvailableTab);
+          }
+        } catch (error) {
+          console.error('관리자 정보 복원 실패:', error);
+          sessionStorage.removeItem('adminInfo');
+          sessionStorage.removeItem('adminAuthenticated');
+        }
+      }
+      
       // 즉시 PIN 목록 가져오기
       fetchActivePins();
       
