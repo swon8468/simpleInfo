@@ -692,6 +692,131 @@ class DataService {
     }
   }
 
+  // 관리자 관리
+  async getAdmins() {
+    try {
+      const adminsRef = collection(db, 'admins');
+      const q = query(adminsRef, orderBy('createdAt', 'desc'));
+      const adminsSnapshot = await getDocs(q);
+      return adminsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error('관리자 목록 가져오기 실패:', error);
+      throw error;
+    }
+  }
+
+  async getAdminByCode(adminCode) {
+    try {
+      const adminsRef = collection(db, 'admins');
+      const q = query(adminsRef, where('adminCode', '==', adminCode));
+      const querySnapshot = await getDocs(q);
+      
+      if (querySnapshot.empty) {
+        return null;
+      }
+      
+      const doc = querySnapshot.docs[0];
+      return { id: doc.id, ...doc.data() };
+    } catch (error) {
+      console.error('관리자 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  async createAdmin(adminData) {
+    try {
+      // 관리자 코드 중복 확인
+      const existingAdmin = await this.getAdminByCode(adminData.adminCode);
+      if (existingAdmin) {
+        throw new Error('이미 존재하는 관리자 코드입니다.');
+      }
+
+      const adminsRef = collection(db, 'admins');
+      const docRef = await addDoc(adminsRef, {
+        name: adminData.name,
+        adminCode: adminData.adminCode,
+        permissions: adminData.permissions || [],
+        level: adminData.level || '일반 관리자',
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        isActive: true
+      });
+      
+      return docRef.id;
+    } catch (error) {
+      console.error('관리자 생성 실패:', error);
+      throw error;
+    }
+  }
+
+  async updateAdmin(adminId, adminData) {
+    try {
+      const adminRef = doc(db, 'admins', adminId);
+      
+      // 관리자 코드는 수정 불가
+      const updateData = {
+        name: adminData.name,
+        permissions: adminData.permissions || [],
+        level: adminData.level || '일반 관리자',
+        updatedAt: serverTimestamp()
+      };
+      
+      await updateDoc(adminRef, updateData);
+    } catch (error) {
+      console.error('관리자 수정 실패:', error);
+      throw error;
+    }
+  }
+
+  async deleteAdmin(adminId) {
+    try {
+      const adminRef = doc(db, 'admins', adminId);
+      await deleteDoc(adminRef);
+    } catch (error) {
+      console.error('관리자 삭제 실패:', error);
+      throw error;
+    }
+  }
+
+  async checkAdminCodeExists(adminCode, excludeId = null) {
+    try {
+      const adminsRef = collection(db, 'admins');
+      const q = query(adminsRef, where('adminCode', '==', adminCode));
+      const querySnapshot = await getDocs(q);
+      
+      if (excludeId) {
+        return querySnapshot.docs.some(doc => doc.id !== excludeId);
+      }
+      
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('관리자 코드 중복 확인 실패:', error);
+      throw error;
+    }
+  }
+
+  // 초기 관리자 생성 (최고 관리자)
+  async createInitialAdmin() {
+    try {
+      const existingAdmins = await this.getAdmins();
+      if (existingAdmins.length > 0) {
+        return; // 이미 관리자가 있으면 생성하지 않음
+      }
+
+      await this.createAdmin({
+        name: '시스템 관리자',
+        adminCode: 'swon8468',
+        permissions: ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'],
+        level: '최고 관리자'
+      });
+      
+      console.log('초기 관리자 생성 완료');
+    } catch (error) {
+      console.error('초기 관리자 생성 실패:', error);
+      throw error;
+    }
+  }
+
 
 }
 

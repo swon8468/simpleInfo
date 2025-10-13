@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Visibility, VisibilityOff, Warning, Security } from '@mui/icons-material';
+import DataService from '../services/DataService';
 import './AdminAuth.css';
 
 function AdminAuth({ onSuccess }) {
@@ -10,29 +11,53 @@ function AdminAuth({ onSuccess }) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const ADMIN_PASSWORD = 'swon8468';
-
   useEffect(() => {
     // 관리자 인증 화면 body 색 설정
     document.body.style.background = '#f5f5f5';
+    
+    // 초기 관리자 생성 (최고 관리자)
+    initializeAdmin();
     
     return () => {
       document.body.style.background = '#f5f5f5';
     };
   }, []);
 
+  // 초기 관리자 생성
+  const initializeAdmin = async () => {
+    try {
+      await DataService.createInitialAdmin();
+    } catch (error) {
+      console.error('초기 관리자 생성 실패:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    // 비밀번호 확인
-    if (password === ADMIN_PASSWORD) {
-      // 세션에 인증 상태 저장
-      sessionStorage.setItem('adminAuthenticated', 'true');
-      onSuccess();
-    } else {
-      setError('잘못된 비밀번호입니다.');
+    try {
+      // DB에서 관리자 조회
+      const admin = await DataService.getAdminByCode(password);
+      
+      if (admin && admin.isActive) {
+        // 세션에 관리자 정보 저장
+        sessionStorage.setItem('adminAuthenticated', 'true');
+        sessionStorage.setItem('adminInfo', JSON.stringify({
+          id: admin.id,
+          name: admin.name,
+          adminCode: admin.adminCode,
+          permissions: admin.permissions,
+          level: admin.level
+        }));
+        onSuccess(admin);
+      } else {
+        setError('잘못된 관리자 코드이거나 비활성화된 계정입니다.');
+      }
+    } catch (error) {
+      console.error('관리자 인증 실패:', error);
+      setError('인증 중 오류가 발생했습니다.');
     }
     
     setIsLoading(false);

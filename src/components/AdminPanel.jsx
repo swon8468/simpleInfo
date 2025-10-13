@@ -10,12 +10,14 @@ import AdminMealCalendar from './AdminMealCalendar';
 import AdminMainNotice from './AdminMainNotice';
 import AdminPatchnotes from './AdminPatchnotes';
 import AdminSchoolBlocking from './AdminSchoolBlocking';
-import { Lightbulb, PushPin, Warning, Block, CheckCircle, Monitor, Activity } from '@mui/icons-material';
+import AdminManagement from './AdminManagement';
+import { Lightbulb, PushPin, Warning, Block, CheckCircle, Monitor, Link } from '@mui/icons-material';
 import './AdminPanel.css';
 
 function AdminPanel() {
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentAdmin, setCurrentAdmin] = useState(null);
   const [activeTab, setActiveTab] = useState('schedule');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -192,13 +194,30 @@ function AdminPanel() {
     }
   };
 
-  const handleAuthSuccess = () => {
+  // 권한 확인 함수
+  const hasPermission = (permission) => {
+    if (!currentAdmin) return false;
+    return currentAdmin.permissions?.includes(permission) || false;
+  };
+
+  // 인증 성공 핸들러
+  const handleAuthSuccess = (admin) => {
     setIsAuthenticated(true);
+    setCurrentAdmin(admin);
+    
+    // 권한이 있는 첫 번째 탭으로 이동
+    const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'];
+    const firstAvailableTab = availableTabs.find(tab => hasPermission(tab));
+    if (firstAvailableTab) {
+      setActiveTab(firstAvailableTab);
+    }
   };
 
   const handleLogout = () => {
     sessionStorage.removeItem('adminAuthenticated');
+    sessionStorage.removeItem('adminInfo');
     setIsAuthenticated(false);
+    setCurrentAdmin(null);
   };
 
   const handleBackToMain = () => {
@@ -447,8 +466,8 @@ function AdminPanel() {
                   {systemStatus.statusText}
                 </span>
                 <span className="system-details">
-                  <Activity sx={{ fontSize: 16, marginRight: 0.5 }} />
-                  연결: {systemStatus.activeConnections}개
+                  <Link sx={{ fontSize: 16, marginRight: 0.5 }} />
+                  연결: {systemStatus.activeConnections}개(제어용 + 출력용)
                 </span>
               </div>
             </div>
@@ -465,60 +484,86 @@ function AdminPanel() {
           {message && <div className="message">{message}</div>}
 
           <div className="admin-tabs">
-            <button 
-              className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
-              onClick={() => setActiveTab('schedule')}
-            >
-              학사일정
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'meal' ? 'active' : ''}`}
-              onClick={() => setActiveTab('meal')}
-            >
-              급식
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'announcement' ? 'active' : ''}`}
-              onClick={() => setActiveTab('announcement')}
-            >
-              공지사항
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'allergy' ? 'active' : ''}`}
-              onClick={() => setActiveTab('allergy')}
-            >
-              알레르기
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'campusLayout' ? 'active' : ''}`}
-              onClick={() => setActiveTab('campusLayout')}
-            >
-              교실 배치
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'mainNotice' ? 'active' : ''}`}
-              onClick={() => setActiveTab('mainNotice')}
-            >
-              메인 공지사항
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'patchnotes' ? 'active' : ''}`}
-              onClick={() => setActiveTab('patchnotes')}
-            >
-              패치 노트
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'schoolBlocking' ? 'active' : ''}`}
-              onClick={() => setActiveTab('schoolBlocking')}
-            >
-              학교 차단
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
-              onClick={() => setActiveTab('pins')}
-            >
-              활성화된 PIN
-            </button>
+            {hasPermission('schedule') && (
+              <button 
+                className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}
+                onClick={() => setActiveTab('schedule')}
+              >
+                학사일정
+              </button>
+            )}
+            {hasPermission('meal') && (
+              <button 
+                className={`tab-btn ${activeTab === 'meal' ? 'active' : ''}`}
+                onClick={() => setActiveTab('meal')}
+              >
+                급식
+              </button>
+            )}
+            {hasPermission('announcement') && (
+              <button 
+                className={`tab-btn ${activeTab === 'announcement' ? 'active' : ''}`}
+                onClick={() => setActiveTab('announcement')}
+              >
+                공지사항
+              </button>
+            )}
+            {hasPermission('allergy') && (
+              <button 
+                className={`tab-btn ${activeTab === 'allergy' ? 'active' : ''}`}
+                onClick={() => setActiveTab('allergy')}
+              >
+                알레르기
+              </button>
+            )}
+            {hasPermission('campusLayout') && (
+              <button 
+                className={`tab-btn ${activeTab === 'campusLayout' ? 'active' : ''}`}
+                onClick={() => setActiveTab('campusLayout')}
+              >
+                교실 배치
+              </button>
+            )}
+            {hasPermission('mainNotice') && (
+              <button 
+                className={`tab-btn ${activeTab === 'mainNotice' ? 'active' : ''}`}
+                onClick={() => setActiveTab('mainNotice')}
+              >
+                메인 공지사항
+              </button>
+            )}
+            {hasPermission('patchnotes') && (
+              <button 
+                className={`tab-btn ${activeTab === 'patchnotes' ? 'active' : ''}`}
+                onClick={() => setActiveTab('patchnotes')}
+              >
+                패치 노트
+              </button>
+            )}
+            {hasPermission('schoolBlocking') && (
+              <button 
+                className={`tab-btn ${activeTab === 'schoolBlocking' ? 'active' : ''}`}
+                onClick={() => setActiveTab('schoolBlocking')}
+              >
+                학교 차단
+              </button>
+            )}
+            {hasPermission('pins') && (
+              <button 
+                className={`tab-btn ${activeTab === 'pins' ? 'active' : ''}`}
+                onClick={() => setActiveTab('pins')}
+              >
+                활성화된 PIN
+              </button>
+            )}
+            {hasPermission('adminManagement') && (
+              <button 
+                className={`tab-btn ${activeTab === 'adminManagement' ? 'active' : ''}`}
+                onClick={() => setActiveTab('adminManagement')}
+              >
+                관리자 관리
+              </button>
+            )}
           </div>
 
           <div className="admin-content">
@@ -810,6 +855,12 @@ function AdminPanel() {
                     ))}
                   </ul>
                 )}
+              </div>
+            )}
+
+            {activeTab === 'adminManagement' && (
+              <div className="form-section">
+                <AdminManagement currentAdmin={currentAdmin} />
               </div>
             )}
           </div>
