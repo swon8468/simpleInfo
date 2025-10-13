@@ -149,6 +149,10 @@ function AdminPanel() {
       // 실시간으로 학교 차단 상태 모니터링
       const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
         setSchoolBlockingStatus(isActive);
+        // 차단이 활성화되면 메인 화면으로 강제 이동 (관리자 페이지도 즉시 차단 적용)
+        if (isActive) {
+          navigate('/');
+        }
       });
 
       // 실시간으로 시스템 상태 모니터링

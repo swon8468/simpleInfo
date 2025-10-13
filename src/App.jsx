@@ -5,6 +5,7 @@ import ControlMode from './components/ControlMode';
 import OutputMode from './components/OutputMode';
 import AdminPanel from './components/AdminPanel';
 import SchoolBlockingScreen from './components/SchoolBlockingScreen';
+import NotFound from './components/NotFound';
 
 function App() {
   // Vite가 제공하는 BASE_URL을 사용하여 개발('/')과 배포('/simpleInfo/') 모두 지원
@@ -19,6 +20,7 @@ function App() {
           <Route path="/control/*" element={<ControlMode />} />
           <Route path="/output/*" element={<OutputMode />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

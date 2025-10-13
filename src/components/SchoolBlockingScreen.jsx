@@ -1,28 +1,36 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
 import { School, Build, Rocket, AccessTime } from '@mui/icons-material';
 import './SchoolBlockingScreen.css';
 
 function SchoolBlockingScreen() {
   const [blockingActive, setBlockingActive] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    // 관리자 페이지인 경우 차단 화면 표시하지 않음
-    const currentPath = window.location.pathname;
-    if (currentPath.includes('/admin')) {
+    // 현재 경로 기준으로 차단 화면 표시 여부 결정
+    const onAdmin = location.pathname.includes('/admin');
+    if (onAdmin) {
+      // 관리자 페이지에서는 차단 화면을 표시하지 않음
+      setBlockingActive(false);
       return;
     }
 
-    // 학교 생활 도우미 차단 상태 확인
-    checkSchoolBlockingStatus();
-    
-    // 실시간 차단 상태 모니터링
-    const unsubscribe = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
-      setBlockingActive(isActive);
-    });
-    
-    return () => unsubscribe();
-  }, []);
+    // 학교 생활 도우미 차단 상태 확인 및 구독
+    let unsubscribe = () => {};
+    const run = async () => {
+      await checkSchoolBlockingStatus();
+      unsubscribe = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
+        setBlockingActive(isActive);
+      });
+    };
+    run();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [location.pathname]);
 
   const checkSchoolBlockingStatus = async () => {
     try {
