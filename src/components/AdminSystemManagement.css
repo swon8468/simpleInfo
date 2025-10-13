@@ -266,36 +266,99 @@
 }
 
 .logs-table {
-  width: 100%;
-  border-collapse: collapse;
+  width: auto;
+  min-width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
   font-size: 0.9rem;
-  table-layout: fixed;
+  table-layout: auto;
 }
 
 .logs-table th {
   background: #f8f9fa;
-  padding: 12px 8px;
-  text-align: left;
+  padding: 10px 6px;
+  text-align: center;
   font-weight: 600;
   color: #333;
-  border-bottom: 2px solid #e0e0e0;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
   position: sticky;
   top: 0;
   z-index: 10;
+  font-size: 0.9rem;
+  vertical-align: middle;
+  white-space: nowrap;
 }
 
-.logs-table th:nth-child(1) { width: 15%; } /* 시간 */
-.logs-table th:nth-child(2) { width: 8%; }  /* 레벨 */
-.logs-table th:nth-child(3) { width: 12%; } /* 작업 */
-.logs-table th:nth-child(4) { width: 25%; } /* 상세 내용 */
-.logs-table th:nth-child(5) { width: 15%; } /* 관리자 */
-.logs-table th:nth-child(6) { width: 12%; } /* IP */
-.logs-table th:nth-child(7) { width: 13%; } /* 세션 */
-
 .logs-table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #f0f0f0;
-  vertical-align: top;
+  padding: 10px 6px;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  vertical-align: middle;
+  text-align: center;
+  background: #fff;
+}
+
+/* 내용에 맞는 최적화된 열 너비 */
+.logs-table th:nth-child(1),
+.logs-table td:nth-child(1) { 
+  width: auto; 
+  min-width: 180px;  /* 시간 정보 */
+  text-align: center;
+  white-space: nowrap;
+} /* 시간 */
+
+.logs-table th:nth-child(2),
+.logs-table td:nth-child(2) { 
+  width: auto; 
+  min-width: 60px;   /* 레벨 아이콘 + 텍스트 */
+  text-align: center;
+  white-space: nowrap;
+} /* 레벨 */
+
+.logs-table th:nth-child(3),
+.logs-table td:nth-child(3) { 
+  width: auto; 
+  min-width: 80px;   /* 작업명 최대 글자 너비에 맞춤 */
+  text-align: center;
+  white-space: nowrap;
+} /* 작업 */
+
+.logs-table th:nth-child(4),
+.logs-table td:nth-child(4) { 
+  width: auto; 
+  min-width: 300px;  /* 상세 내용 */
+  text-align: center;  /* 헤더 가운데 정렬 */
+  word-wrap: break-word;
+  white-space: normal;
+} /* 상세 내용 */
+
+.logs-table th:nth-child(5),
+.logs-table td:nth-child(5) { 
+  width: auto; 
+  min-width: 100px;  /* IP 주소 최대 글자 너비에 맞춤 */
+  text-align: center;
+  white-space: nowrap;
+} /* IP */
+
+.logs-table th:nth-child(6),
+.logs-table td:nth-child(6) { 
+  width: auto; 
+  min-width: 150px;  /* 관리자명 + 코드 */
+  text-align: center;  /* 헤더 가운데 정렬 */
+  white-space: nowrap;
+} /* 관리자 */
+
+
+/* 정렬 기능을 위한 스타일 */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.sortable-header:hover {
+  background-color: #e9ecef;
 }
 
 .log-row:hover {
@@ -364,6 +427,8 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+  align-items: center;
+  justify-content: center;
 }
 
 .admin-name {
@@ -418,13 +483,6 @@
   background: #cc0000;
 }
 
-.sortable-header {
-  user-select: none;
-}
-
-.sortable-header:hover {
-  background: #e8f4fd;
-}
 
 .log-session {
   font-family: monospace;
@@ -537,3 +595,4 @@
     max-width: 200px;
   }
 }
+

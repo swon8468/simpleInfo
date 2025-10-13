@@ -92,6 +92,13 @@ function AdminScheduleCalendar() {
       title: event.title,
       target: event.target || []
     });
+    
+    // 수정할 이벤트의 날짜를 selectedDate로 설정
+    if (event.eventDate) {
+      const eventDate = event.eventDate instanceof Date ? event.eventDate : new Date(event.eventDate);
+      setSelectedDate(eventDate);
+    }
+    
     setShowForm(true);
   };
 

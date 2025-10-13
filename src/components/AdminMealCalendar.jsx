@@ -98,6 +98,13 @@ function AdminMealCalendar() {
       lunch: meal.lunch.join(', '),
       dinner: meal.dinner.join(', ')
     });
+    
+    // 수정할 급식의 날짜를 selectedDate로 설정
+    if (meal.date) {
+      const mealDate = meal.date instanceof Date ? meal.date : new Date(meal.date);
+      setSelectedDate(mealDate);
+    }
+    
     setShowForm(true);
   };
 

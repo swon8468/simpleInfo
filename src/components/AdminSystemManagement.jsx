@@ -375,8 +375,7 @@ function AdminSystemManagement({ currentAdmin }) {
                 <table className="logs-table">
                   <thead>
                     <tr>
-                      <th 
-                        className="sortable-header"
+                      <th
                         onClick={() => handleSort('timestamp')}
                         style={{ cursor: 'pointer' }}
                       >
@@ -385,8 +384,7 @@ function AdminSystemManagement({ currentAdmin }) {
                           sortDirection === 'asc' ? ' ↑' : ' ↓'
                         )}
                       </th>
-                      <th 
-                        className="sortable-header"
+                      <th
                         onClick={() => handleSort('level')}
                         style={{ cursor: 'pointer' }}
                       >
@@ -395,8 +393,7 @@ function AdminSystemManagement({ currentAdmin }) {
                           sortDirection === 'asc' ? ' ↑' : ' ↓'
                         )}
                       </th>
-                      <th 
-                        className="sortable-header"
+                      <th
                         onClick={() => handleSort('action')}
                         style={{ cursor: 'pointer' }}
                       >
@@ -405,19 +402,10 @@ function AdminSystemManagement({ currentAdmin }) {
                           sortDirection === 'asc' ? ' ↑' : ' ↓'
                         )}
                       </th>
-                      <th>상세 내용</th>
-                      <th 
-                        className="sortable-header"
-                        onClick={() => handleSort('adminName')}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        관리자
-                        {sortField === 'adminName' && (
-                          sortDirection === 'asc' ? ' ↑' : ' ↓'
-                        )}
+                      <th>
+                        상세 내용
                       </th>
-                      <th 
-                        className="sortable-header"
+                      <th
                         onClick={() => handleSort('ip')}
                         style={{ cursor: 'pointer' }}
                       >
@@ -426,43 +414,43 @@ function AdminSystemManagement({ currentAdmin }) {
                           sortDirection === 'asc' ? ' ↑' : ' ↓'
                         )}
                       </th>
-                      <th>세션</th>
+                      <th
+                        onClick={() => handleSort('adminName')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        관리자
+                        {sortField === 'adminName' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredLogs.map((log) => (
                       <tr key={log.id} className={`log-row ${log.level}`}>
+                        {/* 1. 시간 */}
                         <td className="log-timestamp">
                           {formatTimestamp(log.timestamp)}
                         </td>
+                        {/* 2. 레벨 */}
                         <td className="log-level-cell">
                           <div className="log-level">
                             {getLevelIcon(log.level)}
                             <span className="level-text">{getLevelText(log.level)}</span>
                           </div>
                         </td>
+                        {/* 3. 작업 */}
                         <td className="log-action">{log.action}</td>
+                        {/* 4. 상세 내용 */}
                         <td className="log-details">{log.details}</td>
+                        {/* 5. IP */}
+                        <td className="log-ip">{log.ip || 'N/A'}</td>
+                        {/* 6. 관리자 */}
                         <td className="log-admin">
                           <div className="admin-info">
                             <div className="admin-name">{log.adminName}</div>
                             <div className="admin-code">({log.adminId})</div>
                           </div>
-                        </td>
-                        <td className="log-ip">{log.ip || 'N/A'}</td>
-                        <td className="log-session">
-                          {log.sessionId ? (
-                            <div className="session-cell">
-                              <span>{log.sessionId.substring(0, 8)}...</span>
-                              <button 
-                                className="delete-session-btn"
-                                onClick={() => handleDeleteSession(log.sessionId)}
-                                title="세션 삭제"
-                              >
-                                ×
-                              </button>
-                            </div>
-                          ) : 'N/A'}
                         </td>
                       </tr>
                     ))}

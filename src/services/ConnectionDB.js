@@ -258,7 +258,12 @@ class ConnectionDB {
   // 제어 데이터 전송 (제어용 디바이스에서 출력용 디바이스로)
   async sendControlData(controlSessionId, data) {
     try {
-      console.log('ConnectionDB: 제어 데이터 전송 시도:', controlSessionId, data);
+      console.log('ConnectionDB: 제어 데이터 전송 시도:', {
+        controlSessionId,
+        data,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent
+      });
       
       // 제어용 세션 정보 가져오기
       const controlDocRef = doc(db, 'connections', controlSessionId);
@@ -273,7 +278,10 @@ class ConnectionDB {
       const controlData = controlDocSnap.data();
       const outputSessionId = controlData.connectedOutputSession;
       
-      console.log('ConnectionDB: 제어용 세션 데이터:', controlData);
+      console.log('ConnectionDB: 제어용 세션 데이터:', {
+        ...controlData,
+        timestamp: new Date().toISOString()
+      });
       console.log('ConnectionDB: 연결된 출력용 세션 ID:', outputSessionId);
       
       if (!outputSessionId) {
@@ -282,16 +290,31 @@ class ConnectionDB {
       
       // 출력용 세션에 제어 데이터 전송
       const outputDocRef = doc(db, 'connections', outputSessionId);
-      console.log('ConnectionDB: 출력용 세션에 데이터 전송 시작:', outputSessionId);
+      console.log('ConnectionDB: 출력용 세션에 데이터 전송 시작:', {
+        outputSessionId,
+        data,
+        timestamp: new Date().toISOString()
+      });
+      
       await updateDoc(outputDocRef, {
         controlData: data,
         lastUpdated: serverTimestamp(),
         heartbeat: serverTimestamp()
       });
       
-      console.log('ConnectionDB: 제어 데이터 전송 완료:', outputSessionId);
+      console.log('ConnectionDB: 제어 데이터 전송 완료:', {
+        outputSessionId,
+        data,
+        timestamp: new Date().toISOString(),
+        success: true
+      });
     } catch (error) {
-      console.error('제어 데이터 전송 실패:', error);
+      console.error('제어 데이터 전송 실패:', {
+        controlSessionId,
+        data,
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
       throw error;
     }
   }

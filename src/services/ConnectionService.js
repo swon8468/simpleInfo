@@ -12,6 +12,7 @@ import {
   getDocs,
   updateDoc
 } from 'firebase/firestore';
+import ActivityLogService from './ActivityLogService';
 
 class ConnectionService {
   constructor() {
@@ -109,6 +110,15 @@ class ConnectionService {
           
           console.log('ConnectionService: 1:1 매칭 연결 완료:', pin, '제어용 ID:', controlDeviceId, '페어링 ID:', pairingId);
           
+          // 연결 성공 로그 기록
+          await ActivityLogService.logActivity({
+            level: '소',
+            action: '제어용-출력용 연결',
+            details: `제어용과 출력용이 PIN ${pin}으로 연결됨`,
+            adminName: '시스템',
+            adminId: 'system'
+          });
+          
           this.isConnected = true;
           this.currentPin = pin;
           sessionStorage.setItem('controlDeviceId', controlDeviceId);
@@ -193,6 +203,17 @@ class ConnectionService {
       }
       
       console.log('ConnectionService: 1:1 매칭 데이터 전송 완료:', pin, controlDeviceId, data);
+      
+      // 제어 동작 로그 기록
+      if (data.currentPage) {
+        await ActivityLogService.logActivity({
+          level: '소',
+          action: '제어용 동작',
+          details: `제어용에서 ${data.currentPage} 페이지로 이동`,
+          adminName: '시스템',
+          adminId: 'system'
+        });
+      }
     } catch (error) {
       console.error('제어 데이터 전송 실패:', error);
       throw error;
@@ -409,6 +430,15 @@ class ConnectionService {
             message: '관리자에 의해 연결이 해제되었습니다.'
           },
           lastUpdated: serverTimestamp()
+        });
+        
+        // 연결 해제 로그 기록
+        await ActivityLogService.logActivity({
+          level: '중',
+          action: '제어용-출력용 연결 해제',
+          details: `관리자에 의해 PIN ${pin} 연결이 해제됨`,
+          adminName: '시스템',
+          adminId: 'system'
         });
         
         // 출력용 디바이스 문서 삭제

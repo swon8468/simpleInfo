@@ -42,6 +42,13 @@ function OutputMain() {
     };
   }, [showMainNotice, mainNotice]);
 
+  // 컴포넌트 언마운트 시 TTS 중지
+  useEffect(() => {
+    return () => {
+      TTSService.stop();
+    };
+  }, []);
+
   useEffect(() => {
     // 출력용 화면 body 색 설정
     document.body.style.background = '#f5f5f5';
@@ -655,11 +662,25 @@ function OutputMain() {
             TTSService.speakAnnouncementContent(currentAnnouncement);
             setTtsStatus(TTSService.getStatus());
           }, 1000);
-
+          
           return () => clearTimeout(timer);
         }
       }
     }, [announcementData, controlData?.announcementIndex]);
+
+    // 다시 읽기 신호 처리
+    useEffect(() => {
+      if (announcementData && controlData?.reReadAnnouncement) {
+        const currentIndex = controlData.announcementIndex || 0;
+        const currentAnnouncement = announcementData[currentIndex] || announcementData[0];
+        
+        if (currentAnnouncement && currentAnnouncement.content) {
+          // 다시 읽기 신호가 오면 즉시 TTS 실행
+          TTSService.speakAnnouncementContent(currentAnnouncement, true); // 강제 읽기
+          setTtsStatus(TTSService.getStatus());
+        }
+      }
+    }, [announcementData, controlData?.reReadAnnouncement]);
 
     // TTS 상태 업데이트를 위한 주기적 체크
     useEffect(() => {
@@ -744,7 +765,8 @@ function OutputMain() {
                   <button 
                     className="tts-btn play-btn"
                     onClick={() => {
-                      TTSService.speakAnnouncementContent(currentAnnouncement);
+                      TTSService.activateTTS(); // TTS 활성화
+                      TTSService.speakAnnouncementContent(currentAnnouncement, true); // 강제 읽기
                       setTtsStatus(TTSService.getStatus());
                     }}
                     title="음성으로 읽기"

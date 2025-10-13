@@ -39,6 +39,28 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
+.listen-btn {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.listen-btn:hover {
+  background-color: #1976D2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+
 .nav-btn {
   padding: 15px 30px;
   font-size: 1.2rem;

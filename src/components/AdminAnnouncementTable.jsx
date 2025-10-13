@@ -22,7 +22,13 @@ function AdminAnnouncementTable() {
     setLoading(true);
     try {
       const data = await DataService.getAnnouncements();
-      setAnnouncements(data);
+      // 최신순으로 정렬 (createdAt 기준 내림차순)
+      const sortedData = data.sort((a, b) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB - dateA;
+      });
+      setAnnouncements(sortedData);
     } catch (error) {
       showMessage('공지사항 로드 실패');
     } finally {
@@ -95,9 +101,9 @@ function AdminAnnouncementTable() {
 
   return (
     <div className="admin-table-container">
-      <div className="table-header">
+      <div className="announcement-header">
         <h2><Article sx={{ fontSize: 20, marginRight: 6 }} /> 공지사항 관리</h2>
-        <button className="add-btn" onClick={handleAdd} disabled={loading}>
+        <button className="add-announcement-btn" onClick={handleAdd} disabled={loading}>
           <Add sx={{ fontSize: 18, marginRight: 4 }} /> 추가
         </button>
       </div>
@@ -136,52 +142,46 @@ function AdminAnnouncementTable() {
         </div>
       )}
 
-      <div className="table-container">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>번호</th>
-              <th>제목</th>
-              <th>내용</th>
-              <th>생성일</th>
-              <th>조회수</th>
-              <th>작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {announcements.map((announcement, index) => (
-              <tr key={announcement.id}>
-                <td>{index + 1}</td>
-                <td>{announcement.title}</td>
-                <td className="content-cell">
-                  <div style={{ whiteSpace: 'pre-line' }}>
-                    {announcement.content}
-                  </div>
-                </td>
-                <td>
-                  {announcement.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
-                </td>
-                <td>{announcement.views || 0}</td>
-                <td>
-                  <button 
-                    className="edit-btn" 
-                    onClick={() => handleEdit(announcement)}
-                    disabled={loading}
-                  >
-                    <Edit sx={{ fontSize: 16, marginRight: 4 }} /> 수정
-                  </button>
-                  <button 
-                    className="delete-btn" 
-                    onClick={() => handleDelete(announcement.id)}
-                    disabled={loading}
-                  >
-                    <Delete sx={{ fontSize: 16, marginRight: 4 }} /> 삭제
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="announcement-list">
+        {announcements.map((announcement, index) => (
+          <div key={announcement.id} className="announcement-card">
+            <div className="announcement-card-header">
+              <div className="announcement-number">{index + 1}</div>
+              <div className="announcement-title">{announcement.title}</div>
+              <div className="announcement-actions">
+                <button 
+                  className="edit-announcement-btn" 
+                  onClick={() => handleEdit(announcement)}
+                  disabled={loading}
+                  title="수정"
+                >
+                  <Edit sx={{ fontSize: 16 }} />
+                </button>
+                <button 
+                  className="delete-announcement-btn" 
+                  onClick={() => handleDelete(announcement.id)}
+                  disabled={loading}
+                  title="삭제"
+                >
+                  <Delete sx={{ fontSize: 16 }} />
+                </button>
+              </div>
+            </div>
+            <div className="announcement-card-content">
+              <p className="announcement-content-text" style={{ whiteSpace: 'pre-line' }}>
+                {announcement.content}
+              </p>
+            </div>
+            <div className="announcement-card-footer">
+              <span className="announcement-date">
+                등록일: {announcement.createdAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+              </span>
+              <span className="announcement-views">
+                조회수: {announcement.views || 0}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

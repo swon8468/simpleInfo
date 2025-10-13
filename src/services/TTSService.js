@@ -4,6 +4,10 @@ class TTSService {
     this.currentUtterance = null;
     this.isPlaying = false;
     this.isPaused = false;
+    this.lastReadContent = null; // 마지막으로 읽은 내용 저장
+    this.lastReadAnnouncementId = null; // 마지막으로 읽은 공지사항 ID 저장
+    this.isActivated = false; // 사용자 제스처로 활성화되었는지 확인
+    this.autoPlayEnabled = false; // 자동 재생이 허용되었는지 확인
   }
 
   // TTS 재생
@@ -98,10 +102,16 @@ class TTSService {
   // TTS 중지
   stop() {
     if (this.isPlaying) {
-      this.speechSynthesis.cancel();
-      this.isPlaying = false;
-      this.isPaused = false;
-      console.log('TTS: 음성 재생 중지');
+      try {
+        this.speechSynthesis.cancel();
+        this.isPlaying = false;
+        this.isPaused = false;
+        console.log('TTS: 음성 재생 중지');
+      } catch (error) {
+        console.warn('TTS: 음성 중지 중 오류 발생:', error);
+        this.isPlaying = false;
+        this.isPaused = false;
+      }
     }
   }
 
@@ -125,8 +135,8 @@ class TTSService {
     return voices.filter(voice => voice.lang.startsWith('ko'));
   }
 
-  // 공지사항 내용 읽기 (제목 제외)
-  speakAnnouncementContent(announcement) {
+  // 공지사항 내용 읽기 (제목 제외, 한 번만 읽기)
+  speakAnnouncementContent(announcement, forceRead = false) {
     if (!announcement || !announcement.content) {
       console.warn('TTS: 공지사항 내용이 없습니다.');
       return;
@@ -135,14 +145,39 @@ class TTSService {
     // HTML 태그 제거 및 텍스트 정리
     const cleanContent = this.cleanText(announcement.content);
     
+    // 이미 같은 공지사항을 읽었는지 확인 (강제 읽기가 아닌 경우)
+    if (!forceRead && 
+        this.lastReadAnnouncementId === announcement.id && 
+        this.lastReadContent === cleanContent) {
+      console.log('TTS: 이미 읽은 공지사항입니다. 건너뜁니다.');
+      return;
+    }
+
+    // 자동 재생이 비활성화된 경우 사용자 제스처가 필요
+    if (!forceRead && !this.autoPlayEnabled) {
+      console.log('TTS: 자동 재생이 비활성화되어 있습니다. 사용자가 재생 버튼을 눌러주세요.');
+      return;
+    }
+
     // 읽을 텍스트 구성 (제목은 제외하고 내용만)
-    const textToSpeak = `공지사항 내용입니다. ${cleanContent}`;
+    const textToSpeak = cleanContent;
+    
+    // 마지막으로 읽은 내용 저장
+    this.lastReadContent = cleanContent;
+    this.lastReadAnnouncementId = announcement.id;
     
     this.speak(textToSpeak, {
       rate: 0.8,  // 조금 느리게 읽기
       pitch: 1.0,
       volume: 0.9
     });
+  }
+
+  // 사용자 제스처로 TTS 활성화
+  activateTTS() {
+    this.isActivated = true;
+    this.autoPlayEnabled = true;
+    console.log('TTS: 사용자 제스처로 활성화되었습니다.');
   }
 
   // 텍스트 정리 함수

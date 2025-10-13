@@ -12,6 +12,11 @@ function NotFound() {
 
   return (
     <div className="notfound-page">
+      <div className="background-decoration">
+        <div className="decoration-circle circle-1"></div>
+        <div className="decoration-circle circle-2"></div>
+        <div className="decoration-circle circle-3"></div>
+      </div>
       <div className="notfound-card">
         <div className="notfound-icon">
           <ErrorIcon sx={{ fontSize: 64, color: '#d32f2f' }} />

@@ -6,7 +6,7 @@ import ActivityLogService from '../services/ActivityLogService';
 import './AdminAuth.css';
 
 function AdminAuth({ onSuccess }) {
-  const [password, setPassword] = useState('');
+  const [adminCode, setAdminCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -40,7 +40,7 @@ function AdminAuth({ onSuccess }) {
 
     try {
       // DB에서 관리자 조회
-      const admin = await DataService.getAdminByCode(password);
+      const admin = await DataService.getAdminByCode(adminCode);
       
       if (admin && admin.isActive) {
         console.log('로그인 성공한 관리자 정보:', admin);
@@ -76,8 +76,8 @@ function AdminAuth({ onSuccess }) {
     navigate('/');
   };
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+  const handleAdminCodeChange = (e) => {
+    setAdminCode(e.target.value);
     setError(''); // 에러 메시지 초기화
   };
 
@@ -113,16 +113,16 @@ function AdminAuth({ onSuccess }) {
           
           <form onSubmit={handleSubmit} className="admin-auth-form">
             <div className="password-input-container">
-              <label htmlFor="password" className="password-label">
-                관리자 비밀번호
+              <label htmlFor="adminCode" className="password-label">
+                관리자 코드
               </label>
               <div className="input-wrapper">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  placeholder="비밀번호를 입력하세요"
+                  id="adminCode"
+                  value={adminCode}
+                  onChange={handleAdminCodeChange}
+                  placeholder="관리자 코드를 입력하세요"
                   className="password-input"
                   required
                 />
@@ -147,7 +147,7 @@ function AdminAuth({ onSuccess }) {
               <button 
                 type="submit" 
                 className={`login-button ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading || !password.trim()}
+                disabled={isLoading || !adminCode.trim()}
               >
                 {isLoading ? (
                   <>

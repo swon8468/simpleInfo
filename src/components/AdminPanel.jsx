@@ -68,8 +68,6 @@ function AdminPanel() {
           
           // Firebase에서 최신 관리자 정보 가져오기
           DataService.getAdminByCode(adminInfo.adminCode).then(latestAdminInfo => {
-            console.log('Firebase에서 관리자 정보 로드 성공:', latestAdminInfo);
-            
             if (latestAdminInfo) {
               setCurrentAdmin(latestAdminInfo);
               
@@ -89,22 +87,16 @@ function AdminPanel() {
                 setActiveTab(firstAvailableTab);
               }
             } else {
-              console.error('Firebase에서 관리자 정보를 찾을 수 없음:', adminInfo.adminCode);
               // 관리자 정보를 찾을 수 없으면 로그아웃
               sessionStorage.removeItem('adminInfo');
               sessionStorage.removeItem('adminAuthenticated');
               setIsAuthenticated(false);
             }
           }).catch(error => {
-            console.error('Firebase 관리자 정보 로드 실패:', error);
-            
             // Firebase 로드 실패 시 세션의 관리자 정보로 폴백
-            console.log('세션 관리자 정보로 폴백:', adminInfo);
             if (adminInfo && adminInfo.permissions && adminInfo.level) {
               setCurrentAdmin(adminInfo);
-              console.log('폴백 성공: 세션 정보로 관리자 설정');
             } else {
-              console.error('폴백 실패: 세션 정보도 유효하지 않음');
               sessionStorage.removeItem('adminInfo');
               sessionStorage.removeItem('adminAuthenticated');
               setIsAuthenticated(false);
@@ -280,35 +272,16 @@ function AdminPanel() {
 
   // 권한 확인 함수
   const hasPermission = (permission) => {
-    // 디버깅을 위한 상세 로그
-    console.log(`권한 확인 시작: ${permission}`, {
-      currentAdmin: currentAdmin,
-      isAuthenticated: isAuthenticated,
-      adminLevel: currentAdmin?.level,
-      permissions: currentAdmin?.permissions,
-      timestamp: new Date().toISOString()
-    });
-
     if (!currentAdmin) {
-      console.warn(`권한 확인 실패: currentAdmin이 없음 (${permission})`);
       return false;
     }
     
     // 최고 관리자는 모든 권한을 가짐
     if (currentAdmin.level === '최고 관리자') {
-      console.log(`최고 관리자 권한 확인: ${permission} = true`);
       return true;
     }
     
-    const hasPermission = currentAdmin.permissions?.includes(permission) || false;
-    console.log(`권한 확인 결과: ${permission} = ${hasPermission}`, {
-      currentAdmin: currentAdmin,
-      permissions: currentAdmin.permissions,
-      permission: permission,
-      permissionArray: currentAdmin.permissions
-    });
-    
-    return hasPermission;
+    return currentAdmin.permissions?.includes(permission) || false;
   };
 
   // 인증 성공 핸들러
@@ -603,40 +576,6 @@ function AdminPanel() {
           {message && <div className="message">{message}</div>}
 
           <div className="admin-tabs">
-            {/* 디버깅 정보 표시 */}
-            {process.env.NODE_ENV === 'development' && (
-              <div style={{ 
-                background: '#f0f0f0', 
-                padding: '10px', 
-                margin: '10px 0', 
-                fontSize: '12px',
-                borderRadius: '5px'
-              }}>
-                <strong>디버깅 정보:</strong><br/>
-                인증 상태: {isAuthenticated ? '인증됨' : '미인증'}<br/>
-                관리자: {currentAdmin?.name || '없음'} ({currentAdmin?.level || '없음'})<br/>
-                권한: {currentAdmin?.permissions?.join(', ') || '없음'}<br/>
-                활성 탭: {activeTab}<br/>
-                브라우저: {navigator.userAgent}<br/>
-                세션 스토리지 지원: {typeof Storage !== 'undefined' ? '지원' : '미지원'}
-              </div>
-            )}
-            
-            {/* 탭이 하나도 표시되지 않을 경우 경고 메시지 */}
-            {isAuthenticated && currentAdmin && (
-              <div style={{ 
-                background: '#fff3cd', 
-                border: '1px solid #ffeaa7',
-                padding: '10px', 
-                margin: '10px 0', 
-                fontSize: '14px',
-                borderRadius: '5px',
-                display: 'none' // 기본적으로 숨김, JavaScript로 표시
-              }} id="no-tabs-warning">
-                ⚠️ 권한이 있는 탭이 없습니다. 관리자 권한을 확인해주세요.
-              </div>
-            )}
-            
             {hasPermission('schedule') && (
               <button 
                 className={`tab-btn ${activeTab === 'schedule' ? 'active' : ''}`}

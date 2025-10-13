@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
+import TTSService from '../services/TTSService';
 import './ControlAnnouncement.css';
 
 function ControlAnnouncement() {
@@ -53,6 +54,23 @@ function ControlAnnouncement() {
     }
   };
 
+  const handleListenAgain = async () => {
+    // 출력용에 다시 듣기 신호 전송
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
+    
+    if (controlSessionId) {
+      try {
+        await ConnectionDB.sendControlData(controlSessionId, {
+          currentPage: 'announcement',
+          announcementIndex: currentIndex,
+          reReadAnnouncement: true // 다시 읽기 플래그
+        });
+      } catch (error) {
+        console.error('다시 듣기 신호 전송 실패:', error);
+      }
+    }
+  };
+
   return (
     <div className="control-announcement">
       <h1>공지사항</h1>
@@ -64,6 +82,9 @@ function ControlAnnouncement() {
 
       <div className="current-post">
         <p>현재 게시물: {currentIndex + 1}번째</p>
+        <button className="listen-btn" onClick={handleListenAgain}>
+          🔊 다시 듣기
+        </button>
       </div>
 
       <button className="main-icon-btn" onClick={handleBackToMain}>
