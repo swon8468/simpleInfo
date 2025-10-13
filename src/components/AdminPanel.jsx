@@ -271,6 +271,12 @@ function AdminPanel() {
       return false;
     }
     
+    // 최고 관리자는 모든 권한을 가짐
+    if (currentAdmin.level === '최고 관리자') {
+      console.log(`최고 관리자 권한 확인: ${permission} = true`);
+      return true;
+    }
+    
     const hasPermission = currentAdmin.permissions?.includes(permission) || false;
     console.log(`권한 확인: ${permission} = ${hasPermission}`, {
       currentAdmin: currentAdmin,

@@ -100,6 +100,12 @@ function AdminScheduleCalendar() {
     setLoading(true);
     
     try {
+      // selectedDate가 null인지 확인
+      if (!selectedDate) {
+        console.error('선택된 날짜가 없습니다.');
+        return;
+      }
+      
       // 로컬 날짜를 사용하여 시간대 변환 문제 방지
       const year = selectedDate.getFullYear();
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
