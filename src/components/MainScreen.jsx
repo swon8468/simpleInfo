@@ -245,7 +245,6 @@ function MainScreen() {
           </div>
         ) : (
           <>
-            <h3>모드를 선택하세요</h3>
             {activePinCount > 0 && (
               <p className="connection-info">
                 현재 활성화된 연결: <strong>{activePinCount}</strong>개 / 최대 10개
