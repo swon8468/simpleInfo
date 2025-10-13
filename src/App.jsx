@@ -19,7 +19,7 @@ function App() {
           <Route path="/" element={<MainScreen />} />
           <Route path="/control/*" element={<ControlMode />} />
           <Route path="/output/*" element={<OutputMode />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin" element={<MainScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

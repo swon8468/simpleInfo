@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import DataService from '../services/DataService';
 import ConnectionDB from '../services/ConnectionDB';
 import SystemMonitoringService from '../services/SystemMonitoringService';
@@ -40,6 +40,16 @@ function AdminPanel() {
     lastActivity: null
   });
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // admin=true 쿼리 파라미터로만 접근 허용
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const adminMode = params.get('admin');
+    if (adminMode !== 'true') {
+      navigate('/');
+    }
+  }, [location.search, navigate]);
 
   useEffect(() => {
     // 관리자 화면 body 색 설정
@@ -148,11 +158,8 @@ function AdminPanel() {
 
       // 실시간으로 학교 차단 상태 모니터링
       const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isActive) => {
+        // 관리자 페이지는 차단 중에도 유지 (상태 표시만)
         setSchoolBlockingStatus(isActive);
-        // 차단이 활성화되면 메인 화면으로 강제 이동 (관리자 페이지도 즉시 차단 적용)
-        if (isActive) {
-          navigate('/');
-        }
       });
 
       // 실시간으로 시스템 상태 모니터링

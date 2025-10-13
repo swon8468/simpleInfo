@@ -224,7 +224,10 @@ function MainScreen() {
   };
 
   const handleAdminMode = () => {
-    navigate('/admin');
+    const url = new URL(window.location.href);
+    url.pathname = `${import.meta.env.BASE_URL}`; // 루트로
+    url.searchParams.set('admin', 'true');
+    window.location.href = url.toString();
   };
 
   return (
