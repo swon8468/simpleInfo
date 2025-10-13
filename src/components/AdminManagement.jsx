@@ -259,6 +259,19 @@ function AdminManagement({ currentAdmin }) {
         return;
       }
 
+      // 최고 관리자 수정 시 이름만 변경 가능
+      if (editingAdmin.level === '최고 관리자') {
+        const updatePayload = {
+          name: formData.name
+        };
+        
+        await DataService.updateAdmin(editingAdmin.id, updatePayload);
+        showMessage('관리자 이름이 성공적으로 수정되었습니다.');
+        resetForm();
+        loadAdmins();
+        return;
+      }
+
       // 일반 관리자는 최소 1개 권한 필요
       if (formData.level !== '최고 관리자' && formData.permissions.length === 0) {
         showMessage('최소 하나의 권한을 선택해주세요.', 'error');
@@ -370,7 +383,7 @@ function AdminManagement({ currentAdmin }) {
                 value={formData.adminCode}
                 onChange={handleInputChange}
                 placeholder="관리자 코드를 입력하세요"
-                disabled={editingAdmin || codeCheckStatus === 'available'} // 수정 시 또는 중복 확인 완료 시 비활성화
+                disabled={editingAdmin || codeCheckStatus === 'available' || (editingAdmin && editingAdmin.level === '최고 관리자')} // 수정 시 또는 중복 확인 완료 시 비활성화, 최고 관리자 수정 시 비활성화
               />
               {!editingAdmin && (
                 <button 
@@ -402,15 +415,34 @@ function AdminManagement({ currentAdmin }) {
               name="level"
               value={formData.level}
               onChange={handleInputChange}
+              disabled={editingAdmin && editingAdmin.level === '최고 관리자'}
             >
               <option value="일반 관리자">일반 관리자</option>
               <option value="최고 관리자">최고 관리자</option>
             </select>
+            {editingAdmin && editingAdmin.level === '최고 관리자' && (
+              <small className="disabled-note">최고 관리자의 등급은 수정할 수 없습니다.</small>
+            )}
           </div>
 
           <div className="form-group">
             <label>권한 설정</label>
-            {formData.level === '최고 관리자' ? (
+            {editingAdmin && editingAdmin.level === '최고 관리자' ? (
+              <div className="permissions-disabled">
+                <div className="disabled-message">
+                  <CheckCircle sx={{ fontSize: 20, marginRight: 0.5, color: '#4caf50' }} />
+                  최고 관리자의 권한은 수정할 수 없습니다.
+                </div>
+                <div className="permissions-list">
+                  {permissionOptions.map(option => (
+                    <div key={option.key} className="permission-item-disabled">
+                      <CheckCircle sx={{ fontSize: 16, marginRight: 0.5, color: '#4caf50' }} />
+                      <span>{option.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : formData.level === '최고 관리자' ? (
               <div className="permissions-disabled">
                 <div className="disabled-message">
                   <CheckCircle sx={{ fontSize: 20, marginRight: 0.5, color: '#4caf50' }} />
@@ -539,14 +571,20 @@ function AdminManagement({ currentAdmin }) {
                     <div className="permissions-tooltip">
                       <div className="tooltip-title">권한 목록</div>
                       <div className="tooltip-permissions">
-                        {admin.permissions?.map(permission => {
-                          const permissionLabel = permissionOptions.find(opt => opt.key === permission)?.label || permission;
-                          return (
-                            <div key={permission} className="tooltip-permission">
-                              {permissionLabel}
-                            </div>
-                          );
-                        })}
+                        {currentAdmin?.level === '최고 관리자' ? (
+                          admin.permissions?.map(permission => {
+                            const permissionLabel = permissionOptions.find(opt => opt.key === permission)?.label || permission;
+                            return (
+                              <div key={permission} className="tooltip-permission">
+                                {permissionLabel}
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="tooltip-permission">
+                            권한 정보는 최고 관리자만 확인할 수 있습니다.
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -559,7 +597,7 @@ function AdminManagement({ currentAdmin }) {
                   {admin.level}
                 </div>
                 <div className="admin-permissions">
-                  {admin.permissions?.length || 0}개 권한
+                  {currentAdmin?.level === '최고 관리자' ? `${admin.permissions?.length || 0}개 권한` : '***'}
                 </div>
                 <div className="admin-date">
                   {admin.createdAt?.toDate?.()?.toLocaleDateString() || '알 수 없음'}

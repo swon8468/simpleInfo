@@ -370,7 +370,44 @@
   font-family: monospace;
   font-size: 0.8rem;
   color: #666;
-  min-width: 80px;
+}
+
+.log-session {
+  min-width: 120px;
+}
+
+.session-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.delete-session-btn {
+  background: #ff4444;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.delete-session-btn:hover {
+  background: #cc0000;
+}
+
+.sortable-header {
+  user-select: none;
+}
+
+.sortable-header:hover {
+  background: #e8f4fd;
 }
 
 .log-session {

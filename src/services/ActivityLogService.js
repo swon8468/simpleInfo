@@ -9,6 +9,12 @@ class ActivityLogService {
   // 활동 로그 기록
   async logActivity(action, level, details, adminInfo = null, ip = null) {
     try {
+      // IP가 제공되지 않으면 비동기로 가져오기
+      let clientIP = ip;
+      if (!clientIP) {
+        clientIP = await this.getClientIP();
+      }
+      
       const logData = {
         timestamp: new Date(),
         adminId: adminInfo?.adminCode || 'system',
@@ -16,7 +22,7 @@ class ActivityLogService {
         action,
         level, // 'major', 'medium', 'minor'
         details,
-        ip: ip || this.getClientIP(),
+        ip: clientIP,
         userAgent: navigator.userAgent,
         sessionId: this.getSessionId()
       };
@@ -202,19 +208,37 @@ class ActivityLogService {
     });
   }
 
-  // 클라이언트 IP 가져오기 (실제 환경에서는 서버에서 처리해야 함)
-  getClientIP() {
-    // 브라우저 환경에서 best-effort로 외부 IP를 가져옵니다.
-    // 외부 네트워크 호출 없이 userAgent 기반 추정은 제한적이므로, 기본은 N/A로 두고
-    // 서버가 없으므로 이후 필요 시 Cloud Function 등으로 교체합니다.
+  // 클라이언트 IP 가져오기
+  async getClientIP() {
     try {
-      // Cloudflare 또는 프록시가 X-Forwarded-For를 주지 않는 한, 클라이언트 JS로는 정확 IP 수집이 불가
-      // 임시로 로컬 저장된 최근 IP 사용 (없으면 N/A)
+      // 먼저 로컬 저장된 IP 확인
       const stored = sessionStorage.getItem('clientIP');
-      return stored || 'N/A';
-    } catch (e) {
-      return 'N/A';
+      const storedTime = sessionStorage.getItem('clientIPTime');
+      
+      // 1시간 이내의 IP가 있으면 사용
+      if (stored && storedTime && (Date.now() - parseInt(storedTime)) < 3600000) {
+        return stored;
+      }
+      
+      // 외부 API로 IP 가져오기
+      const response = await fetch('https://api.ipify.org?format=json');
+      if (response.ok) {
+        const data = await response.json();
+        const ip = data.ip;
+        
+        // IP 저장
+        sessionStorage.setItem('clientIP', ip);
+        sessionStorage.setItem('clientIPTime', Date.now().toString());
+        
+        return ip;
+      }
+    } catch (error) {
+      console.warn('IP 주소 가져오기 실패:', error);
     }
+    
+    // 실패 시 로컬 저장된 IP 또는 N/A 반환
+    const fallback = sessionStorage.getItem('clientIP');
+    return fallback || 'N/A';
   }
 
   // 세션 ID 생성

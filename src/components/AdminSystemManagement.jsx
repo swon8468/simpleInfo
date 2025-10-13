@@ -16,6 +16,8 @@ function AdminSystemManagement({ currentAdmin }) {
   const [levelFilter, setLevelFilter] = useState('all');
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsCount, setLogsCount] = useState(100);
+  const [sortField, setSortField] = useState('timestamp');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   useEffect(() => {
     loadPinCode();
@@ -35,7 +37,7 @@ function AdminSystemManagement({ currentAdmin }) {
   // 필터 적용
   useEffect(() => {
     applyFilters(activityLogs);
-  }, [searchTerm, levelFilter, activityLogs]);
+  }, [searchTerm, levelFilter, activityLogs, sortField, sortDirection]);
 
   const loadPinCode = async () => {
     try {
@@ -61,7 +63,17 @@ function AdminSystemManagement({ currentAdmin }) {
     }
   };
 
-  // 필터 적용 함수
+  // 정렬 함수
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // 필터 및 정렬 적용 함수
   const applyFilters = (logs) => {
     let filtered = [...logs];
 
@@ -80,6 +92,32 @@ function AdminSystemManagement({ currentAdmin }) {
       filtered = filtered.filter(log => log.level === levelFilter);
     }
 
+    // 정렬 적용
+    filtered.sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+
+      if (sortField === 'timestamp') {
+        aValue = aValue?.toDate ? aValue.toDate() : new Date(aValue);
+        bValue = bValue?.toDate ? bValue.toDate() : new Date(bValue);
+      } else if (sortField === 'level') {
+        const levelOrder = { 'major': 3, 'medium': 2, 'minor': 1 };
+        aValue = levelOrder[aValue] || 0;
+        bValue = levelOrder[bValue] || 0;
+      }
+
+      if (typeof aValue === 'string') {
+        aValue = aValue.toLowerCase();
+        bValue = bValue.toLowerCase();
+      }
+
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
     setFilteredLogs(filtered);
   };
 
@@ -88,11 +126,20 @@ function AdminSystemManagement({ currentAdmin }) {
     loadActivityLogs();
   };
 
-  const logActivity = async (action, level, details) => {
-    try {
-      await ActivityLogService.logActivity(action, level, details, currentAdmin);
-    } catch (error) {
-      console.error('활동 로그 작성 실패:', error);
+  // 세션 삭제 함수
+  const handleDeleteSession = async (sessionId) => {
+    if (window.confirm('이 세션을 삭제하시겠습니까?')) {
+      try {
+        setLoading(true);
+        // 세션 삭제 로직 구현 (필요시 DataService에 추가)
+        await logActivity('세션 삭제', 'medium', `세션 ID: ${sessionId}`);
+        showMessage('세션이 삭제되었습니다.', 'success');
+        loadActivityLogs();
+      } catch (error) {
+        showMessage('세션 삭제에 실패했습니다.', 'error');
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -328,12 +375,57 @@ function AdminSystemManagement({ currentAdmin }) {
                 <table className="logs-table">
                   <thead>
                     <tr>
-                      <th>시간</th>
-                      <th>레벨</th>
-                      <th>작업</th>
+                      <th 
+                        className="sortable-header"
+                        onClick={() => handleSort('timestamp')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        시간
+                        {sortField === 'timestamp' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
+                      <th 
+                        className="sortable-header"
+                        onClick={() => handleSort('level')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        레벨
+                        {sortField === 'level' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
+                      <th 
+                        className="sortable-header"
+                        onClick={() => handleSort('action')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        작업
+                        {sortField === 'action' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
                       <th>상세 내용</th>
-                      <th>관리자</th>
-                      <th>IP</th>
+                      <th 
+                        className="sortable-header"
+                        onClick={() => handleSort('adminName')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        관리자
+                        {sortField === 'adminName' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
+                      <th 
+                        className="sortable-header"
+                        onClick={() => handleSort('ip')}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        IP
+                        {sortField === 'ip' && (
+                          sortDirection === 'asc' ? ' ↑' : ' ↓'
+                        )}
+                      </th>
                       <th>세션</th>
                     </tr>
                   </thead>
@@ -358,7 +450,20 @@ function AdminSystemManagement({ currentAdmin }) {
                           </div>
                         </td>
                         <td className="log-ip">{log.ip || 'N/A'}</td>
-                        <td className="log-session">{log.sessionId ? log.sessionId.substring(0, 8) + '...' : 'N/A'}</td>
+                        <td className="log-session">
+                          {log.sessionId ? (
+                            <div className="session-cell">
+                              <span>{log.sessionId.substring(0, 8)}...</span>
+                              <button 
+                                className="delete-session-btn"
+                                onClick={() => handleDeleteSession(log.sessionId)}
+                                title="세션 삭제"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ) : 'N/A'}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -128,8 +128,15 @@ class DataService {
   async updateScheduleEventById(eventId, eventData) {
     try {
       const eventRef = doc(db, 'schedules', eventId);
+      
+      // eventDate가 문자열인 경우 Date 객체로 변환
+      const updateData = { ...eventData };
+      if (updateData.eventDate && typeof updateData.eventDate === 'string') {
+        updateData.eventDate = new Date(updateData.eventDate);
+      }
+      
       await updateDoc(eventRef, {
-        ...eventData,
+        ...updateData,
         updatedAt: serverTimestamp()
       });
       console.log('학사일정이 수정되었습니다.');
