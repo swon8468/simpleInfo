@@ -95,6 +95,34 @@ function MainScreen() {
   }, []);
 
 
+  // 활성화된 PIN 확인 함수
+  const checkActivePin = async () => {
+    try {
+      console.log('MainScreen.checkActivePin: 시작 - 현재 시간:', new Date().toISOString());
+      const activeConnections = await ConnectionDB.getActiveConnections();
+      console.log('MainScreen.checkActivePin: 가져온 연결 목록:', activeConnections);
+      const count = activeConnections.length;
+      console.log('MainScreen.checkActivePin: 연결 개수:', count);
+      setActivePinCount(count);
+      
+      if (count > 0) {
+        const activeConnection = activeConnections[0];
+        console.log('MainScreen.checkActivePin: 첫 번째 연결:', activeConnection);
+        setActivePinNumber(activeConnection.sessionId);
+        setHasActivePin(true);
+      } else {
+        console.log('MainScreen.checkActivePin: 연결 없음');
+        setHasActivePin(false);
+        setActivePinNumber(null);
+      }
+    } catch (error) {
+      console.error('MainScreen.checkActivePin: 활성 PIN 확인 실패:', error);
+      setHasActivePin(false);
+      setActivePinNumber(null);
+      setActivePinCount(0);
+    }
+  };
+
   // 학교 차단 상태 확인 함수
   const checkSchoolBlockingStatus = async () => {
     try {
