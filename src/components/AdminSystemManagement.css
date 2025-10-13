@@ -269,6 +269,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  table-layout: fixed;
 }
 
 .logs-table th {
@@ -282,6 +283,14 @@
   top: 0;
   z-index: 10;
 }
+
+.logs-table th:nth-child(1) { width: 15%; } /* 시간 */
+.logs-table th:nth-child(2) { width: 8%; }  /* 레벨 */
+.logs-table th:nth-child(3) { width: 12%; } /* 작업 */
+.logs-table th:nth-child(4) { width: 25%; } /* 상세 내용 */
+.logs-table th:nth-child(5) { width: 15%; } /* 관리자 */
+.logs-table th:nth-child(6) { width: 12%; } /* IP */
+.logs-table th:nth-child(7) { width: 13%; } /* 세션 */
 
 .logs-table td {
   padding: 10px 8px;
@@ -309,12 +318,12 @@
   font-size: 0.8rem;
   color: #666;
   white-space: nowrap;
-  min-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .log-level-cell {
   text-align: center;
-  min-width: 60px;
 }
 
 .log-level {
@@ -335,18 +344,20 @@
 .log-action {
   font-weight: 600;
   color: #333;
-  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .log-details {
   color: #555;
   line-height: 1.4;
-  max-width: 300px;
   word-wrap: break-word;
+  overflow: hidden;
 }
 
 .log-admin {
-  min-width: 120px;
+  overflow: hidden;
 }
 
 .admin-info {
@@ -370,10 +381,15 @@
   font-family: monospace;
   font-size: 0.8rem;
   color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .log-session {
-  min-width: 120px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #999;
 }
 
 .session-cell {

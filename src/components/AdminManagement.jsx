@@ -336,10 +336,17 @@ function AdminManagement({ currentAdmin }) {
         {canManageAdmins && (
           <button 
             className="add-admin-btn"
-            onClick={() => setShowAddForm(true)}
+            onClick={() => {
+              // 수정 중이면 수정 폼을 닫고 새로 추가 폼을 열기
+              if (editingAdmin) {
+                setEditingAdmin(null);
+                resetForm();
+              }
+              setShowAddForm(true);
+            }}
           >
             <Add sx={{ fontSize: 20, marginRight: 0.5 }} />
-            관리자 추가
+            {editingAdmin ? '새 관리자 추가' : '관리자 추가'}
           </button>
         )}
       </div>
