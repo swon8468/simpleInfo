@@ -132,7 +132,13 @@ function AdminSystemManagement({ currentAdmin }) {
       try {
         setLoading(true);
         // 세션 삭제 로직 구현 (필요시 DataService에 추가)
-        await logActivity('세션 삭제', 'medium', `세션 ID: ${sessionId}`);
+        await ActivityLogService.logActivity({
+          level: '중',
+          action: '세션 삭제',
+          details: `세션 ID: ${sessionId}`,
+          adminName: currentAdmin?.name || '시스템',
+          adminId: currentAdmin?.adminCode || 'system'
+        });
         showMessage('세션이 삭제되었습니다.', 'success');
         loadActivityLogs();
       } catch (error) {
@@ -162,20 +168,24 @@ function AdminSystemManagement({ currentAdmin }) {
         updatedBy: currentAdmin?.adminCode || 'unknown'
       });
 
-      await logActivity(
-        'PIN 코드 변경',
-        'major',
-        `PIN 코드가 ${pinCode}로 변경됨`
-      );
+      await ActivityLogService.logActivity({
+        level: '대',
+        action: 'PIN 코드 변경',
+        details: `PIN 코드가 ${pinCode}로 변경됨`,
+        adminName: currentAdmin?.name || '시스템',
+        adminId: currentAdmin?.adminCode || 'system'
+      });
 
       showMessage('PIN 코드가 성공적으로 업데이트되었습니다', 'success');
     } catch (error) {
       showMessage('PIN 코드 업데이트 실패', 'error');
-      await logActivity(
-        'PIN 코드 변경 실패',
-        'medium',
-        `오류: ${error.message}`
-      );
+      await ActivityLogService.logActivity({
+        level: '중',
+        action: 'PIN 코드 변경 실패',
+        details: `오류: ${error.message}`,
+        adminName: currentAdmin?.name || '시스템',
+        adminId: currentAdmin?.adminCode || 'system'
+      });
     } finally {
       setLoading(false);
     }
@@ -183,11 +193,13 @@ function AdminSystemManagement({ currentAdmin }) {
 
   const handleTestPinCode = async () => {
     try {
-      await logActivity(
-        'PIN 코드 테스트',
-        'minor',
-        `PIN 코드 ${pinCode} 테스트 실행`
-      );
+      await ActivityLogService.logActivity({
+        level: '소',
+        action: 'PIN 코드 테스트',
+        details: `PIN 코드 ${pinCode} 테스트 실행`,
+        adminName: currentAdmin?.name || '시스템',
+        adminId: currentAdmin?.adminCode || 'system'
+      });
       showMessage('PIN 코드 테스트가 완료되었습니다', 'success');
     } catch (error) {
       showMessage('PIN 코드 테스트 실패', 'error');
