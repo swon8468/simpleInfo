@@ -204,8 +204,17 @@ class ActivityLogService {
 
   // 클라이언트 IP 가져오기 (실제 환경에서는 서버에서 처리해야 함)
   getClientIP() {
-    // 실제 환경에서는 서버에서 IP를 받아와야 함
-    return 'localhost';
+    // 브라우저 환경에서 best-effort로 외부 IP를 가져옵니다.
+    // 외부 네트워크 호출 없이 userAgent 기반 추정은 제한적이므로, 기본은 N/A로 두고
+    // 서버가 없으므로 이후 필요 시 Cloud Function 등으로 교체합니다.
+    try {
+      // Cloudflare 또는 프록시가 X-Forwarded-For를 주지 않는 한, 클라이언트 JS로는 정확 IP 수집이 불가
+      // 임시로 로컬 저장된 최근 IP 사용 (없으면 N/A)
+      const stored = sessionStorage.getItem('clientIP');
+      return stored || 'N/A';
+    } catch (e) {
+      return 'N/A';
+    }
   }
 
   // 세션 ID 생성

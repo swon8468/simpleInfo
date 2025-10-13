@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DataService from '../services/DataService';
 import NotificationService from '../services/NotificationService';
 import './AdminTable.css';
+import { Add, Edit, Delete, Save, Cancel, Article } from '@mui/icons-material';
 
 function AdminAnnouncementTable() {
   const [announcements, setAnnouncements] = useState([]);
@@ -95,9 +96,9 @@ function AdminAnnouncementTable() {
   return (
     <div className="admin-table-container">
       <div className="table-header">
-        <h2>공지사항 관리</h2>
+        <h2><Article sx={{ fontSize: 20, marginRight: 6 }} /> 공지사항 관리</h2>
         <button className="add-btn" onClick={handleAdd} disabled={loading}>
-          + 추가
+          <Add sx={{ fontSize: 18, marginRight: 4 }} /> 추가
         </button>
       </div>
 
@@ -126,10 +127,10 @@ function AdminAnnouncementTable() {
           </div>
           <div className="form-actions">
             <button className="save-btn" onClick={handleSave} disabled={loading}>
-              {loading ? '저장 중...' : '저장'}
+              <Save sx={{ fontSize: 16, marginRight: 4 }} /> {loading ? '저장 중...' : '저장'}
             </button>
             <button className="cancel-btn" onClick={handleCancel} disabled={loading}>
-              취소
+              <Cancel sx={{ fontSize: 16, marginRight: 4 }} /> 취소
             </button>
           </div>
         </div>
@@ -167,14 +168,14 @@ function AdminAnnouncementTable() {
                     onClick={() => handleEdit(announcement)}
                     disabled={loading}
                   >
-                    수정
+                    <Edit sx={{ fontSize: 16, marginRight: 4 }} /> 수정
                   </button>
                   <button 
                     className="delete-btn" 
                     onClick={() => handleDelete(announcement.id)}
                     disabled={loading}
                   >
-                    삭제
+                    <Delete sx={{ fontSize: 16, marginRight: 4 }} /> 삭제
                   </button>
                 </td>
               </tr>

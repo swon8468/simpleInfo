@@ -8,6 +8,7 @@ import NotificationService from '../services/NotificationService';
 import { Warning, Refresh, Notifications } from '@mui/icons-material';
 import logoImage from '/logo.png';
 import './MainScreen.css';
+import ActivityLogService from '../services/ActivityLogService';
 
 function MainScreen() {
   const navigate = useNavigate();
@@ -87,6 +88,9 @@ function MainScreen() {
     
     // 메인 화면 body 색 설정
     document.body.style.background = '#f5f5f5';
+
+    // 접속 로그 기록 (IP는 best-effort, 클라이언트에서 수집 불가 시 N/A)
+    ActivityLogService.logActivity('메인 화면 접속', 'minor', '사용자가 메인 화면(/)에 접속함');
     
     // cleanup에서 원래 색상으로 되돌리기
     return () => {

@@ -24,6 +24,9 @@
 }
 
 .add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background-color: #f8f9fa;
   color: #333;
   border: none;

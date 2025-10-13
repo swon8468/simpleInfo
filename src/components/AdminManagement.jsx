@@ -201,6 +201,10 @@ function AdminManagement({ currentAdmin }) {
   };
 
   const handlePermissionChange = (permissionKey) => {
+    // 일반 관리자일 때는 'adminManagement', 'systemManagement' 권한을 절대 부여할 수 없음
+    if (formData.level !== '최고 관리자' && (permissionKey === 'adminManagement' || permissionKey === 'systemManagement')) {
+      return; // 무시
+    }
     setFormData(prev => ({
       ...prev,
       permissions: prev.permissions.includes(permissionKey)
@@ -216,13 +220,19 @@ function AdminManagement({ currentAdmin }) {
         return;
       }
 
-      // 최고 관리자는 권한 체크 생략
+      // 일반 관리자는 최소 1개 권한 필요
       if (formData.level !== '최고 관리자' && formData.permissions.length === 0) {
         showMessage('최소 하나의 권한을 선택해주세요.', 'error');
         return;
       }
 
-      await DataService.createAdmin(formData);
+      // 일반 관리자일 경우 금지 권한 제거 후 저장
+      const payload = { ...formData };
+      if (payload.level !== '최고 관리자') {
+        payload.permissions = (payload.permissions || []).filter((p) => p !== 'adminManagement' && p !== 'systemManagement');
+      }
+
+      await DataService.createAdmin(payload);
       showMessage('관리자가 성공적으로 생성되었습니다.');
       resetForm();
       loadAdmins();
@@ -249,7 +259,7 @@ function AdminManagement({ currentAdmin }) {
         return;
       }
 
-      // 최고 관리자는 권한 체크 생략
+      // 일반 관리자는 최소 1개 권한 필요
       if (formData.level !== '최고 관리자' && formData.permissions.length === 0) {
         showMessage('최소 하나의 권한을 선택해주세요.', 'error');
         return;
@@ -258,13 +268,19 @@ function AdminManagement({ currentAdmin }) {
       // 관리자 정보 변경 전 원본 정보 저장
       const originalAdmin = editingAdmin;
       
-      await DataService.updateAdmin(editingAdmin.id, formData);
+      // 일반 관리자일 경우 금지 권한 제거 후 업데이트
+      const updatePayload = { ...formData };
+      if (updatePayload.level !== '최고 관리자') {
+        updatePayload.permissions = (updatePayload.permissions || []).filter((p) => p !== 'adminManagement' && p !== 'systemManagement');
+      }
+
+      await DataService.updateAdmin(editingAdmin.id, updatePayload);
       
       // 관리자 정보가 변경된 경우 해당 관리자 연결 해제
       if (originalAdmin.adminCode !== formData.adminCode || 
           originalAdmin.name !== formData.name ||
-          JSON.stringify(originalAdmin.permissions) !== JSON.stringify(formData.permissions) ||
-          originalAdmin.level !== formData.level) {
+          JSON.stringify(originalAdmin.permissions) !== JSON.stringify(updatePayload.permissions) ||
+          originalAdmin.level !== updatePayload.level) {
         
         // 해당 관리자의 모든 세션 연결 해제
         await DataService.disconnectAdminSessions(formData.adminCode);
@@ -411,16 +427,20 @@ function AdminManagement({ currentAdmin }) {
               </div>
             ) : (
               <div className="permissions-grid">
-                {permissionOptions.map(option => (
-                  <label key={option.key} className="permission-item">
-                    <input
-                      type="checkbox"
-                      checked={formData.permissions.includes(option.key)}
-                      onChange={() => handlePermissionChange(option.key)}
-                    />
-                    <span>{option.label}</span>
-                  </label>
-                ))}
+                {permissionOptions.map(option => {
+                  const disabled = formData.level !== '최고 관리자' && (option.key === 'adminManagement' || option.key === 'systemManagement');
+                  return (
+                    <label key={option.key} className="permission-item" style={disabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}>
+                      <input
+                        type="checkbox"
+                        checked={formData.permissions.includes(option.key)}
+                        onChange={() => handlePermissionChange(option.key)}
+                        disabled={disabled}
+                      />
+                      <span>{option.label}{disabled ? ' (최고 관리자 전용)' : ''}</span>
+                    </label>
+                  );
+                })}
               </div>
             )}
           </div>
