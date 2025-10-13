@@ -241,7 +241,7 @@ function AdminPanel() {
     setCurrentAdmin(admin);
     
     // 권한이 있는 첫 번째 탭으로 이동
-    const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement'];
+    const availableTabs = ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'];
     const firstAvailableTab = availableTabs.find(tab => hasPermission(tab));
     if (firstAvailableTab) {
       setActiveTab(firstAvailableTab);
@@ -506,10 +506,11 @@ function AdminPanel() {
               </div>
             </div>
             <div className="header-buttons">
-              <div className="admin-info">
-                <span className="admin-name">{currentAdmin?.name}</span>
-                <span className="admin-code">{currentAdmin?.adminCode}</span>
-              </div>
+          <div className="admin-info">
+            <span className="admin-name">{currentAdmin?.name}</span>
+            <span className="admin-code">{currentAdmin?.adminCode}</span>
+            <span className="admin-permissions">권한: {currentAdmin?.permissions?.join(', ') || '없음'}</span>
+          </div>
               <button className="logout-btn" onClick={handleLogout}>
                 로그아웃
               </button>
@@ -609,6 +610,12 @@ function AdminPanel() {
               >
                 시스템 관리
               </button>
+            )}
+            {/* 디버깅: 시스템 관리 권한 확인 */}
+            {currentAdmin && (
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+                시스템 관리 권한: {hasPermission('systemManagement') ? '있음' : '없음'}
+              </div>
             )}
             {/* 권한이 없는 경우 메시지 표시 */}
             {!currentAdmin?.permissions?.length && (
