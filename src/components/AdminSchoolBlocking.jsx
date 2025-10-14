@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
 import NotificationService from '../services/NotificationService';
+import ActivityLogService from '../services/ActivityLogService';
 import { School, Block, CheckCircle, Assignment, Warning, Block as BlockIcon, Refresh } from '@mui/icons-material';
 import './AdminSchoolBlocking.css';
 
-function AdminSchoolBlocking() {
+function AdminSchoolBlocking({ currentAdmin }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [blockingStatus, setBlockingStatus] = useState(false);
@@ -50,6 +51,11 @@ function AdminSchoolBlocking() {
         console.error('차단 알림 발송 실패:', error);
       }
       
+      // 로그 기록
+      if (currentAdmin) {
+        await ActivityLogService.logSchoolBlockingToggle(true, currentAdmin);
+      }
+      
       setMessage('학교 생활 도우미가 차단되었습니다. 모든 디바이스에 즉시 적용됩니다.');
       setBlockingStatus(true);
     } catch (error) {
@@ -75,6 +81,11 @@ function AdminSchoolBlocking() {
         await NotificationService.showBlockingNotification(false);
       } catch (error) {
         console.error('차단 해제 알림 발송 실패:', error);
+      }
+      
+      // 로그 기록
+      if (currentAdmin) {
+        await ActivityLogService.logSchoolBlockingToggle(false, currentAdmin);
       }
       
       setMessage('학교 생활 도우미 차단이 해제되었습니다. 모든 디바이스가 정상 작동합니다.');

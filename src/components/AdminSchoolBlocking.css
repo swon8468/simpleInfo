@@ -27,6 +27,8 @@
 
 .status-section {
   margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
 }
 
 .status-indicator {
@@ -38,6 +40,8 @@
   font-size: 1.3rem;
   font-weight: 600;
   gap: 15px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .status-indicator.active {

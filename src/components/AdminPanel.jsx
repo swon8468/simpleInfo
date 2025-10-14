@@ -187,6 +187,36 @@ function AdminPanel() {
     }
   }, []);
 
+  // 탭 변경 시 해당 데이터 로드
+  useEffect(() => {
+    if (!isAuthenticated || !currentAdmin) return;
+
+    const loadTabData = async () => {
+      try {
+        switch (activeTab) {
+          case 'pins':
+            await fetchActivePins();
+            break;
+          case 'allergy':
+            await loadAllergyData();
+            break;
+          case 'campusLayout':
+            await loadCampusLayoutImage();
+            break;
+          case 'schoolBlocking':
+            await checkSchoolBlockingStatus();
+            break;
+          default:
+            break;
+        }
+      } catch (error) {
+        console.error(`${activeTab} 탭 데이터 로드 실패:`, error);
+      }
+    };
+
+    loadTabData();
+  }, [activeTab, isAuthenticated, currentAdmin]);
+
   // 알레르기 정보 로드 (새로운 컬렉션 사용)
   const loadAllergyData = async () => {
     try {
@@ -285,7 +315,7 @@ function AdminPanel() {
   };
 
   // 인증 성공 핸들러
-  const handleAuthSuccess = (admin) => {
+  const handleAuthSuccess = async (admin) => {
     setIsAuthenticated(true);
     setCurrentAdmin(admin);
     
@@ -294,6 +324,41 @@ function AdminPanel() {
     const firstAvailableTab = availableTabs.find(tab => hasPermission(tab));
     if (firstAvailableTab) {
       setActiveTab(firstAvailableTab);
+    }
+
+    // 인증 성공 시 모든 초기 데이터 로드
+    try {
+      // 학교 차단 상태 확인
+      await checkSchoolBlockingStatus();
+      
+      // 시스템 모니터링 시작
+      SystemMonitoringService.startMonitoring();
+      
+      // 시스템 상태 체크
+      await SystemMonitoringService.checkSystemHealth();
+      const initialSystemStatus = await SystemMonitoringService.getCurrentStatus();
+      if (initialSystemStatus) {
+        setSystemStatus(initialSystemStatus);
+      }
+      
+      // PIN 목록 가져오기
+      await fetchActivePins();
+      
+      // 알레르기 정보 로드
+      await loadAllergyData();
+      
+      // 교실 배치 이미지 로드
+      await loadCampusLayoutImage();
+      
+      // 여러 번 시도로 접속 전 연결된 PIN 포함
+      const retryDelays = [1000, 3000, 5000, 8000];
+      retryDelays.forEach((delay, index) => {
+        setTimeout(() => {
+          fetchActivePins();
+        }, delay);
+      });
+    } catch (error) {
+      console.error('초기 데이터 로드 실패:', error);
     }
   };
 
@@ -689,6 +754,21 @@ function AdminPanel() {
                 <div className="allergy-management">
                   <div className="allergy-items-list">
                     <h3>현재 알레르기 항목</h3>
+                    <button 
+                      type="button" 
+                      onClick={loadAllergyData}
+                      style={{ 
+                        marginBottom: '10px', 
+                        padding: '5px 10px', 
+                        fontSize: '12px',
+                        backgroundColor: '#f0f0f0',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      새로고침
+                    </button>
                     {Array.isArray(allergyForm.items) && allergyForm.items.length > 0 ? (
                       <div className="allergy-items">
                         {allergyForm.items.map((item, index) => (
@@ -817,7 +897,7 @@ function AdminPanel() {
 
             {activeTab === 'mainNotice' && (
               <div className="form-section">
-                <AdminMainNotice />
+                <AdminMainNotice currentAdmin={currentAdmin} />
               </div>
             )}
 
@@ -829,7 +909,7 @@ function AdminPanel() {
 
             {activeTab === 'schoolBlocking' && (
               <div className="form-section">
-                <AdminSchoolBlocking />
+                <AdminSchoolBlocking currentAdmin={currentAdmin} />
               </div>
             )}
 
@@ -885,13 +965,13 @@ function AdminPanel() {
                   <p
                     className="realtime-indicator"
                     style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                    onClick={() => {
-                      fetchActivePins();
-                      setActiveTab('pins');
-                      setPinMessage('새로고침 실행 중...');
+                    onClick={async () => {
+                      await fetchActivePins();
+                      setPinMessage('새로고침 완료');
+                      setTimeout(() => setPinMessage(''), 2000);
                     }}
                   >
-                    PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침되고 PIN관리 탭으로 이동됩니다.
+                    PIN이 보이지 않으면 <span style={{ color: '#007bff', fontWeight: 'bold' }}>여기</span>를 누르면 새로고침됩니다.
                   </p>
                   {activePins.length >= 10 && (
                     <p className="pin-warning"><Warning sx={{ fontSize: 16, marginRight: 0.5 }} /> 최대 PIN 개수에 도달했습니다. 새로운 PIN 생성을 위해 기존 PIN을 제거해주세요.</p>

@@ -95,13 +95,17 @@ function OutputMain() {
         }
       });
       
-      // 학교 차단 상태 실시간 모니터링
-      const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus((isBlocked) => {
-        if (isBlocked) {
-          // 차단 상태가 되면 메인 화면으로 이동
-          navigate('/');
-        }
-      });
+      // 학교 차단 상태는 SchoolBlockingScreen에서 처리하므로 여기서는 제거
+      // const unsubscribeBlocking = ConnectionDB.subscribeToSchoolBlockingStatus(async (isBlocked) => {
+      //   if (isBlocked) {
+      //     // 메인 공지사항이 활성화된 경우 차단하지 않음
+      //     const mainNoticeActive = await ConnectionDB.getMainNoticeStatus();
+      //     if (!mainNoticeActive) {
+      //       // 차단 상태가 되면 메인 화면으로 이동
+      //       navigate('/');
+      //     }
+      //   }
+      // });
       
       // Heartbeat 주기적 실행 (연결 유지) - 1분마다
       const heartbeatInterval = setInterval(async () => {
@@ -114,7 +118,7 @@ function OutputMain() {
       
       return () => {
         clearInterval(heartbeatInterval);
-        unsubscribeBlocking();
+        // unsubscribeBlocking(); // 제거됨
       };
     } else {
       // 세션 정보가 없으면 메인 화면으로 리다이렉트
@@ -650,13 +654,16 @@ function OutputMain() {
       loadAnnouncementData();
     }, [controlData?.announcementIndex]);
 
-    // 공지사항이 변경될 때마다 TTS로 내용 읽기
+    // 공지사항이 변경될 때마다 TTS로 내용 읽기 (자동 재생 활성화)
     useEffect(() => {
       if (announcementData && controlData?.announcementIndex !== undefined) {
         const currentIndex = controlData.announcementIndex || 0;
         const currentAnnouncement = announcementData[currentIndex] || announcementData[0];
         
         if (currentAnnouncement && currentAnnouncement.content) {
+          // TTS 자동 재생 활성화
+          TTSService.activateTTS();
+          
           // 약간의 지연 후 TTS 시작 (화면 렌더링 완료 후)
           const timer = setTimeout(() => {
             TTSService.speakAnnouncementContent(currentAnnouncement);

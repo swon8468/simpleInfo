@@ -781,27 +781,6 @@ class DataService {
     }
   }
 
-  // 초기 관리자 생성 (최고 관리자)
-  async createInitialAdmin() {
-    try {
-      const existingAdmins = await this.getAdmins();
-      if (existingAdmins.length > 0) {
-        return; // 이미 관리자가 있으면 생성하지 않음
-      }
-
-      await this.createAdmin({
-        name: '시스템 관리자',
-        adminCode: 'swon8468',
-        permissions: ['schedule', 'meal', 'announcement', 'allergy', 'campusLayout', 'mainNotice', 'patchnotes', 'schoolBlocking', 'pins', 'adminManagement', 'systemManagement'],
-        level: '최고 관리자'
-      });
-      
-      console.log('초기 관리자 생성 완료');
-    } catch (error) {
-      console.error('초기 관리자 생성 실패:', error);
-      throw error;
-    }
-  }
 
   // 관리자 세션 연결 해제
   async disconnectAdminSessions(adminCode) {

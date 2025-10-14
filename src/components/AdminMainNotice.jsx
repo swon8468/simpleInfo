@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import ConnectionDB from '../services/ConnectionDB';
+import ActivityLogService from '../services/ActivityLogService';
 import './AdminMainNotice.css';
 
-function AdminMainNotice() {
+function AdminMainNotice({ currentAdmin }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [activePins, setActivePins] = useState([]);
@@ -191,6 +192,11 @@ function AdminMainNotice() {
       );
 
       // 메인 공지사항은 알림 발송하지 않음
+
+      // 메인 공지사항 활성화 로그 기록
+      if (currentAdmin) {
+        await ActivityLogService.logMainNoticeToggle(true, noticeForm.title, currentAdmin);
+      }
 
       setMessage('메인 공지사항이 성공적으로 전송되었습니다.');
       setNoticeForm({

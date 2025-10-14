@@ -73,25 +73,43 @@ function ControlConnection() {
       )}
 
       <div className="keypad">
-        <div className="keypad-row">
+        {/* 매우 작은 높이에서는 한 줄로 배치 */}
+        <div className="compact-layout">
           <button className="key" onClick={() => handleNumberClick('1')}>1</button>
           <button className="key" onClick={() => handleNumberClick('2')}>2</button>
           <button className="key" onClick={() => handleNumberClick('3')}>3</button>
-        </div>
-        <div className="keypad-row">
           <button className="key" onClick={() => handleNumberClick('4')}>4</button>
           <button className="key" onClick={() => handleNumberClick('5')}>5</button>
           <button className="key" onClick={() => handleNumberClick('6')}>6</button>
-        </div>
-        <div className="keypad-row">
           <button className="key" onClick={() => handleNumberClick('7')}>7</button>
           <button className="key" onClick={() => handleNumberClick('8')}>8</button>
           <button className="key" onClick={() => handleNumberClick('9')}>9</button>
-        </div>
-        <div className="keypad-row">
-          <button className="key backspace" onClick={handleBackspace}>⌫</button>
           <button className="key" onClick={() => handleNumberClick('0')}>0</button>
-          <button className="key empty"></button>
+          <button className="key backspace" onClick={handleBackspace}>⌫</button>
+        </div>
+        
+        {/* 일반적인 높이에서는 기존 레이아웃 */}
+        <div className="normal-layout">
+          <div className="keypad-row">
+            <button className="key" onClick={() => handleNumberClick('1')}>1</button>
+            <button className="key" onClick={() => handleNumberClick('2')}>2</button>
+            <button className="key" onClick={() => handleNumberClick('3')}>3</button>
+          </div>
+          <div className="keypad-row">
+            <button className="key" onClick={() => handleNumberClick('4')}>4</button>
+            <button className="key" onClick={() => handleNumberClick('5')}>5</button>
+            <button className="key" onClick={() => handleNumberClick('6')}>6</button>
+          </div>
+          <div className="keypad-row">
+            <button className="key" onClick={() => handleNumberClick('7')}>7</button>
+            <button className="key" onClick={() => handleNumberClick('8')}>8</button>
+            <button className="key" onClick={() => handleNumberClick('9')}>9</button>
+          </div>
+          <div className="keypad-row">
+            <button className="key backspace" onClick={handleBackspace}>⌫</button>
+            <button className="key" onClick={() => handleNumberClick('0')}>0</button>
+            <button className="key empty"></button>
+          </div>
         </div>
       </div>
 

@@ -5,11 +5,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 10px;
   font-family: 'Arial', sans-serif;
   text-align: center;
   width: 100%;
+  max-width: 100vw;
   box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .monitor-icon {
@@ -31,22 +34,50 @@
 
 .pin-display {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  padding: 0 10px;
 }
 
 .pin-digit {
-  width: 50px;
-  height: 60px;
+  width: 45px;
+  height: 55px;
   border: 2px solid #ddd;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: bold;
   background-color: white;
   color: #333;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .pin-digit {
+    width: 40px;
+    height: 50px;
+    font-size: 1.1rem;
+  }
+  
+  .pin-display {
+    gap: 6px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .pin-digit {
+    width: 50px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+  
+  .pin-display {
+    gap: 10px;
+  }
 }
 
 .pin-digit.empty {
@@ -57,27 +88,110 @@
 .keypad {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  margin-bottom: 40px;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 10px;
 }
 
 .keypad-row {
   display: flex;
-  gap: 15px;
+  gap: 8px;
   justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 매우 작은 높이에서 한 줄로 배치 */
+@media (max-height: 500px) {
+  .keypad {
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 15px;
+  }
+  
+  /* 작은 높이에서는 compact-layout만 표시 */
+  .compact-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+  }
+  
+  .normal-layout {
+    display: none;
+  }
+}
+
+/* 기본적으로 normal-layout만 표시 */
+.compact-layout {
+  display: none;
+}
+
+.normal-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 일반적인 높이에서는 normal-layout만 표시 */
+@media (min-height: 501px) {
+  .compact-layout {
+    display: none;
+  }
+  
+  .normal-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
 }
 
 .key {
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
   border: none;
-  border-radius: 10px;
-  font-size: 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: bold;
   background-color: #4CAF50;
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 768px) {
+  .key {
+    width: 45px;
+    height: 45px;
+    font-size: 0.9rem;
+  }
+  
+  .keypad-row {
+    gap: 6px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .key {
+    width: 60px;
+    height: 60px;
+    font-size: 1.2rem;
+  }
+  
+  .keypad-row {
+    gap: 10px;
+  }
+}
+
+/* 매우 작은 높이에서 키 크기 조정 */
+@media (max-height: 500px) {
+  .key {
+    width: 40px;
+    height: 40px;
+    font-size: 0.8rem;
+  }
 }
 
 .key:hover {

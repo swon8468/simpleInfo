@@ -1,4 +1,5 @@
 import { db } from '../firebase';
+import ActivityLogService from './ActivityLogService';
 import { 
   collection, 
   doc, 
@@ -76,6 +77,12 @@ class ConnectionDB {
       const outputSessions = await this.findOutputSessionByPin(pin);
       
       if (outputSessions.length === 0) {
+        // 연결 실패 로그 기록
+        try {
+          await ActivityLogService.logConnectionFailure(pin, '유효하지 않은 PIN');
+        } catch (logError) {
+          console.error('연결 실패 로그 기록 실패:', logError);
+        }
         return { success: false, error: '유효하지 않은 PIN입니다.' };
       }
       
@@ -83,6 +90,12 @@ class ConnectionDB {
       
       // 이미 연결된 상태인지 확인
       if (outputSession.status === 'connected' || outputSession.connectedControlSession) {
+        // 연결 실패 로그 기록
+        try {
+          await ActivityLogService.logConnectionFailure(pin, '이미 다른 제어용 디바이스에 연결됨');
+        } catch (logError) {
+          console.error('연결 실패 로그 기록 실패:', logError);
+        }
         return { success: false, error: '이 PIN은 이미 다른 제어용 디바이스에 연결되어 있습니다.' };
       }
       
@@ -120,6 +133,17 @@ class ConnectionDB {
         controlSessionId: controlSessionId,
         pairingId: pairingId
       });
+      
+      // 기기 연결 성공 로그 기록
+      try {
+        await ActivityLogService.logConnectionSuccess(
+          controlSessionId, 
+          outputSession.sessionId, 
+          pin
+        );
+      } catch (logError) {
+        console.error('연결 로그 기록 실패:', logError);
+      }
       
       return { 
         success: true, 
@@ -600,18 +624,40 @@ class ConnectionDB {
     }
   }
 
+  // 메인 공지사항 활성 상태 확인
+  async getMainNoticeStatus() {
+    try {
+      const settingsRef = collection(db, 'settings');
+      const mainNoticeDoc = doc(settingsRef, 'mainNotice');
+      const docSnapshot = await getDoc(mainNoticeDoc);
+      
+      if (docSnapshot.exists()) {
+        return docSnapshot.data().isActive || false;
+      }
+      return false;
+    } catch (error) {
+      console.error('메인 공지사항 상태 조회 실패:', error);
+      return false;
+    }
+  }
+
   // 학교 생활 도우미 차단 관련 함수들
   async getSchoolBlockingStatus() {
     try {
       const settingsRef = collection(db, 'settings');
       const blockingDoc = doc(settingsRef, 'schoolBlocking');
-      const docSnap = await getDoc(blockingDoc);
+      const mainNoticeDoc = doc(settingsRef, 'mainNotice');
       
-      if (docSnap.exists()) {
-        return docSnap.data().isActive || false;
-      }
+      const [blockingSnapshot, mainNoticeSnapshot] = await Promise.all([
+        getDoc(blockingDoc),
+        getDoc(mainNoticeDoc)
+      ]);
       
-      return false;
+      const blockingActive = blockingSnapshot.exists() ? (blockingSnapshot.data().isActive || false) : false;
+      const mainNoticeActive = mainNoticeSnapshot.exists() ? (mainNoticeSnapshot.data().isActive || false) : false;
+      
+      // 메인 공지사항이 활성화된 경우 차단 무시
+      return blockingActive && !mainNoticeActive;
     } catch (error) {
       console.error('차단 상태 조회 실패:', error);
       return false;
@@ -633,18 +679,38 @@ class ConnectionDB {
     }
   }
 
-  // 학교 차단 상태 구독 함수
+  // 학교 차단 상태 구독 함수 (메인 공지사항 활성화시 차단 무시)
   subscribeToSchoolBlockingStatus(callback) {
     const settingsRef = collection(db, 'settings');
-    const blockingDoc = doc(settingsRef, 'schoolBlocking');
-    
-    return onSnapshot(blockingDoc, (doc) => {
-      if (doc.exists()) {
-        callback(doc.data().isActive || false);
-      } else {
-        callback(false);
+    const blockingRef = doc(settingsRef, 'schoolBlocking');
+    const mainNoticeRef = doc(settingsRef, 'mainNotice');
+
+    let blockingActive = false;
+    let mainNoticeActive = false;
+
+    const emit = () => {
+      const shouldBlock = blockingActive && !mainNoticeActive;
+      try {
+        callback(shouldBlock);
+      } catch (e) {
+        console.error('subscribeToSchoolBlockingStatus 콜백 오류:', e);
       }
+    };
+
+    const unsubBlock = onSnapshot(blockingRef, (snap) => {
+      blockingActive = snap.exists() ? (snap.data().isActive || false) : false;
+      emit();
     });
+
+    const unsubNotice = onSnapshot(mainNoticeRef, (snap) => {
+      mainNoticeActive = snap.exists() ? (snap.data().isActive || false) : false;
+      emit();
+    });
+
+    return () => {
+      try { unsubBlock && unsubBlock(); } catch {}
+      try { unsubNotice && unsubNotice(); } catch {}
+    };
   }
 
   // 모든 연결된 디바이스에 차단 상태 알림 전송

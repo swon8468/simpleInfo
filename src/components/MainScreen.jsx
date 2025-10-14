@@ -243,12 +243,7 @@ function MainScreen() {
           <div className="active-pin-warning">
             <h3><Warning sx={{ fontSize: 24, marginRight: 1 }} /> 최대 연결 수에 도달했습니다</h3>
             <p>현재 활성화된 연결: <strong>{activePinCount}</strong>개 / 최대 10개</p>
-            <p>새로운 연결을 위해서는 관리자 페이지에서 기존 PIN을 제거해야 합니다.</p>
-            <div className="warning-buttons">
-              <button className="mode-btn admin-btn" onClick={handleAdminMode}>
-                관리자 페이지로 이동
-              </button>
-            </div>
+            <p>새로운 연결을 위해서는 관리자에게 문의해주세요.</p>
           </div>
         ) : (
           <>
