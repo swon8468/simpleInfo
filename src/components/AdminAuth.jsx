@@ -16,22 +16,12 @@ function AdminAuth({ onSuccess }) {
     // 관리자 인증 화면 body 색 설정
     document.body.style.background = '#f5f5f5';
     
-    // 초기 관리자 생성 (최고 관리자)
-    initializeAdmin();
-    
     return () => {
       document.body.style.background = '#f5f5f5';
     };
   }, []);
 
-  // 초기 관리자 생성
-  const initializeAdmin = async () => {
-    try {
-      await DataService.createInitialAdmin();
-    } catch (error) {
-      console.error('초기 관리자 생성 실패:', error);
-    }
-  };
+  // 초기 관리자 생성 로직 제거됨 – 운영 환경에서는 사전 등록된 관리자만 사용
 
   const handleSubmit = async (e) => {
     e.preventDefault();
