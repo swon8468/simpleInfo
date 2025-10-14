@@ -3,20 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/simpleInfo/logo.svg" />
-    <script>
-      // handle redirect from 404.html (GitHub Pages SPA)
-      (function() {
-        var l = window.location;
-        var params = new URLSearchParams(l.search);
-        var p = params.get('p');
-        if (p) {
-          var restored = '/' + p.replace(/~/g, '/');
-          var q = params.get('q');
-          var newUrl = restored + (q ? ('?' + q) : '') + l.hash;
-          window.history.replaceState(null, '', newUrl);
-        }
-      })();
-    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>학교생활도우미</title>
     <script type="module" crossorigin src="/simpleInfo/assets/index-B_qN5Mnq.js"></script>
