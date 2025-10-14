@@ -4,17 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/simpleInfo/logo.svg" />
     <script>
-      // handle redirect from 404.html (GitHub Pages SPA)
+      // GitHub Pages SPA fallback: redirect unknown routes to index preserving path
       (function() {
+        var pathSegmentsToKeep = 1; // keep '/simpleInfo'
         var l = window.location;
-        var params = new URLSearchParams(l.search);
-        var p = params.get('p');
-        if (p) {
-          var restored = '/' + p.replace(/~/g, '/');
-          var q = params.get('q');
-          var newUrl = restored + (q ? ('?' + q) : '') + l.hash;
-          window.history.replaceState(null, '', newUrl);
-        }
+        if (l.search.startsWith('?')) return;
+        var redirect = l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+          l.pathname.split('/').slice(0, pathSegmentsToKeep + 1).join('/') + '/?p=' +
+          l.pathname.slice(1).replace(/\//g, '~') + (l.search ? '&q=' + l.search.slice(1) : '') + l.hash;
+        if (!l.search.includes('p=')) l.replace(redirect);
       })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
