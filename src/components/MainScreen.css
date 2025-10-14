@@ -263,6 +263,34 @@
   font-size: 1.1rem;
 }
 
+/* PWA 설치 버튼 */
+.install-button {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  border: none;
+  border-radius: 10px;
+  padding: 15px 20px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.3);
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 130px;
+}
+
+.install-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.install-icon {
+  font-size: 1.1rem;
+}
+
 /* 패치 노트 모달 */
 .modal-overlay {
   position: fixed;

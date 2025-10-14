@@ -5,7 +5,7 @@ import { db } from '../firebase';
 import ConnectionDB from '../services/ConnectionDB';
 import DataService from '../services/DataService';
 import NotificationService from '../services/NotificationService';
-import { Warning, Refresh, Notifications } from '@mui/icons-material';
+import { Warning, Refresh, Notifications, GetApp } from '@mui/icons-material';
 import logoImage from '/logo.png';
 import './MainScreen.css';
 import ActivityLogService from '../services/ActivityLogService';
@@ -22,6 +22,8 @@ function MainScreen() {
   const [notificationSupported, setNotificationSupported] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState(false);
   const [schoolBlockingStatus, setSchoolBlockingStatus] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallButton, setShowInstallButton] = useState(false);
 
   // 버전 비교 함수 (v2.0.0 > v1.9.0 > v1.8.0)
   const compareVersions = (a, b) => {
@@ -138,6 +140,21 @@ function MainScreen() {
   };
 
   useEffect(() => {
+    // PWA 설치 프롬프트 처리
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallButton(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    // PWA 설치 완료 처리
+    window.addEventListener('appinstalled', () => {
+      setShowInstallButton(false);
+      setDeferredPrompt(null);
+    });
+
     // 활성화된 PIN 확인
     checkActivePin();
     
@@ -198,6 +215,23 @@ function MainScreen() {
       }
     };
   }, [navigate]);
+
+  // PWA 설치 함수
+  const handleInstallPWA = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('PWA 설치 승인됨');
+      } else {
+        console.log('PWA 설치 거부됨');
+      }
+      
+      setDeferredPrompt(null);
+      setShowInstallButton(false);
+    }
+  };
 
   const handleControlMode = () => {
     navigate('/control');
@@ -287,6 +321,14 @@ function MainScreen() {
           <button className="notification-button" onClick={requestNotificationPermission}>
             <span className="notification-icon"><Notifications sx={{ fontSize: 24 }} /></span>
             <span>알림 허용</span>
+          </button>
+        )}
+        
+        {/* PWA 설치 버튼 */}
+        {showInstallButton && (
+          <button className="install-button" onClick={handleInstallPWA}>
+            <span className="install-icon"><GetApp sx={{ fontSize: 24 }} /></span>
+            <span>앱 설치</span>
           </button>
         )}
       </div>

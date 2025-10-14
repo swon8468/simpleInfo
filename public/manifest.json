@@ -1,0 +1,27 @@
+{
+  "name": "학교생활도우미",
+  "short_name": "학교생활도우미",
+  "description": "학교 생활을 도와주는 통합 관리 시스템",
+  "start_url": "/simpleInfo/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2196F3",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/simpleInfo/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/simpleInfo/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "lang": "ko",
+  "dir": "ltr"
+}
