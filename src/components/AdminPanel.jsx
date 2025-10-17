@@ -57,6 +57,11 @@ function AdminPanel() {
     }
   }, [location.search, navigate]);
 
+  // 컴포넌트 마운트 시 교실 배치 이미지 로드
+  useEffect(() => {
+    loadCampusLayoutImages();
+  }, []);
+
   useEffect(() => {
     // 관리자 화면 body 색 설정
     document.body.style.background = '#f5f5f5';

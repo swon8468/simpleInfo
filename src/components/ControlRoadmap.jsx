@@ -38,17 +38,23 @@ function ControlRoadmap() {
 
   const handleImageSelect = async (imageId) => {
     setSelectedImageId(imageId);
-    await sendControlData('roadmap', imageId);
+    // 로딩 상태 전송
+    await sendControlData('roadmap', imageId, true);
+    // 잠시 후 로딩 상태 해제
+    setTimeout(async () => {
+      await sendControlData('roadmap', imageId, false);
+    }, 1000);
   };
 
-  const sendControlData = async (page, imageId = null) => {
+  const sendControlData = async (page, imageId = null, isLoading = false) => {
     const controlSessionId = sessionStorage.getItem('controlSessionId');
     
     if (controlSessionId) {
       try {
         await ConnectionDB.sendControlData(controlSessionId, {
           currentPage: page,
-          selectedImageId: imageId
+          selectedImageId: imageId,
+          isLoading: isLoading
         });
       } catch (error) {
         console.error('제어 데이터 전송 실패:', error);

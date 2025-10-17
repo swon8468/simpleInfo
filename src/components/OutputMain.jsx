@@ -426,16 +426,6 @@ function OutputMain() {
                           {day.events.map((event, eventIndex) => (
                             <div key={eventIndex} className="event-item">
                               <div className="event-title">{event.title}</div>
-                              {event.target && event.target.length > 0 && (
-                                <div className="event-target">
-                                  {event.target.length > 1 ? 
-                                    event.target.map((grade, gradeIndex) => (
-                                      <div key={gradeIndex} className="grade-item">{grade}</div>
-                                    )) : 
-                                    event.target.join(', ')
-                                  }
-                                </div>
-                              )}
                             </div>
                           ))}
                         </div>
@@ -479,16 +469,6 @@ function OutputMain() {
                             {day.events.map((event, eventIndex) => (
                               <div key={eventIndex} className="week-event-item">
                                 <div className="event-title">{event.title}</div>
-                                {event.target && event.target.length > 0 && (
-                                  <div className="event-target">
-                                    {event.target.length > 1 ? 
-                                      event.target.map((grade, gradeIndex) => (
-                                        <div key={gradeIndex} className="grade-item">{grade}</div>
-                                      )) : 
-                                      event.target.join(', ')
-                                    }
-                                  </div>
-                                )}
                               </div>
                             ))}
                           </div>
@@ -580,6 +560,12 @@ function OutputMain() {
     useEffect(() => {
       const loadCampusImage = async () => {
         try {
+          // 제어 데이터에서 로딩 상태가 true이면 로딩 표시
+          if (controlData?.isLoading) {
+            setLoading(true);
+            return;
+          }
+
           // 제어 데이터에서 선택된 이미지 ID가 있으면 해당 이미지 로드
           if (controlData?.selectedImageId) {
             const imageData = await DataService.getCampusLayoutImage(controlData.selectedImageId);
@@ -607,7 +593,7 @@ function OutputMain() {
       };
 
       loadCampusImage();
-    }, [controlData?.selectedImageId]);
+    }, [controlData?.selectedImageId, controlData?.isLoading]);
 
     if (loading) {
       return (
