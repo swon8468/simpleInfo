@@ -1,0 +1,209 @@
+/* 학교 생활 도우미 차단 화면 */
+.school-blocking-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.blocking-container {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+}
+
+.blocking-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.blocking-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+.blocking-message {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.blocking-details {
+  background: #f8f9fa;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 15px 0;
+  padding: 0 20px;
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  min-width: 40px;
+}
+
+.detail-item span:last-child {
+  color: #333;
+  font-size: 1rem;
+}
+
+.blocking-footer {
+  border-top: 2px solid #e9ecef;
+  padding-top: 20px;
+}
+
+.blocking-footer p {
+  margin: 8px 0;
+  color: #666;
+}
+
+.contact-info {
+  font-style: italic;
+  color: #888 !important;
+}
+
+/* 관리자 차단 제어 */
+.admin-blocking-control {
+  padding: 40px;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.blocking-control-card {
+  background: white;
+  border-radius: 15px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.blocking-control-card h3 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+.control-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.block-btn,
+.unblock-btn {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.block-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+}
+
+.block-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+.unblock-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+}
+
+.unblock-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.unblock-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.control-info {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .blocking-container {
+    padding: 30px 20px;
+    border-radius: 15px;
+  }
+  
+  .blocking-icon {
+    font-size: 3rem;
+  }
+  
+  .blocking-title {
+    font-size: 1.5rem;
+  }
+  
+  .blocking-message {
+    font-size: 1rem;
+  }
+  
+  .blocking-details {
+    padding: 20px;
+  }
+  
+  .detail-item {
+    flex-direction: row;
+    text-align: left;
+    padding: 8px 0;
+  }
+  
+  .control-buttons {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .block-btn,
+  .unblock-btn {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .admin-blocking-control {
+    padding: 20px;
+  }
+  
+  .blocking-control-card {
+    padding: 30px 20px;
+  }
+}
