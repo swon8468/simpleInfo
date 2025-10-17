@@ -1,11 +1,11 @@
 const CACHE_NAME = 'school-life-helper-v1';
 const urlsToCache = [
-  '/simpleInfo/',
-  '/simpleInfo/index.html',
-  '/simpleInfo/assets/index-B_qN5Mnq.js',
-  '/simpleInfo/assets/index-DrlUxP42.css',
-  '/simpleInfo/logo.png',
-  '/simpleInfo/logo.svg'
+  '/',
+  '/index.html',
+  '/assets/index-B_qN5Mnq.js',
+  '/assets/index-DrlUxP42.css',
+  '/logo.png',
+  '/logo.svg'
 ];
 
 self.addEventListener('install', (event) => {
