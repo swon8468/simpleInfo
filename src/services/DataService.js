@@ -53,7 +53,6 @@ class DataService {
       
       return schedules;
     } catch (error) {
-      console.error('학사일정 데이터 가져오기 실패:', error);
       return {};
     }
   }
@@ -61,14 +60,11 @@ class DataService {
   // 주간 학사일정 데이터 가져오기
   async getWeeklyScheduleData(startDate, endDate) {
     try {
-      console.log('DataService: 주간 학사일정 데이터 가져오기 시작', { startDate, endDate });
-      
       // Date 객체를 Firebase Timestamp로 변환
       const startTimestamp = Timestamp.fromDate(startDate);
       const endTimestamp = Timestamp.fromDate(endDate);
       
-      console.log('DataService: 변환된 타임스탬프', { startTimestamp, endTimestamp });
-      
+
       const scheduleRef = collection(db, 'schedules');
       const q = query(
         scheduleRef,
@@ -96,10 +92,8 @@ class DataService {
         });
       });
       
-      console.log('DataService: 주간 학사일정 데이터 가져오기 완료', schedules);
       return schedules;
     } catch (error) {
-      console.error('주간 학사일정 데이터 가져오기 실패:', error);
       return {};
     }
   }
@@ -116,10 +110,7 @@ class DataService {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      
-      console.log('학사일정이 추가되었습니다:', { year, month, day, title, target });
     } catch (error) {
-      console.error('학사일정 추가 실패:', error);
       throw error;
     }
   }
@@ -139,9 +130,7 @@ class DataService {
         ...updateData,
         updatedAt: serverTimestamp()
       });
-      console.log('학사일정이 수정되었습니다.');
     } catch (error) {
-      console.error('학사일정 수정 실패:', error);
       throw error;
     }
   }
@@ -151,9 +140,7 @@ class DataService {
     try {
       const eventRef = doc(db, 'schedules', eventId);
       await deleteDoc(eventRef);
-      console.log('학사일정이 삭제되었습니다.');
     } catch (error) {
-      console.error('학사일정 삭제 실패:', error);
       throw error;
     }
   }
@@ -186,7 +173,6 @@ class DataService {
         });
       }
     } catch (error) {
-      console.error('학사일정 업데이트 실패:', error);
     }
   }
 
@@ -213,7 +199,6 @@ class DataService {
         dinner: []
       };
     } catch (error) {
-      console.error('급식 데이터 가져오기 실패:', error);
       return {
         lunch: [],
         dinner: []
@@ -231,10 +216,7 @@ class DataService {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
-      
-      console.log('급식 데이터가 추가되었습니다:', { date, lunch, dinner });
-    } catch (error) {
-      console.error('급식 데이터 추가 실패:', error);
+      } catch (error) {
     }
   }
 
@@ -259,13 +241,9 @@ class DataService {
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        
-        console.log('급식 데이터가 생성되었습니다:', { date, lunchItems, dinnerItems });
       }
       
-      console.log('급식 정보가 업데이트되었습니다.');
     } catch (error) {
-      console.error('급식 정보 업데이트 실패:', error);
       throw error;
     }
   }
@@ -281,9 +259,7 @@ class DataService {
         await deleteDoc(doc.ref);
       });
       
-      console.log('급식 정보가 삭제되었습니다.');
     } catch (error) {
-      console.error('급식 정보 삭제 실패:', error);
       throw error;
     }
   }
@@ -386,7 +362,6 @@ class DataService {
       }
       return [];
     } catch (error) {
-      console.error('알레르기 정보 가져오기 실패:', error);
       return [];
     }
   }
@@ -402,7 +377,6 @@ class DataService {
       }
       return {};
     } catch (error) {
-      console.error('학교 정보 가져오기 실패:', error);
       return {};
     }
   }
@@ -416,14 +390,12 @@ class DataService {
         updatedAt: serverTimestamp()
       });
     } catch (error) {
-      console.error('학교 정보 업데이트 실패:', error);
     }
   }
 
   // 알레르기 정보 업데이트
   async updateAllergyInfo(items) {
     try {
-      console.log('DataService: 알레르기 정보 업데이트 시작:', items);
       
       if (!Array.isArray(items) || items.length === 0) {
         throw new Error('알레르기 정보가 올바르지 않습니다.');
@@ -436,13 +408,10 @@ class DataService {
         createdAt: serverTimestamp()
       };
       
-      console.log('Firestore에 저장할 데이터:', data);
       
       await setDoc(allergyRef, data, { merge: true });
       
-      console.log('알레르기 정보 업데이트 완료');
     } catch (error) {
-      console.error('알레르기 정보 업데이트 실패:', error);
       throw error;
     }
   }
@@ -454,11 +423,9 @@ class DataService {
     // 이 함수는 더 이상 아무 동작도 하지 않음
     return;
   }
-  // 교실 배치 이미지 관리
-  async uploadCampusLayoutImage(file) {
+  // 교실 배치 이미지 관리 (다중 이미지 지원)
+  async uploadCampusLayoutImage(file, floorInfo = {}) {
     try {
-      console.log('이미지 업로드 시작:', file.name, file.size, file.type);
-      
       // 파일 유효성 검사
       if (!file.type.startsWith('image/')) {
         throw new Error('이미지 파일만 업로드 가능합니다.');
@@ -473,37 +440,38 @@ class DataService {
       const fileName = `campus-layout-${timestamp}.${file.name.split('.').pop()}`;
       const imageRef = ref(storage, `campus-layout/${fileName}`);
       
-      console.log('Storage 참조 생성:', imageRef.fullPath);
       
       // 이미지 업로드 (메타데이터 포함)
       const metadata = {
         contentType: file.type,
         customMetadata: {
           uploadedBy: 'admin',
-          uploadTime: timestamp.toString()
+          uploadTime: timestamp.toString(),
+          buildingName: floorInfo.buildingName || '',
+          floorNumber: floorInfo.floorNumber || '',
+          description: floorInfo.description || ''
         }
       };
       
       const uploadResult = await uploadBytes(imageRef, file, metadata);
-      console.log('업로드 완료:', uploadResult);
       
       // 다운로드 URL 가져오기
       const downloadURL = await getDownloadURL(uploadResult.ref);
-      console.log('다운로드 URL:', downloadURL);
       
-      // Firestore에 이미지 URL 저장
-      const docRef = doc(db, 'settings', 'campusLayout');
-      await setDoc(docRef, {
+      // Firestore에 이미지 정보 저장
+      const imagesRef = collection(db, 'campusLayoutImages');
+      await addDoc(imagesRef, {
         imageURL: downloadURL,
         fileName: fileName,
+        buildingName: floorInfo.buildingName || '',
+        floorNumber: floorInfo.floorNumber || '',
+        description: floorInfo.description || '',
         uploadedAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      }, { merge: true });
+      });
       
-      console.log('Firestore 저장 완료');
-      return downloadURL;
+      return { downloadURL, fileName, floorInfo };
     } catch (error) {
-      console.error('교실 배치 이미지 업로드 실패:', error);
       
       // 구체적인 오류 메시지 제공
       if (error.code === 'storage/unauthorized') {
@@ -518,27 +486,89 @@ class DataService {
     }
   }
 
-  async getCampusLayoutImage() {
+  // 다중 이미지 목록 가져오기 (건물명 가나다순, 층순으로 정렬)
+  async getCampusLayoutImages() {
     try {
-      const docRef = doc(db, 'settings', 'campusLayout');
+      const imagesRef = collection(db, 'campusLayoutImages');
+      const imagesSnapshot = await getDocs(imagesRef);
+      const images = imagesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      // 건물명 가나다순, 그 다음 층순으로 정렬
+      return images.sort((a, b) => {
+        const buildingA = a.buildingName || '';
+        const buildingB = b.buildingName || '';
+        
+        // 건물명이 같으면 층순으로 정렬 (낮은층부터 높은층 순서)
+        if (buildingA === buildingB) {
+          const floorA = a.floorNumber || '';
+          const floorB = b.floorNumber || '';
+          
+          // 층수를 숫자로 변환하는 함수
+          const getFloorNumber = (floorStr) => {
+            if (!floorStr) return 0;
+            
+            // "지하1층", "지하2층" 등의 경우
+            if (floorStr.includes('지하')) {
+              const match = floorStr.match(/지하(\d+)/);
+              return match ? -parseInt(match[1]) : 0;
+            }
+            
+            // "1층", "2층" 등의 경우
+            const match = floorStr.match(/(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+          };
+          
+          const floorNumA = getFloorNumber(floorA);
+          const floorNumB = getFloorNumber(floorB);
+          
+          return floorNumA - floorNumB;
+        }
+        
+        // 건물명 가나다순 정렬
+        return buildingA.localeCompare(buildingB, 'ko-KR');
+      });
+    } catch (error) {
+      return [];
+    }
+  }
+
+  // 특정 이미지 가져오기
+  async getCampusLayoutImage(imageId) {
+    try {
+      const docRef = doc(db, 'campusLayoutImages', imageId);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
-        return docSnap.data().imageURL;
+        return { id: docSnap.id, ...docSnap.data() };
       }
       return null;
     } catch (error) {
-      console.error('교실 배치 이미지 가져오기 실패:', error);
       return null;
     }
   }
 
-  async deleteCampusLayoutImage() {
+  // 이미지 정보 업데이트
+  async updateCampusLayoutImage(imageId, floorInfo) {
     try {
-      console.log('이미지 삭제 시작');
+      const docRef = doc(db, 'campusLayoutImages', imageId);
+      await updateDoc(docRef, {
+        buildingName: floorInfo.buildingName || '',
+        floorNumber: floorInfo.floorNumber || '',
+        description: floorInfo.description || '',
+        updatedAt: serverTimestamp()
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // 개별 이미지 삭제
+  async deleteCampusLayoutImage(imageId) {
+    try {
+      console.log('이미지 삭제 시작:', imageId);
       
-      // Firestore에서 현재 이미지 정보 가져오기
-      const docRef = doc(db, 'settings', 'campusLayout');
+      // Firestore에서 이미지 정보 가져오기
+      const docRef = doc(db, 'campusLayoutImages', imageId);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
@@ -549,18 +579,11 @@ class DataService {
           // Storage에서 이미지 삭제
           const imageRef = ref(storage, `campus-layout/${fileName}`);
           await deleteObject(imageRef);
-          console.log('Storage에서 이미지 삭제 완료:', fileName);
         }
+        
+        // Firestore에서 문서 삭제
+        await deleteDoc(docRef);
       }
-      
-      // Firestore에서 URL 삭제
-      await setDoc(docRef, {
-        imageURL: null,
-        fileName: null,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-      
-      console.log('Firestore에서 이미지 정보 삭제 완료');
     } catch (error) {
       console.error('교실 배치 이미지 삭제 실패:', error);
       throw error;
@@ -686,7 +709,6 @@ class DataService {
       const adminsSnapshot = await getDocs(q);
       return adminsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (error) {
-      console.error('관리자 목록 가져오기 실패:', error);
       throw error;
     }
   }
@@ -704,7 +726,6 @@ class DataService {
       const doc = querySnapshot.docs[0];
       return { id: doc.id, ...doc.data() };
     } catch (error) {
-      console.error('관리자 조회 실패:', error);
       throw error;
     }
   }
@@ -730,7 +751,6 @@ class DataService {
       
       return docRef.id;
     } catch (error) {
-      console.error('관리자 생성 실패:', error);
       throw error;
     }
   }
@@ -749,7 +769,6 @@ class DataService {
       
       await updateDoc(adminRef, updateData);
     } catch (error) {
-      console.error('관리자 수정 실패:', error);
       throw error;
     }
   }
@@ -759,7 +778,6 @@ class DataService {
       const adminRef = doc(db, 'admins', adminId);
       await deleteDoc(adminRef);
     } catch (error) {
-      console.error('관리자 삭제 실패:', error);
       throw error;
     }
   }
@@ -776,7 +794,6 @@ class DataService {
       
       return !querySnapshot.empty;
     } catch (error) {
-      console.error('관리자 코드 중복 확인 실패:', error);
       throw error;
     }
   }

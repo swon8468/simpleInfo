@@ -18,12 +18,16 @@
 }
 
 .poster-title {
-  background: #d87900; /* 이미지의 주황색 톤 */
-  color: #000;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
   font-weight: 800;
-  font-size: 5rem;
-  padding: 30px 80px;
-  border-radius: 80px;
+  font-size: 5.5rem;
+  padding: 35px 80px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  border: none;
+  position: relative;
 }
 
 .poster-grid {
@@ -52,17 +56,27 @@
 }
 
 .poster-item {
-  background: #e5e5e5;
-  border-radius: 8px;
-  padding: 26px 30px;
-  font-size: 4rem;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px 35px;
+  font-size: 5rem;
   font-weight: 700;
-  color: #111;
+  color: #333333;
   text-align: center;
   word-break: keep-all;
   box-sizing: border-box;
   width: 100%;
   max-width: 420px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.poster-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: #667eea;
 }
 
 /* 로딩 스피너 */
@@ -298,13 +312,19 @@
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .poster-title {
-    font-size: 3rem;
-    padding: 18px 36px;
-    border-radius: 40px;
+    font-size: 4rem;
+    padding: 25px 50px;
+    border-radius: 16px;
   }
   .poster-grid {
     grid-template-columns: 1fr;
     gap: 20px;
+  }
+  .poster-item {
+    font-size: 4rem;
+    padding: 25px 30px;
+    max-width: 350px;
+    border-radius: 12px;
   }
   .meal-header {
     flex-direction: column;

@@ -167,6 +167,12 @@
 /* 학사일정 스타일 */
 .schedule-display {
   text-align: center;
+  max-width: 80vw;
+  max-height: 80vh;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .schedule-display h2 {
@@ -178,13 +184,14 @@
 /* 월별 달력 스타일 */
 .calendar-container {
   width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0 10px;
   box-sizing: border-box;
-  height: 100%;
+  height: calc(80vh - 100px);
   overflow: hidden;
 }
 
@@ -316,13 +323,14 @@
 
 /* 주별 달력 스타일 */
 .weekly-calendar {
-  max-width: 1200px;
-  min-width: 800px;
+  max-width: 80vw;
+  max-height: calc(80vh - 100px);
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 
 .week-header {
@@ -509,21 +517,133 @@
 /* 교내 배치도 스타일 */
 .roadmap-display {
   text-align: center;
-  max-width: 1000px;
-  min-width: 600px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  max-height: 80vh;
-  overflow: hidden;
+  padding: 20px;
 }
 
 .roadmap-display h2 {
   font-size: 2.5rem;
   color: #333;
   margin-bottom: 30px;
+}
+
+.campus-image-container {
+  width: 100%;
+  max-width: 1000px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.campus-image {
+  width: 100%;
+  height: auto;
+  max-height: 30vh;
+  object-fit: contain;
+  display: block;
+}
+
+.image-info-footer {
+  background: linear-gradient(135deg, #2196F3, #1976D2);
+  color: white;
+  padding: 12px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.image-info-footer h3 {
+  font-size: 1.4rem;
+  margin: 0 0 6px 0;
+  font-weight: bold;
+}
+
+.image-info-footer .floor-info {
+  font-size: 1.1rem;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.image-info-footer .description {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.2;
+}
+
+.no-campus-image {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.no-campus-image h3 {
+  font-size: 2rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.no-campus-image p {
+  font-size: 1.2rem;
+  color: #888;
+  margin: 0;
+}
+
+/* 반응형 디자인 - 교내 배치도 */
+@media (max-width: 768px) {
+  .campus-image {
+    max-height: 25vh;
+  }
+  
+  .image-info-footer {
+    padding: 10px;
+  }
+  
+  .image-info-footer h3 {
+    font-size: 1.2rem;
+  }
+  
+  .image-info-footer .floor-info {
+    font-size: 0.9rem;
+  }
+  
+  .image-info-footer .description {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .campus-image {
+    max-height: 20vh;
+  }
+  
+  .image-info-footer {
+    padding: 8px;
+  }
+  
+  .image-info-footer h3 {
+    font-size: 1rem;
+  }
+  
+  .image-info-footer .floor-info {
+    font-size: 0.8rem;
+  }
+  
+  .image-info-footer .description {
+    font-size: 0.7rem;
+  }
 }
 
 .campus-map {

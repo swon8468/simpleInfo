@@ -28,8 +28,14 @@ function AdminPanel() {
   const [pinNicknames, setPinNicknames] = useState({}); // PIN별 별명 정보
   const [editingNicknamePin, setEditingNicknamePin] = useState(null);
   const [nicknameValue, setNicknameValue] = useState('');
-  const [campusLayoutImage, setCampusLayoutImage] = useState(null);
+  const [campusLayoutImages, setCampusLayoutImages] = useState([]);
   const [campusLayoutLoading, setCampusLayoutLoading] = useState(false);
+  const [editingImage, setEditingImage] = useState(null);
+  const [imageForm, setImageForm] = useState({
+    buildingName: '',
+    floorNumber: '',
+    description: ''
+  });
   const [schoolBlockingStatus, setSchoolBlockingStatus] = useState(false);
   const [systemStatus, setSystemStatus] = useState({
     isOnline: false,
@@ -86,6 +92,9 @@ function AdminPanel() {
               if (firstAvailableTab) {
                 setActiveTab(firstAvailableTab);
               }
+              
+              // 교실 배치 이미지 목록 로드
+              loadCampusLayoutImages();
             } else {
               // 관리자 정보를 찾을 수 없으면 로그아웃
               sessionStorage.removeItem('adminInfo');
@@ -549,6 +558,17 @@ function AdminPanel() {
     }
   };
 
+  // 교실 배치 이미지 목록 로드
+  const loadCampusLayoutImages = async () => {
+    try {
+      const images = await DataService.getCampusLayoutImages();
+      setCampusLayoutImages(images);
+    } catch (error) {
+      console.error('이미지 목록 로드 실패:', error);
+      showMessage('이미지 목록을 불러오는데 실패했습니다.');
+    }
+  };
+
   // 교실 배치 이미지 업로드
   const handleCampusLayoutUpload = async (event) => {
     const file = event.target.files[0];
@@ -559,29 +579,63 @@ function AdminPanel() {
       return;
     }
 
+    if (campusLayoutImages.length >= 10) {
+      showMessage('최대 10개의 이미지만 업로드할 수 있습니다.');
+      return;
+    }
+
     setCampusLayoutLoading(true);
     try {
-      const imageURL = await DataService.uploadCampusLayoutImage(file);
-      setCampusLayoutImage(imageURL);
+      await DataService.uploadCampusLayoutImage(file, imageForm);
       showMessage('교실 배치 이미지가 업로드되었습니다.');
+      setImageForm({ buildingName: '', floorNumber: '', description: '' });
+      await loadCampusLayoutImages();
     } catch (error) {
-      showMessage('교실 배치 이미지 업로드에 실패했습니다.');
+      showMessage('교실 배치 이미지 업로드에 실패했습니다: ' + error.message);
+    } finally {
+      setCampusLayoutLoading(false);
+    }
+  };
+
+  // 교실 배치 이미지 정보 수정
+  const handleImageEdit = (image) => {
+    setEditingImage(image);
+    setImageForm({
+      buildingName: image.buildingName || '',
+      floorNumber: image.floorNumber || '',
+      description: image.description || ''
+    });
+  };
+
+  // 교실 배치 이미지 정보 업데이트
+  const handleImageUpdate = async () => {
+    if (!editingImage) return;
+
+    setCampusLayoutLoading(true);
+    try {
+      await DataService.updateCampusLayoutImage(editingImage.id, imageForm);
+      showMessage('이미지 정보가 업데이트되었습니다.');
+      setEditingImage(null);
+      setImageForm({ buildingName: '', floorNumber: '', description: '' });
+      await loadCampusLayoutImages();
+    } catch (error) {
+      showMessage('이미지 정보 업데이트에 실패했습니다: ' + error.message);
     } finally {
       setCampusLayoutLoading(false);
     }
   };
 
   // 교실 배치 이미지 삭제
-  const handleCampusLayoutDelete = async () => {
-    if (!campusLayoutImage) return;
+  const handleCampusLayoutDelete = async (imageId) => {
+    if (!confirm('정말로 이 이미지를 삭제하시겠습니까?')) return;
 
     setCampusLayoutLoading(true);
     try {
-      await DataService.deleteCampusLayoutImage();
-      setCampusLayoutImage(null);
+      await DataService.deleteCampusLayoutImage(imageId);
       showMessage('교실 배치 이미지가 삭제되었습니다.');
+      await loadCampusLayoutImages();
     } catch (error) {
-      showMessage('교실 배치 이미지 삭제에 실패했습니다.');
+      showMessage('교실 배치 이미지 삭제에 실패했습니다: ' + error.message);
     } finally {
       setCampusLayoutLoading(false);
     }
@@ -918,40 +972,159 @@ function AdminPanel() {
               <div className="form-section">
                 <h2>교실 배치 이미지 관리</h2>
                 <div className="campus-layout-section">
-                  <div className="image-upload-area">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleCampusLayoutUpload}
-                      disabled={campusLayoutLoading}
-                      id="campus-layout-upload"
-                      style={{ display: 'none' }}
-                    />
-                    <label htmlFor="campus-layout-upload" className="upload-btn">
-                      {campusLayoutLoading ? '업로드 중...' : '이미지 업로드'}
-                    </label>
+                  {/* 이미지 업로드 폼 */}
+                  <div className="image-upload-form">
+                    <h3>새 이미지 업로드</h3>
+                    <div className="form-group">
+                      <label>건물명:</label>
+                      <input
+                        type="text"
+                        value={imageForm.buildingName}
+                        onChange={(e) => setImageForm(prev => ({ ...prev, buildingName: e.target.value }))}
+                        placeholder="예: 본관, 신관, 체육관"
+                        disabled={campusLayoutLoading}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>층수:</label>
+                      <input
+                        type="text"
+                        value={imageForm.floorNumber}
+                        onChange={(e) => setImageForm(prev => ({ ...prev, floorNumber: e.target.value }))}
+                        placeholder="예: 1층, 2층, 지하1층"
+                        disabled={campusLayoutLoading}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>설명:</label>
+                      <textarea
+                        value={imageForm.description}
+                        onChange={(e) => setImageForm(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="층에 대한 추가 설명"
+                        rows="3"
+                        disabled={campusLayoutLoading}
+                      />
+                    </div>
+                    <div className="upload-area">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCampusLayoutUpload}
+                        disabled={campusLayoutLoading || campusLayoutImages.length >= 10}
+                        id="campus-layout-upload"
+                        style={{ display: 'none' }}
+                      />
+                      <label htmlFor="campus-layout-upload" className="upload-btn">
+                        {campusLayoutLoading ? (
+                          <div className="upload-spinner">
+                            <div className="spinner"></div>
+                            <span>업로드 중...</span>
+                          </div>
+                        ) : campusLayoutImages.length >= 10 ? '최대 10개까지 업로드 가능' : '이미지 업로드'}
+                      </label>
+                      <p className="upload-info">현재 {campusLayoutImages.length}/10개 업로드됨</p>
+                    </div>
                   </div>
-                  
-                  <div className="current-image-section">
-                    <h3>현재 교실 배치 이미지</h3>
-                    {campusLayoutImage ? (
-                      <div className="image-preview">
-                        <img src={campusLayoutImage} alt="교실 배치" />
-                        <button 
-                          className="delete-btn-overlay" 
-                          onClick={handleCampusLayoutDelete}
-                          disabled={campusLayoutLoading}
-                          title="이미지 삭제"
-                        >
-                          ✕
-                        </button>
+
+                  {/* 이미지 목록 */}
+                  <div className="images-list">
+                    <h3>업로드된 이미지 목록</h3>
+                    {campusLayoutImages.length === 0 ? (
+                      <div className="no-images">
+                        <p>업로드된 이미지가 없습니다.</p>
                       </div>
                     ) : (
-                      <div className="no-image">
-                        <p>업로드된 이미지가 없습니다.</p>
+                      <div className="images-grid">
+                        {campusLayoutImages.map((image) => (
+                          <div key={image.id} className="image-item">
+                            <div className="image-preview">
+                              <img src={image.imageURL} alt={`${image.buildingName} ${image.floorNumber}`} />
+                              <div className="image-overlay">
+                                <button 
+                                  className="edit-btn" 
+                                  onClick={() => handleImageEdit(image)}
+                                  disabled={campusLayoutLoading}
+                                  title="정보 수정"
+                                >
+                                  ✏️
+                                </button>
+                                <button 
+                                  className="delete-btn" 
+                                  onClick={() => handleCampusLayoutDelete(image.id)}
+                                  disabled={campusLayoutLoading}
+                                  title="이미지 삭제"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            </div>
+                            <div className="image-info">
+                              <h4>{image.buildingName || '건물명 없음'}</h4>
+                              <p className="floor">{image.floorNumber || '층수 없음'}</p>
+                              {image.description && (
+                                <p className="description">{image.description}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
+
+                  {/* 이미지 수정 모달 */}
+                  {editingImage && (
+                    <div className="edit-modal">
+                      <div className="modal-content">
+                        <h3>이미지 정보 수정</h3>
+                        <div className="form-group">
+                          <label>건물명:</label>
+                          <input
+                            type="text"
+                            value={imageForm.buildingName}
+                            onChange={(e) => setImageForm(prev => ({ ...prev, buildingName: e.target.value }))}
+                            disabled={campusLayoutLoading}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>층수:</label>
+                          <input
+                            type="text"
+                            value={imageForm.floorNumber}
+                            onChange={(e) => setImageForm(prev => ({ ...prev, floorNumber: e.target.value }))}
+                            disabled={campusLayoutLoading}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>설명:</label>
+                          <textarea
+                            value={imageForm.description}
+                            onChange={(e) => setImageForm(prev => ({ ...prev, description: e.target.value }))}
+                            rows="3"
+                            disabled={campusLayoutLoading}
+                          />
+                        </div>
+                        <div className="modal-buttons">
+                          <button 
+                            className="save-btn" 
+                            onClick={handleImageUpdate}
+                            disabled={campusLayoutLoading}
+                          >
+                            저장
+                          </button>
+                          <button 
+                            className="cancel-btn" 
+                            onClick={() => {
+                              setEditingImage(null);
+                              setImageForm({ buildingName: '', floorNumber: '', description: '' });
+                            }}
+                            disabled={campusLayoutLoading}
+                          >
+                            취소
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

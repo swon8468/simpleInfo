@@ -327,7 +327,7 @@ function OutputMain() {
         return <MealDisplay controlData={controlData} />;
         
       case 'roadmap':
-        return <RoadmapDisplay />;
+        return <RoadmapDisplay controlData={controlData} />;
         
       case 'announcement':
         return <AnnouncementDisplay announcements={announcements} controlData={controlData} />;
@@ -573,15 +573,32 @@ function OutputMain() {
   };
 
   // 교내 배치도 컴포넌트
-  const RoadmapDisplay = () => {
+  const RoadmapDisplay = ({ controlData }) => {
     const [campusImage, setCampusImage] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
       const loadCampusImage = async () => {
         try {
-          const imageURL = await DataService.getCampusLayoutImage();
-          setCampusImage(imageURL);
+          // 제어 데이터에서 선택된 이미지 ID가 있으면 해당 이미지 로드
+          if (controlData?.selectedImageId) {
+            const imageData = await DataService.getCampusLayoutImage(controlData.selectedImageId);
+            if (imageData) {
+              setCampusImage(imageData);
+            } else {
+              // 선택된 이미지를 찾을 수 없으면 첫 번째 이미지 로드
+              const images = await DataService.getCampusLayoutImages();
+              if (images.length > 0) {
+                setCampusImage(images[0]);
+              }
+            }
+          } else {
+            // 선택된 이미지가 없으면 첫 번째 이미지 로드
+            const images = await DataService.getCampusLayoutImages();
+            if (images.length > 0) {
+              setCampusImage(images[0]);
+            }
+          }
         } catch (error) {
           console.error('교실 배치 이미지 로드 실패:', error);
         } finally {
@@ -590,7 +607,7 @@ function OutputMain() {
       };
 
       loadCampusImage();
-    }, []);
+    }, [controlData?.selectedImageId]);
 
     if (loading) {
       return (
@@ -609,7 +626,14 @@ function OutputMain() {
         <h2>교내 배치도</h2>
         {campusImage ? (
           <div className="campus-image-container">
-            <img src={campusImage} alt="교실 배치도" className="campus-image" />
+            <img src={campusImage.imageURL} alt={`${campusImage.buildingName} ${campusImage.floorNumber}`} className="campus-image" />
+            <div className="image-info-footer">
+              <h3>{campusImage.buildingName || '건물명 없음'}</h3>
+              <p className="floor-info">{campusImage.floorNumber || '층수 없음'}</p>
+              {campusImage.description && (
+                <p className="description">{campusImage.description}</p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="no-campus-image">
