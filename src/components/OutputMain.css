@@ -167,8 +167,9 @@
 /* 학사일정 스타일 */
 .schedule-display {
   text-align: center;
-  max-width: 80vw;
-  max-height: 80vh;
+  max-width: 1880px; /* 1920px - 40px (패딩) */
+  width: 100%;
+  max-height: 1040px; /* 1080px - 40px (패딩) */
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
@@ -177,7 +178,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: calc(80vh - 100px);
+  min-height: calc(100vh - 100px);
 }
 
 .schedule-display h2 {
@@ -190,6 +191,7 @@
 
 /* 월별 달력 스타일 */
 .calendar-container {
+  max-width: 1880px; /* 1920px - 40px (패딩) */
   width: 100%;
   margin: 0 auto;
   display: flex;
@@ -208,6 +210,7 @@
   gap: 2px;
   margin-bottom: 15px;
   width: 100%;
+  max-width: 100%;
 }
 
 .day-header {
@@ -227,12 +230,15 @@
   flex-direction: column;
   gap: 2px;
   width: 100%;
+  max-width: 100%;
 }
 
 .calendar-week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .calendar-day {
@@ -332,10 +338,9 @@
 
 /* 주별 달력 스타일 */
 .weekly-calendar {
-  max-width: 1200px;
-  min-width: 800px;
-  margin: 0 auto;
+  max-width: 1880px; /* 1920px - 40px (패딩) */
   width: 100%;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -349,7 +354,7 @@
   gap: 2px;
   margin-bottom: 15px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
 }
 
 .week-day {
@@ -369,7 +374,7 @@
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 100%;
 }
 
 .week-day-cell {
@@ -451,7 +456,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
-  max-width: 1200px;
+  max-width: 1880px; /* 1920px - 40px (패딩) */
   margin: 0 auto;
   width: 100%;
 }

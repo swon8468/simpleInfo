@@ -7,6 +7,7 @@ function OutputRoadmap() {
   const [campusImages, setCampusImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -57,6 +58,9 @@ function OutputRoadmap() {
       if (data.currentPage === 'roadmap' && data.selectedImageId) {
         console.log('출력용: roadmap 페이지 데이터 수신, 선택된 이미지 ID:', data.selectedImageId);
         
+        // 이미지 로딩 시작
+        setImageLoading(true);
+        
         // campusImages에서 해당 이미지 찾기
         const image = campusImages.find(img => img.id === data.selectedImageId);
         console.log('출력용: campusImages에서 찾은 이미지:', image);
@@ -84,6 +88,7 @@ function OutputRoadmap() {
             });
           } else {
             console.error('출력용: 이미지 URL이 없음');
+            setImageLoading(false);
           }
         }
       } else {
@@ -142,6 +147,12 @@ function OutputRoadmap() {
       
       {selectedImage ? (
         <div className="campus-image-container">
+          {imageLoading && (
+            <div className="loading-container" style={{ position: 'absolute', zIndex: 10 }}>
+              <div className="loading-spinner"></div>
+              <p>이미지를 불러오는 중...</p>
+            </div>
+          )}
           <img 
             src={selectedImage.imageURL} 
             alt={`${selectedImage.buildingName} ${selectedImage.floorNumber}`}
@@ -149,9 +160,11 @@ function OutputRoadmap() {
             onError={(e) => {
               console.error('출력용: 이미지 로드 실패:', selectedImage.imageURL);
               e.target.style.display = 'none';
+              setImageLoading(false);
             }}
             onLoad={() => {
               console.log('출력용: 이미지 로드 성공:', selectedImage.imageURL);
+              setImageLoading(false);
             }}
           />
           <div className="image-info">

@@ -32,7 +32,8 @@
   grid-auto-flow: row;
   gap: 40px 60px;
   justify-items: center;
-  max-width: 1320px;
+  max-width: 1880px; /* 1920px - 40px (패딩) */
+  width: 100%;
   margin: 0 auto;
 }
 

@@ -1,12 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ConnectionDB from '../services/ConnectionDB';
 import TTSService from '../services/TTSService';
+import DataService from '../services/DataService';
 import './ControlAnnouncement.css';
 
 function ControlAnnouncement() {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [announcements, setAnnouncements] = useState([]);
+
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
+
+  const loadAnnouncements = async () => {
+    try {
+      const data = await DataService.getAnnouncements();
+      setAnnouncements(data);
+    } catch (error) {
+      console.error('공지사항 로드 실패:', error);
+      setAnnouncements([]);
+    }
+  };
 
   const handleBackToMain = async () => {
     await sendControlData('main');
@@ -81,7 +97,9 @@ function ControlAnnouncement() {
       </div>
 
       <div className="current-post">
-        <p>현재 게시물: {currentIndex + 1}번째</p>
+        {announcements.length > 0 && (
+          <p>현재 게시물: {currentIndex + 1}번째</p>
+        )}
         <button className="listen-btn" onClick={handleListenAgain}>
           🔊 다시 듣기
         </button>

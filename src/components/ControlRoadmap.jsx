@@ -88,8 +88,23 @@ function ControlRoadmap() {
     }
   };
 
-  const handleBackToMain = () => {
+  const handleBackToMain = async () => {
+    await sendControlData('main');
     navigate('/control/main');
+  };
+
+  const sendControlData = async (page) => {
+    const controlSessionId = sessionStorage.getItem('controlSessionId');
+    
+    if (controlSessionId) {
+      try {
+        await ConnectionDB.sendControlData(controlSessionId, {
+          currentPage: page
+        });
+      } catch (error) {
+        console.error('제어 데이터 전송 실패:', error);
+      }
+    }
   };
 
   if (loading) {

@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // connections 컬렉션: 모든 사용자가 읽기/쓰기 가능 (PIN 기반 연결 시스템)
+    match /connections/{connectionId} {
+      allow read, write: if true;
+    }
+    
+    // activityLogs 컬렉션: 모든 사용자가 읽기/쓰기 가능 (활동 로그)
+    match /activityLogs/{logId} {
+      allow read, write: if true;
+    }
+    
+    // settings 컬렉션: 모든 사용자가 읽기/쓰기 가능 (시스템 설정)
+    match /settings/{settingId} {
+      allow read, write: if true;
+    }
+    
+    // admins 컬렉션: 모든 사용자가 읽기/쓰기 가능 (관리자 정보)
+    match /admins/{adminId} {
+      allow read, write: if true;
+    }
+    
+    // announcements 컬렉션: 모든 사용자가 읽기/쓰기 가능 (공지사항)
+    match /announcements/{announcementId} {
+      allow read, write: if true;
+    }
+    
+    // schedules 컬렉션: 모든 사용자가 읽기/쓰기 가능 (학사일정)
+    match /schedules/{scheduleId} {
+      allow read, write: if true;
+    }
+    
+    // meals 컬렉션: 모든 사용자가 읽기/쓰기 가능 (급식 정보)
+    match /meals/{mealId} {
+      allow read, write: if true;
+    }
+    
+    // patchnotes 컬렉션: 모든 사용자가 읽기/쓰기 가능 (패치노트)
+    match /patchnotes/{patchnoteId} {
+      allow read, write: if true;
+    }
+    
+    // system 컬렉션: 모든 사용자가 읽기/쓰기 가능 (시스템 설정, PIN 코드 등)
+    match /system/{documentId} {
+      allow read, write: if true;
+    }
+    
+    // campusLayoutImages 컬렉션: 모든 사용자가 읽기/쓰기 가능 (교실 배치 이미지)
+    match /campusLayoutImages/{imageId} {
+      allow read, write: if true;
+    }
+    
+    // allergyItems 컬렉션: 모든 사용자가 읽기/쓰기 가능 (알레르기 정보)
+    match /allergyItems/{itemId} {
+      allow read, write: if true;
+    }
+    
+    // systemHealth 컬렉션: 모든 사용자가 읽기/쓰기 가능 (시스템 모니터링)
+    match /systemHealth/{documentId} {
+      allow read, write: if true;
+    }
+    
+    // 기타 모든 컬렉션: 모든 사용자가 읽기/쓰기 가능 (개발/테스트 환경용)
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
